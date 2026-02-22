@@ -6,6 +6,9 @@ import Process from "@/components/Process";
 import Products from "@/components/Products";
 import Industries from "@/components/Industries";
 import WhyFusion from "@/components/WhyFusion";
+import Pricing from "@/components/Pricing";
+import CaseStudies from "@/components/CaseStudies";
+import Founder from "@/components/Founder";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
 
@@ -21,6 +24,9 @@ const Index = () => {
         <Products />
         <Industries />
         <WhyFusion />
+        <Pricing />
+        <CaseStudies />
+        <Founder />
         <CTASection />
       </main>
       <Footer />

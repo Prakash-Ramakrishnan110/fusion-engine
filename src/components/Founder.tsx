@@ -1,0 +1,52 @@
+import { motion } from "framer-motion";
+import { Linkedin, Twitter, Github } from "lucide-react";
+
+const Founder = () => {
+  return (
+    <section id="founder" className="py-24">
+      <div className="container mx-auto px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="max-w-3xl mx-auto text-center"
+        >
+          <h2 className="text-3xl md:text-4xl font-bold mb-12">Behind the Engine</h2>
+
+          <div className="glass-card gradient-border p-8 md:p-12 glow-box">
+            <div className="w-24 h-24 rounded-full bg-primary/10 border-2 border-primary/30 mx-auto mb-6 flex items-center justify-center">
+              <span className="text-3xl font-bold text-primary">FE</span>
+            </div>
+
+            <h3 className="text-xl font-bold mb-1">Founder & CEO</h3>
+            <p className="text-sm text-primary mb-6">Fusion Engine Technology</p>
+
+            <p className="text-muted-foreground leading-relaxed mb-8 max-w-xl mx-auto">
+              An engineer and product builder focused on creating scalable digital systems. 
+              Started Fusion Engine Technology with one goal: help businesses automate, scale, 
+              and compete with world-class technology — without the enterprise price tag.
+            </p>
+
+            <div className="flex justify-center gap-4">
+              {[
+                { icon: Linkedin, href: "#" },
+                { icon: Twitter, href: "#" },
+                { icon: Github, href: "#" },
+              ].map(({ icon: Icon, href }, i) => (
+                <a
+                  key={i}
+                  href={href}
+                  className="w-10 h-10 rounded-xl bg-secondary/50 flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
+                >
+                  <Icon size={18} />
+                </a>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+export default Founder;
