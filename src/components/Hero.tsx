@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight, ExternalLink } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 const Hero = () => {
   return (
@@ -16,6 +17,11 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
           >
+            <img
+              src={logo}
+              alt="Fusion Engine Technology logo — building scalable apps, SaaS, AI, and automation systems"
+              className="h-16 md:h-20 w-auto brightness-150 contrast-110 mb-6"
+            />
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
               Build.{" "}
               <span className="text-primary glow-text">Automate.</span>{" "}

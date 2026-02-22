@@ -100,4 +100,12 @@
     -webkit-mask-composite: xor;
     mask-composite: exclude;
   }
+
+  .brightness-150 {
+    filter: brightness(1.5);
+  }
+
+  .contrast-110 {
+    filter: brightness(1.5) contrast(1.1);
+  }
 }
