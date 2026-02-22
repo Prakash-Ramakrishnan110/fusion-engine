@@ -1,4 +1,4 @@
-import logo from "@/assets/logo.jpeg";
+import logo from "@/assets/logo.png";
 
 const quickLinks = ["Services", "Process", "Products", "Industries", "Why Us"];
 const serviceLinks = ["Mobile Apps", "Web Platforms", "SaaS Products", "AI Systems", "Automation", "Cloud"];
@@ -9,7 +9,7 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-10">
           <div>
-            <img src={logo} alt="Fusion Engine Technology" className="h-10 w-auto rounded mb-4" />
+            <img src={logo} alt="Fusion Engine Technology" className="h-12 w-auto mb-4" />
             <p className="text-sm text-muted-foreground leading-relaxed">
               Building high-performance digital systems for businesses that want to scale.
             </p>
