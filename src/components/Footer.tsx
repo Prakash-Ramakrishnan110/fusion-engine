@@ -9,7 +9,7 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-10">
           <div>
-            <img src={logo} alt="Fusion Engine Technology" className="h-12 w-auto mb-4" />
+            <img src={logo} alt="Fusion Engine Technology — scalable digital systems" className="h-12 w-auto mb-4 brightness-150 contrast-110" />
             <p className="text-sm text-muted-foreground leading-relaxed">
               Building high-performance digital systems for businesses that want to scale.
             </p>
