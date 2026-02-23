@@ -16,9 +16,9 @@ const Navbar = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-border/20 shadow-sm">
-      <div className="container mx-auto flex items-center justify-between h-20 px-4">
+      <div className="container mx-auto flex items-center justify-between h-24 px-4">
         <a href="#" className="flex items-center gap-3">
-          <img src={logo} alt="Fusion Engine Technology — custom mobile apps, web platforms, SaaS, and AI systems" className="h-16 w-auto" />
+          <img src={logo} alt="Fusion Engine Technology" className="w-48 md:w-56 h-auto object-contain" />
         </a>
 
         <div className="hidden md:flex items-center gap-8">

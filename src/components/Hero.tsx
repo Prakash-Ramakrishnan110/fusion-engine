@@ -4,7 +4,7 @@ import Lottie from "lottie-react";
 import { useEffect, useState } from "react";
 import logo from "@/assets/logo.png";
 
-const LOTTIE_URL = "https://lottie.host/4db68bbd-31f6-4cd8-84eb-189571e16e22/2qEuQiCYJh.json";
+const LOTTIE_URL = "https://assets2.lottiefiles.com/packages/lf20_fcfjwiyb.json";
 
 const Hero = () => {
   const [animationData, setAnimationData] = useState(null);
@@ -33,7 +33,7 @@ const Hero = () => {
             <img
               src={logo}
               alt="Fusion Engine Technology logo — building scalable apps, SaaS, AI, and automation systems"
-              className="h-20 md:h-24 w-auto mb-6"
+              className="w-72 md:w-96 h-auto mb-8"
             />
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
               Build.{" "}
