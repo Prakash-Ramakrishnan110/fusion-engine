@@ -102,10 +102,10 @@
   }
 
   .brightness-150 {
-    filter: brightness(3) saturate(0) invert(1);
+    filter: none;
   }
 
   .contrast-110 {
-    filter: brightness(3) saturate(0) invert(1);
+    filter: none;
   }
 }

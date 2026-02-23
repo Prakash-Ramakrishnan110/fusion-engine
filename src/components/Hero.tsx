@@ -1,10 +1,23 @@
 import { motion } from "framer-motion";
 import { ArrowRight, ExternalLink } from "lucide-react";
+import Lottie from "lottie-react";
+import { useEffect, useState } from "react";
 import logo from "@/assets/logo.png";
 
+const LOTTIE_URL = "https://lottie.host/4db68bbd-31f6-4cd8-84eb-189571e16e22/2qEuQiCYJh.json";
+
 const Hero = () => {
+  const [animationData, setAnimationData] = useState(null);
+
+  useEffect(() => {
+    fetch(LOTTIE_URL)
+      .then((res) => res.json())
+      .then(setAnimationData)
+      .catch(console.error);
+  }, []);
+
   return (
-    <section className="relative min-h-screen flex items-center pt-16 overflow-hidden">
+    <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
       {/* Background gradient mesh */}
       <div className="absolute inset-0 gradient-mesh" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/5 blur-[120px] animate-glow-pulse" />
@@ -20,7 +33,7 @@ const Hero = () => {
             <img
               src={logo}
               alt="Fusion Engine Technology logo — building scalable apps, SaaS, AI, and automation systems"
-              className="h-16 md:h-20 w-auto brightness-150 contrast-110 mb-6"
+              className="h-20 md:h-24 w-auto mb-6"
             />
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
               Build.{" "}
@@ -48,57 +61,22 @@ const Hero = () => {
             </div>
           </motion.div>
 
-          {/* Right - Dashboard Mockup */}
+          {/* Right - Lottie Animation */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="hidden lg:block"
+            className="hidden lg:flex items-center justify-center"
           >
-            <div className="glass-card gradient-border p-6 glow-box">
-              {/* Mock dashboard */}
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-3 h-3 rounded-full bg-destructive/60" />
-                <div className="w-3 h-3 rounded-full bg-primary/60" />
-                <div className="w-3 h-3 rounded-full bg-accent/60" />
-                <span className="ml-3 text-xs text-muted-foreground font-body">dashboard.fusionengine.dev</span>
-              </div>
-              <div className="space-y-4">
-                <div className="flex gap-4">
-                  <div className="flex-1 bg-secondary/50 rounded-lg p-4">
-                    <div className="text-xs text-muted-foreground mb-1">Active Users</div>
-                    <div className="text-2xl font-bold text-primary">12,847</div>
-                    <div className="text-xs text-primary/70 mt-1">↑ 23% this month</div>
-                  </div>
-                  <div className="flex-1 bg-secondary/50 rounded-lg p-4">
-                    <div className="text-xs text-muted-foreground mb-1">API Calls</div>
-                    <div className="text-2xl font-bold">2.4M</div>
-                    <div className="text-xs text-primary/70 mt-1">↑ 18% this month</div>
-                  </div>
-                </div>
-                <div className="bg-secondary/50 rounded-lg p-4">
-                  <div className="text-xs text-muted-foreground mb-3">System Performance</div>
-                  <div className="flex items-end gap-1 h-20">
-                    {[40, 65, 45, 80, 55, 70, 90, 60, 75, 85, 50, 95].map((h, i) => (
-                      <motion.div
-                        key={i}
-                        className="flex-1 bg-primary/60 rounded-t"
-                        initial={{ height: 0 }}
-                        animate={{ height: `${h}%` }}
-                        transition={{ duration: 0.5, delay: 0.5 + i * 0.05 }}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div className="grid grid-cols-3 gap-3">
-                  {["99.9% Uptime", "< 50ms Latency", "256-bit Encrypted"].map((text) => (
-                    <div key={text} className="bg-secondary/50 rounded-lg p-3 text-center">
-                      <div className="text-xs text-muted-foreground">{text}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            {animationData ? (
+              <Lottie
+                animationData={animationData}
+                loop
+                className="w-full max-w-[500px] h-auto"
+              />
+            ) : (
+              <div className="w-[500px] h-[400px] rounded-xl bg-secondary/30 animate-pulse" />
+            )}
           </motion.div>
         </div>
       </div>

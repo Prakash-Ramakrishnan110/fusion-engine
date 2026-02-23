@@ -15,10 +15,10 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
-      <div className="container mx-auto flex items-center justify-between h-16 px-4">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-border/20 shadow-sm">
+      <div className="container mx-auto flex items-center justify-between h-20 px-4">
         <a href="#" className="flex items-center gap-3">
-          <img src={logo} alt="Fusion Engine Technology — custom mobile apps, web platforms, SaaS, and AI systems" className="h-12 w-auto brightness-150 contrast-110" />
+          <img src={logo} alt="Fusion Engine Technology — custom mobile apps, web platforms, SaaS, and AI systems" className="h-16 w-auto" />
         </a>
 
         <div className="hidden md:flex items-center gap-8">
@@ -26,7 +26,7 @@ const Navbar = () => {
             <a
               key={link.label}
               href={link.href}
-              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="text-sm text-gray-700 hover:text-primary font-medium transition-colors"
             >
               {link.label}
             </a>
