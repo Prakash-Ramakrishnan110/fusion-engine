@@ -30,11 +30,6 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
           >
-            <img
-              src={logo}
-              alt="Fusion Engine Technology logo — building scalable apps, SaaS, AI, and automation systems"
-              className="w-72 md:w-96 h-auto mb-8"
-            />
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
               Build.{" "}
               <span className="text-primary glow-text">Automate.</span>{" "}
