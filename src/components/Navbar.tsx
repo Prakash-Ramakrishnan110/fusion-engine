@@ -17,13 +17,13 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-md border-b border-border/30 shadow-lg">
-      <div className="container mx-auto flex items-center justify-between h-24 px-4">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/30">
+      <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <a href="/" className="flex items-center shrink-0">
           <img
             src={logo}
             alt="Fusion Engine Technology"
-            className="h-24 w-96 object-cover object-center"
+            className="h-14 w-64 object-cover object-center"
           />
         </a>
 
