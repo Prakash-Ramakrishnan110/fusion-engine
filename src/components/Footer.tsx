@@ -5,7 +5,7 @@ const serviceLinks = ["Mobile Apps", "Web Platforms", "SaaS Products", "AI Syste
 
 const Footer = () => {
   return (
-    <footer className="border-t border-border/30 py-16">
+    <footer className="border-t border-border bg-secondary/50 py-16">
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-10">
           <div>
