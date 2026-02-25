@@ -5,11 +5,12 @@ import { Link, useLocation } from "react-router-dom";
 import logo from "@/assets/logo.png";
 
 const navLinks = [
-  { label: "Services", href: "#services" },
-  { label: "Process", href: "#process" },
-  { label: "Products", href: "#products" },
-  { label: "Industries", href: "#industries" },
-  { label: "Why Us", href: "#why-us" },
+  { label: "Services", href: "/services", isRoute: true },
+  { label: "Process", href: "/process", isRoute: true },
+  { label: "Products", href: "/products", isRoute: true },
+  { label: "Industries", href: "/industries", isRoute: true },
+  { label: "Why Us", href: "/why-us", isRoute: true },
+  { label: "Pricing", href: "/pricing", isRoute: true },
   { label: "Contact", href: "/contact", isRoute: true },
 ];
 
@@ -17,7 +18,7 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border/30">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-secondary/80 backdrop-blur-md border-b border-border/30">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <a href="/" className="flex items-center shrink-0">
           <img
@@ -48,12 +49,12 @@ const Navbar = () => {
               </a>
             )
           )}
-          <a
-            href="#cta"
+          <Link
+            to="/contact"
             className="px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-all hover:scale-105 glow-box"
           >
             Start a Project
-          </a>
+          </Link>
         </div>
 
         {/* Mobile toggle */}
@@ -97,13 +98,13 @@ const Navbar = () => {
                   </a>
                 )
               )}
-              <a
-                href="#cta"
-                className="mt-2 px-5 py-3 rounded-lg bg-primary text-primary-foreground text-sm font-semibold text-center"
+              <Link
+                to="/contact"
+                className="mt-2 px-5 py-3 rounded-lg bg-primary text-primary-foreground text-sm font-semibold text-center block"
                 onClick={() => setOpen(false)}
               >
                 Start a Project
-              </a>
+              </Link>
             </div>
           </motion.div>
         )}

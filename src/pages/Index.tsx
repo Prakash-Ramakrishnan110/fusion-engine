@@ -1,12 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import TrustStrip from "@/components/TrustStrip";
-import Services from "@/components/Services";
-import Process from "@/components/Process";
-import Products from "@/components/Products";
-import Industries from "@/components/Industries";
-import WhyFusion from "@/components/WhyFusion";
-import Pricing from "@/components/Pricing";
 import CaseStudies from "@/components/CaseStudies";
 import Founder from "@/components/Founder";
 import CTASection from "@/components/CTASection";
@@ -19,12 +13,6 @@ const Index = () => {
       <main>
         <Hero />
         <TrustStrip />
-        <Services />
-        <Process />
-        <Products />
-        <Industries />
-        <WhyFusion />
-        <Pricing />
         <CaseStudies />
         <Founder />
         <CTASection />
