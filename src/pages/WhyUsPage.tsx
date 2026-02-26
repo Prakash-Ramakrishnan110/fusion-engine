@@ -1,5 +1,8 @@
 import Navbar from "@/components/Navbar";
+import PageHero from "@/components/PageHero";
+import WhyUsMetrics from "@/components/animations/WhyUsMetrics";
 import WhyFusion from "@/components/WhyFusion";
+import StartupToolkit from "@/components/StartupToolkit";
 import PageStats from "@/components/PageStats";
 import Footer from "@/components/Footer";
 import usePageMeta from "@/hooks/usePageMeta";
@@ -16,9 +19,17 @@ const WhyUsPage = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="pt-20">
+      <main>
+        <PageHero
+          badge="Our Edge"
+          title="Why Startups Choose"
+          highlight="Fusion Engine"
+          description="We're not just developers — we're product engineers who think like founders. Speed, scalability, and security are built into everything we do."
+          animation={<WhyUsMetrics />}
+        />
         <WhyFusion />
         <PageStats stats={stats} />
+        <StartupToolkit />
       </main>
       <Footer />
     </div>

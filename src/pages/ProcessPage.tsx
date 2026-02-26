@@ -1,5 +1,8 @@
 import Navbar from "@/components/Navbar";
+import PageHero from "@/components/PageHero";
+import ProcessFlow from "@/components/animations/ProcessFlow";
 import Process from "@/components/Process";
+import StartupAdvantage from "@/components/StartupAdvantage";
 import PageStats from "@/components/PageStats";
 import Footer from "@/components/Footer";
 import usePageMeta from "@/hooks/usePageMeta";
@@ -16,8 +19,16 @@ const ProcessPage = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="pt-20">
+      <main>
+        <PageHero
+          badge="Our Methodology"
+          title="A Proven Process for"
+          highlight="Predictable Results"
+          description="Our 6-step engineering methodology ensures every project is delivered on time, on budget, and beyond expectations. No surprises, just results."
+          animation={<ProcessFlow />}
+        />
         <Process />
+        <StartupAdvantage />
         <PageStats stats={stats} />
       </main>
       <Footer />

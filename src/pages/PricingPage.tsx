@@ -1,5 +1,8 @@
 import Navbar from "@/components/Navbar";
+import PageHero from "@/components/PageHero";
+import PricingVisual from "@/components/animations/PricingVisual";
 import Pricing from "@/components/Pricing";
+import StartupAdvantage from "@/components/StartupAdvantage";
 import PageStats from "@/components/PageStats";
 import Footer from "@/components/Footer";
 import usePageMeta from "@/hooks/usePageMeta";
@@ -16,8 +19,16 @@ const PricingPage = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="pt-20">
+      <main>
+        <PageHero
+          badge="Pricing"
+          title="Simple, Transparent"
+          highlight="Engagement Models"
+          description="No hidden fees, no surprises. Flexible pricing tailored to your project scope and business stage — from startup MVPs to enterprise systems."
+          animation={<PricingVisual />}
+        />
         <Pricing />
+        <StartupAdvantage />
         <PageStats stats={stats} />
       </main>
       <Footer />
