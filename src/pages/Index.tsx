@@ -1,6 +1,10 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import TrustStrip from "@/components/TrustStrip";
+import AnnouncementStrip from "@/components/AnnouncementStrip";
+import SolutionsTabs from "@/components/SolutionsTabs";
+import BigStats from "@/components/BigStats";
+import LogoStrip from "@/components/LogoStrip";
+import HowWeHelp from "@/components/HowWeHelp";
 import CaseStudies from "@/components/CaseStudies";
 import Founder from "@/components/Founder";
 import CTASection from "@/components/CTASection";
@@ -14,7 +18,11 @@ const Index = () => {
       <Navbar />
       <main>
         <Hero />
-        <TrustStrip />
+        <AnnouncementStrip />
+        <SolutionsTabs />
+        <BigStats />
+        <LogoStrip />
+        <HowWeHelp />
         <CaseStudies />
         <Founder />
         <CTASection />

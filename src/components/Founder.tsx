@@ -3,7 +3,7 @@ import { Linkedin, Twitter, Github } from "lucide-react";
 
 const Founder = () => {
   return (
-    <section id="founder" className="py-24">
+    <section id="founder" className="py-24 bg-secondary/20">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -13,9 +13,9 @@ const Founder = () => {
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-12">Behind the Engine</h2>
 
-          <div className="glass-card gradient-border p-8 md:p-12 glow-box">
-            <div className="w-24 h-24 rounded-full bg-primary/10 border-2 border-primary/30 mx-auto mb-6 flex items-center justify-center">
-              <span className="text-3xl font-bold text-primary">FE</span>
+          <div className="glass-card p-8 md:p-12">
+            <div className="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 mx-auto mb-6 flex items-center justify-center">
+              <span className="text-2xl font-bold text-primary">FE</span>
             </div>
 
             <h3 className="text-xl font-bold mb-1">Founder & CEO</h3>
@@ -27,7 +27,7 @@ const Founder = () => {
               and compete with world-class technology — without the enterprise price tag.
             </p>
 
-            <div className="flex justify-center gap-4">
+            <div className="flex justify-center gap-3">
               {[
                 { icon: Linkedin, href: "#" },
                 { icon: Twitter, href: "#" },
@@ -36,7 +36,7 @@ const Founder = () => {
                 <a
                   key={i}
                   href={href}
-                  className="w-10 h-10 rounded-xl bg-secondary/50 flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
+                  className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
                 >
                   <Icon size={18} />
                 </a>

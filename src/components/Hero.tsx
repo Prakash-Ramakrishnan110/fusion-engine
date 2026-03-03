@@ -1,259 +1,252 @@
-import { motion, useMotionValue, useTransform, animate } from "framer-motion";
-import { ArrowRight, ExternalLink, TrendingUp, Users, Zap, Shield, Activity, Globe, RefreshCw } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, ExternalLink } from "lucide-react";
 import { useEffect, useState, useRef, useCallback } from "react";
+import { Link } from "react-router-dom";
 
-const AnimatedCounter = ({ target, duration = 2, prefix = "", suffix = "" }: { target: number; duration?: number; prefix?: string; suffix?: string }) => {
-  const count = useMotionValue(0);
-  const rounded = useTransform(count, (v) => `${prefix}${Math.round(v).toLocaleString()}${suffix}`);
-  const [display, setDisplay] = useState(`${prefix}0${suffix}`);
+// Animated Network Globe Canvas
+const NetworkGlobe = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationRef = useRef<number>(0);
+  const nodesRef = useRef<{ x: number; y: number; vx: number; vy: number; r: number; pulse: number }[]>([]);
+  const timeRef = useRef(0);
 
-  useEffect(() => {
-    const controls = animate(count, target, { duration, ease: "easeOut" });
-    const unsubscribe = rounded.on("change", setDisplay);
-    return () => { controls.stop(); unsubscribe(); };
-  }, [target]);
-
-  return <span>{display}</span>;
-};
-
-const useLiveValue = (base: number, variance: number, interval: number) => {
-  const [value, setValue] = useState(base);
-  useEffect(() => {
-    const id = setInterval(() => {
-      setValue(base + Math.round((Math.random() - 0.3) * variance));
-    }, interval);
-    return () => clearInterval(id);
-  }, [base, variance, interval]);
-  return value;
-};
-
-const kpiConfigs = [
-  { label: "Active Users", base: 12847, variance: 120, icon: Users, color: "text-primary" },
-  { label: "API Calls / mo", base: 2400000, variance: 50000, icon: Zap, color: "text-primary" },
-  { label: "Uptime", base: 999, variance: 0, icon: Shield, color: "text-emerald-400" },
-  { label: "Latency", base: 42, variance: 8, icon: Activity, color: "text-amber-400" },
-];
-
-const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-const KPIDashboard = () => {
-  const [hoveredBar, setHoveredBar] = useState<number | null>(null);
-  const [timeRange, setTimeRange] = useState<"6m" | "12m">("12m");
-  const [tick, setTick] = useState(0);
-
-  // Live-updating bar data
-  const [barData, setBarData] = useState([40, 55, 45, 70, 60, 80, 65, 90, 75, 85, 95, 88]);
-  const [lineData, setLineData] = useState([20, 35, 30, 50, 45, 65, 55, 70, 60, 78, 72, 85]);
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      setBarData(prev => prev.map(v => Math.min(100, Math.max(20, v + Math.round((Math.random() - 0.4) * 6)))));
-      setLineData(prev => prev.map(v => Math.min(95, Math.max(15, v + Math.round((Math.random() - 0.4) * 5)))));
-      setTick(t => t + 1);
-    }, 3000);
-    return () => clearInterval(id);
+  const initNodes = useCallback((w: number, h: number) => {
+    const nodes: typeof nodesRef.current = [];
+    const count = 60;
+    for (let i = 0; i < count; i++) {
+      nodes.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        r: Math.random() * 2 + 1,
+        pulse: Math.random() * Math.PI * 2,
+      });
+    }
+    nodesRef.current = nodes;
   }, []);
 
-  const liveUsers = useLiveValue(12847, 120, 2000);
-  const liveApi = useLiveValue(2400, 50, 2500);
-  const liveLatency = useLiveValue(42, 8, 1800);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-  const displayBars = timeRange === "6m" ? barData.slice(6) : barData;
-  const displayLine = timeRange === "6m" ? lineData.slice(6) : lineData;
-  const displayMonths = timeRange === "6m" ? months.slice(6) : months;
+    const resize = () => {
+      const rect = canvas.parentElement?.getBoundingClientRect();
+      canvas.width = rect?.width || 500;
+      canvas.height = rect?.height || 500;
+      if (nodesRef.current.length === 0) initNodes(canvas.width, canvas.height);
+    };
+    resize();
+    window.addEventListener("resize", resize);
 
-  const kpis = [
-    { label: "Active Users", value: liveUsers, display: liveUsers.toLocaleString(), trend: "+23%", color: "text-primary", icon: Users },
-    { label: "API Calls / mo", value: liveApi, display: `${(liveApi / 1000).toFixed(1)}M`, trend: "+18%", color: "text-primary", icon: Zap },
-    { label: "Uptime", value: 99.9, display: "99.9%", trend: "SLA", color: "text-emerald-400", icon: Shield },
-    { label: "Latency", value: liveLatency, display: `< ${liveLatency}ms`, trend: "p99", color: "text-amber-400", icon: Activity },
-  ];
+    const draw = () => {
+      timeRef.current += 0.01;
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      // Draw globe circle
+      const cx = w / 2;
+      const cy = h / 2;
+      const radius = Math.min(w, h) * 0.42;
+
+      // Globe glow
+      const glow = ctx.createRadialGradient(cx, cy, radius * 0.3, cx, cy, radius * 1.2);
+      glow.addColorStop(0, "hsla(215, 90%, 50%, 0.08)");
+      glow.addColorStop(0.5, "hsla(215, 90%, 50%, 0.04)");
+      glow.addColorStop(1, "transparent");
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, w, h);
+
+      // Globe outline
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.strokeStyle = "hsla(215, 90%, 50%, 0.15)";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Globe grid lines (latitude)
+      for (let i = 1; i < 6; i++) {
+        const lat = (i / 6) * 2 - 1;
+        const y = cy + lat * radius;
+        const halfWidth = Math.sqrt(1 - lat * lat) * radius;
+        ctx.beginPath();
+        ctx.ellipse(cx, y, halfWidth, halfWidth * 0.1, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = "hsla(215, 90%, 50%, 0.06)";
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+
+      // Globe grid lines (longitude) - rotating
+      for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * Math.PI + timeRef.current * 0.3;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, Math.abs(Math.cos(angle)) * radius, radius, 0, 0, Math.PI * 2);
+        ctx.strokeStyle = "hsla(215, 90%, 50%, 0.06)";
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+      }
+
+      // Update and draw nodes
+      const nodes = nodesRef.current;
+      for (const node of nodes) {
+        node.x += node.vx;
+        node.y += node.vy;
+        if (node.x < 0 || node.x > w) node.vx *= -1;
+        if (node.y < 0 || node.y > h) node.vy *= -1;
+        node.pulse += 0.02;
+      }
+
+      // Draw connections
+      const maxDist = 120;
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const dx = nodes[i].x - nodes[j].x;
+          const dy = nodes[i].y - nodes[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < maxDist) {
+            const alpha = (1 - dist / maxDist) * 0.3;
+            ctx.beginPath();
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
+            ctx.strokeStyle = `hsla(215, 90%, 50%, ${alpha})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw nodes
+      for (const node of nodes) {
+        const pulseR = node.r + Math.sin(node.pulse) * 0.5;
+        // Outer glow
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, pulseR * 3, 0, Math.PI * 2);
+        ctx.fillStyle = "hsla(215, 90%, 50%, 0.05)";
+        ctx.fill();
+        // Core
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, pulseR, 0, Math.PI * 2);
+        ctx.fillStyle = "hsla(215, 90%, 60%, 0.6)";
+        ctx.fill();
+      }
+
+      // Animated data packets traveling along connections
+      const t = timeRef.current;
+      for (let i = 0; i < Math.min(nodes.length, 10); i++) {
+        const j = (i + 3) % nodes.length;
+        const progress = ((t * 0.5 + i * 0.37) % 1);
+        const px = nodes[i].x + (nodes[j].x - nodes[i].x) * progress;
+        const py = nodes[i].y + (nodes[j].y - nodes[i].y) * progress;
+        ctx.beginPath();
+        ctx.arc(px, py, 2, 0, Math.PI * 2);
+        ctx.fillStyle = "hsla(215, 90%, 70%, 0.8)";
+        ctx.fill();
+      }
+
+      animationRef.current = requestAnimationFrame(draw);
+    };
+    draw();
+
+    return () => {
+      window.removeEventListener("resize", resize);
+      cancelAnimationFrame(animationRef.current);
+    };
+  }, [initNodes]);
 
   return (
-    <div className="glass-card gradient-border p-5 glow-box">
-      {/* Title bar */}
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-destructive/60" />
-          <div className="w-3 h-3 rounded-full bg-primary/60" />
-          <div className="w-3 h-3 rounded-full bg-accent/60" />
-          <span className="ml-3 text-xs text-muted-foreground font-body">dashboard.fusionengine.dev</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Globe size={12} className="text-primary/60" />
-          <span className="text-[10px] text-primary/70 font-medium">LIVE</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-        </div>
-      </div>
-
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        {kpis.map((kpi, i) => (
-          <motion.div
-            key={kpi.label}
-            className="bg-secondary/50 rounded-lg p-3 cursor-pointer hover:bg-secondary/70 transition-colors group"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 + i * 0.1 }}
-            whileHover={{ scale: 1.03 }}
-          >
-            <div className="flex items-center justify-between mb-1.5">
-              <kpi.icon size={14} className="text-muted-foreground group-hover:text-primary transition-colors" />
-              <span className="text-[10px] text-emerald-400 font-medium flex items-center gap-0.5">
-                <TrendingUp size={9} /> {kpi.trend}
-              </span>
-            </div>
-            <motion.div
-              key={kpi.value}
-              initial={{ opacity: 0.6 }}
-              animate={{ opacity: 1 }}
-              className={`text-xl font-bold ${kpi.color}`}
-            >
-              {kpi.display}
-            </motion.div>
-            <div className="text-[10px] text-muted-foreground mt-0.5">{kpi.label}</div>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Interactive Bar Chart */}
-      <div className="bg-secondary/50 rounded-lg p-4 mb-3">
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs text-muted-foreground font-medium">System Performance</span>
-          <div className="flex items-center gap-2">
-            {/* Time range toggle */}
-            {(["6m", "12m"] as const).map(range => (
-              <button
-                key={range}
-                onClick={() => setTimeRange(range)}
-                className={`text-[10px] px-2 py-0.5 rounded transition-colors ${
-                  timeRange === range ? "bg-primary/20 text-primary font-medium" : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {range}
-              </button>
-            ))}
-            <motion.div
-              animate={{ rotate: tick * 360 }}
-              transition={{ duration: 0.5 }}
-            >
-              <RefreshCw size={10} className="text-muted-foreground" />
-            </motion.div>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 mb-3">
-          <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-            <span className="w-2 h-2 rounded-sm bg-primary/60" /> Throughput
-          </span>
-          <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-            <span className="w-2 h-2 rounded-sm bg-emerald-400/60" /> Efficiency
-          </span>
-        </div>
-        <div className="flex items-end gap-1.5 h-24 relative">
-          {displayBars.map((h, i) => (
-            <div
-              key={i}
-              className="flex-1 relative flex flex-col items-center"
-              onMouseEnter={() => setHoveredBar(i)}
-              onMouseLeave={() => setHoveredBar(null)}
-            >
-              {hoveredBar === i && (
-                <motion.div
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="absolute -top-7 bg-card border border-border rounded px-2 py-0.5 text-[10px] text-foreground whitespace-nowrap z-10 shadow-lg"
-                >
-                  {h}% · {displayLine[i]}%
-                </motion.div>
-              )}
-              <motion.div
-                className="absolute w-1.5 h-1.5 rounded-full bg-emerald-400 z-10"
-                style={{ bottom: `${displayLine[i]}%` }}
-                animate={{ bottom: `${displayLine[i]}%` }}
-                transition={{ duration: 0.6 }}
-              />
-              <motion.div
-                className={`w-full rounded-t cursor-pointer transition-colors ${hoveredBar === i ? 'bg-primary/90' : 'bg-primary/50'}`}
-                animate={{ height: `${h}%` }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-              />
-            </div>
-          ))}
-        </div>
-        <div className="flex justify-between mt-2">
-          {displayMonths.map((m) => (
-            <span key={m} className="text-[8px] text-muted-foreground/60 flex-1 text-center">{m}</span>
-          ))}
-        </div>
-      </div>
-
-      {/* Bottom stats strip */}
-      <div className="grid grid-cols-3 gap-2">
-        {[
-          { label: "99.9% Uptime", icon: "🟢" },
-          { label: "256-bit Encrypted", icon: "🔐" },
-          { label: "Auto-Scaling", icon: "⚡" },
-        ].map((item) => (
-          <motion.div
-            key={item.label}
-            className="bg-secondary/50 rounded-lg p-2.5 text-center hover:bg-secondary/70 transition-colors cursor-default"
-            whileHover={{ scale: 1.05 }}
-          >
-            <div className="text-xs mb-0.5">{item.icon}</div>
-            <div className="text-[10px] text-muted-foreground">{item.label}</div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
+    <canvas
+      ref={canvasRef}
+      className="w-full h-full"
+      style={{ minHeight: 400 }}
+    />
   );
 };
 
+const highlights = [
+  "everywhere",
+  "at scale",
+  "with AI",
+  "securely",
+  "faster",
+];
+
 const Hero = () => {
+  const [highlightIndex, setHighlightIndex] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setHighlightIndex((prev) => (prev + 1) % highlights.length);
+    }, 2500);
+    return () => clearInterval(id);
+  }, []);
+
   return (
     <section className="relative min-h-screen flex items-center pt-20 overflow-hidden">
-      <div className="absolute inset-0 gradient-mesh" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/5 blur-[120px] animate-glow-pulse" />
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-secondary/30" />
+      <div className="absolute top-0 right-0 w-1/2 h-full opacity-30 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-l from-primary/5 to-transparent" />
+      </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-8 items-center">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
           >
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
-              Build.{" "}
-              <span className="text-primary glow-text">Automate.</span>{" "}
-              Scale.
+            <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
+              Build, automate,{" "}
+              <br className="hidden md:block" />
+              and scale{" "}
+              <span className="relative inline-block">
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={highlightIndex}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.4 }}
+                    className="text-primary inline-block"
+                  >
+                    {highlights[highlightIndex]}
+                  </motion.span>
+                </AnimatePresence>
+              </span>
             </h1>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-xl mb-8 leading-relaxed">
-              Fusion Engine Technology builds high-performance digital systems for businesses that want to grow faster with scalable apps, intelligent automation, and SaaS platforms.
+            <p className="text-lg md:text-xl text-muted-foreground max-w-xl mb-10 leading-relaxed">
+              We build high-performance digital systems — apps, AI agents, and platforms — 
+              that are faster, smarter, and more secure. Our engineering studio is the best 
+              place to build and scale modern products.
             </p>
             <div className="flex flex-wrap gap-4">
-              <a
-                href="#cta"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-primary text-primary-foreground font-semibold text-base hover:bg-primary/90 transition-all hover:scale-105 glow-box"
+              <Link
+                to="/contact"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-lg bg-primary text-primary-foreground font-semibold text-base hover:bg-primary/90 transition-all hover:shadow-lg hover:shadow-primary/20"
               >
-                Start a Project
+                Start for free
                 <ArrowRight size={18} />
-              </a>
-              <a
-                href="#services"
-                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl border border-border text-foreground font-medium text-base hover:bg-secondary transition-all hover:scale-105"
+              </Link>
+              <Link
+                to="/pricing"
+                className="inline-flex items-center gap-2 px-7 py-3.5 rounded-lg border border-border text-foreground font-medium text-base hover:bg-secondary transition-all"
               >
-                Explore Services
-                <ExternalLink size={16} />
-              </a>
+                See pricing
+              </Link>
             </div>
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="hidden lg:block"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="hidden lg:block relative"
+            style={{ height: 500 }}
           >
-            <KPIDashboard />
+            <NetworkGlobe />
           </motion.div>
         </div>
       </div>

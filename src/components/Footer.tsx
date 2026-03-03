@@ -1,15 +1,23 @@
+import { Link } from "react-router-dom";
 import logo from "@/assets/logo.png";
 
-const quickLinks = ["Services", "Process", "Products", "Industries", "Why Us"];
+const quickLinks = [
+  { label: "Services", href: "/services" },
+  { label: "Process", href: "/process" },
+  { label: "Products", href: "/products" },
+  { label: "Industries", href: "/industries" },
+  { label: "Why Us", href: "/why-us" },
+];
+
 const serviceLinks = ["Mobile Apps", "Web Platforms", "SaaS Products", "AI Systems", "Automation", "Cloud"];
 
 const Footer = () => {
   return (
-    <footer className="border-t border-border bg-secondary/50 py-16">
+    <footer className="border-t border-border bg-secondary/30 py-16">
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-10">
           <div>
-            <img src={logo} alt="Fusion Engine Technology — scalable digital systems" className="w-48 h-auto mb-4" />
+            <img src={logo} alt="Fusion Engine Technology" className="w-44 h-auto mb-4" />
             <p className="text-sm text-muted-foreground leading-relaxed">
               Building high-performance digital systems for businesses that want to scale.
             </p>
@@ -19,10 +27,10 @@ const Footer = () => {
             <h4 className="font-semibold mb-4 text-sm">Quick Links</h4>
             <ul className="space-y-2">
               {quickLinks.map((l) => (
-                <li key={l}>
-                  <a href={`#${l.toLowerCase().replace(" ", "-")}`} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                    {l}
-                  </a>
+                <li key={l.label}>
+                  <Link to={l.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    {l.label}
+                  </Link>
                 </li>
               ))}
             </ul>
