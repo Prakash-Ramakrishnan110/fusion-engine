@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight, ArrowRight, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
+import LottieAnimation, { LOTTIE_URLS } from "./LottieAnimation";
 
 const caseStudies = [
   {
@@ -51,20 +52,32 @@ const CaseStudies = () => {
   return (
     <section id="case-studies" className="py-24">
       <div className="container mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-6"
-        >
-          <span className="text-sm font-semibold text-primary uppercase tracking-widest">Our Work</span>
-          <h2 className="text-3xl md:text-5xl font-bold mt-3 mb-4">Case Studies</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            Real projects. Real results. Here's how we've helped businesses scale with technology.
-          </p>
-        </motion.div>
+        <div className="grid lg:grid-cols-2 gap-8 items-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <span className="text-sm font-semibold text-primary uppercase tracking-widest">Our Work</span>
+            <h2 className="text-3xl md:text-5xl font-bold mt-3 mb-4">Case Studies</h2>
+            <p className="text-muted-foreground max-w-2xl text-lg">
+              Real projects. Real results. Here's how we've helped businesses scale with technology.
+            </p>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="hidden lg:block"
+          >
+            <LottieAnimation
+              url={LOTTIE_URLS.growth}
+              className="w-full max-w-xs ml-auto"
+            />
+          </motion.div>
+        </div>
 
-        <div className="space-y-12 mt-16">
+        <div className="space-y-12">
           {caseStudies.map((cs, i) => (
             <motion.div
               key={cs.title}

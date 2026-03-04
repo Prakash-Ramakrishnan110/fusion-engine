@@ -1,11 +1,11 @@
 import Navbar from "@/components/Navbar";
 import PageHero from "@/components/PageHero";
-import IndustryMap from "@/components/animations/IndustryMap";
 import Industries from "@/components/Industries";
 import StartupAdvantage from "@/components/StartupAdvantage";
 import PageStats from "@/components/PageStats";
 import Footer from "@/components/Footer";
 import usePageMeta from "@/hooks/usePageMeta";
+import { LOTTIE_URLS } from "@/components/LottieAnimation";
 
 const stats = [
   { value: "7+", label: "Industries Served" },
@@ -25,7 +25,7 @@ const IndustriesPage = () => {
           title="Powering Growth Across"
           highlight="Every Industry"
           description="We've built digital solutions across diverse industries — each with unique challenges, domain expertise, and proven results."
-          animation={<IndustryMap />}
+          lottieUrl={LOTTIE_URLS.globe}
         />
         <Industries />
         <StartupAdvantage />

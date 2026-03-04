@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { TrendingUp, Clock, DollarSign, Users } from "lucide-react";
+import LottieAnimation, { LOTTIE_URLS } from "./LottieAnimation";
 
 const metrics = [
   {
@@ -28,18 +29,30 @@ const StartupAdvantage = () => {
   return (
     <section className="py-24 bg-secondary/30">
       <div className="container mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
-          <span className="text-sm font-semibold text-primary uppercase tracking-widest">Startup Advantage</span>
-          <h2 className="text-3xl md:text-4xl font-bold mt-3 mb-4">Built for Startups That Scale</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            We understand the startup game — speed, cost, and scalability matter more than anything else.
-          </p>
-        </motion.div>
+        <div className="grid lg:grid-cols-2 gap-12 items-center mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <span className="text-sm font-semibold text-primary uppercase tracking-widest">Startup Advantage</span>
+            <h2 className="text-3xl md:text-4xl font-bold mt-3 mb-4">Built for Startups That Scale</h2>
+            <p className="text-muted-foreground max-w-2xl">
+              We understand the startup game — speed, cost, and scalability matter more than anything else.
+            </p>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="hidden lg:block"
+          >
+            <LottieAnimation
+              url={LOTTIE_URLS.startup}
+              className="w-full max-w-xs ml-auto"
+            />
+          </motion.div>
+        </div>
 
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {metrics.map((m, i) => (

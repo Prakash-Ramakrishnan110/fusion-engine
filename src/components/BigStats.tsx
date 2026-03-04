@@ -1,5 +1,6 @@
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
+import LottieAnimation, { LOTTIE_URLS } from "./LottieAnimation";
 
 const AnimatedNumber = ({ target, suffix = "", prefix = "" }: { target: number; suffix?: string; prefix?: string }) => {
   const count = useMotionValue(0);
@@ -42,19 +43,32 @@ const BigStats = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-secondary/30 via-background to-background" />
       
       <div className="container mx-auto px-4 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-3xl md:text-5xl font-bold mb-4">
-            One engineering platform unlike any other
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Only Fusion Engine offers end-to-end product engineering built from the ground up for speed, security, and scale.
-          </p>
-        </motion.div>
+        <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center lg:text-left"
+          >
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">
+              One engineering platform unlike any other
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl">
+              Only Fusion Engine offers end-to-end product engineering built from the ground up for speed, security, and scale.
+            </p>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="hidden lg:block"
+          >
+            <LottieAnimation
+              url={LOTTIE_URLS.dataChart}
+              className="w-full max-w-xs mx-auto"
+            />
+          </motion.div>
+        </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
           {stats.map((stat, i) => (

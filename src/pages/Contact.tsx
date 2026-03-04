@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import usePageMeta from "@/hooks/usePageMeta";
+import LottieAnimation, { LOTTIE_URLS } from "@/components/LottieAnimation";
 
 const Contact = () => {
   usePageMeta("Contact", "📬");
@@ -23,24 +24,35 @@ const Contact = () => {
       <Navbar />
       <main className="pt-28 pb-20">
         <div className="container mx-auto px-4">
-          {/* Back link */}
           <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-8">
             <ArrowLeft size={16} /> Back to Home
           </Link>
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-16"
-          >
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
-              Get in <span className="text-primary glow-text">Touch</span>
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Ready to build something extraordinary? Let's talk about your next project.
-            </p>
-          </motion.div>
+          <div className="grid lg:grid-cols-2 gap-8 items-center mb-16">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
+                Get in <span className="text-primary glow-text">Touch</span>
+              </h1>
+              <p className="text-lg text-muted-foreground max-w-2xl">
+                Ready to build something extraordinary? Let's talk about your next project.
+              </p>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="hidden lg:block"
+            >
+              <LottieAnimation
+                url={LOTTIE_URLS.email}
+                className="w-full max-w-xs ml-auto"
+              />
+            </motion.div>
+          </div>
 
           <div className="grid lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
             {/* Contact Info */}
