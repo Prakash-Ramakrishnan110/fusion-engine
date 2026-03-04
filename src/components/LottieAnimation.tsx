@@ -1,6 +1,6 @@
 import Lottie from "lottie-react";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 interface LottieAnimationProps {
   url: string;
@@ -11,18 +11,117 @@ interface LottieAnimationProps {
 
 const LottieAnimation = ({ url, className = "", loop = true, style }: LottieAnimationProps) => {
   const [animationData, setAnimationData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const elementRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch(url)
-      .then((res) => res.json())
-      .then(setAnimationData)
-      .catch(console.error);
-  }, [url]);
+    const element = elementRef.current;
+    if (!element) return;
 
-  if (!animationData) {
+    observerRef.current = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observerRef.current?.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observerRef.current.observe(element);
+
+    return () => {
+      observerRef.current?.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    setIsLoading(true);
+    setHasError(false);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+    const primaryUrl = url;
+    const fallbackUrls = [
+      "https://assets9.lottiefiles.com/packages/lf20_z4cshyhf.json",
+      "https://assets4.lottiefiles.com/packages/lf20_iorpbol0.json",
+      "https://assets2.lottiefiles.com/packages/lf20_jbrw3hcz.json",
+    ];
+
+    const tryLoad = async (urlToTry: string) => {
+      try {
+        const response = await fetch(urlToTry, { signal: controller.signal });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        setAnimationData(data);
+        setIsLoading(false);
+        setHasError(false);
+        return true;
+      } catch (error) {
+        console.warn(`Failed to load ${urlToTry}:`, error);
+        return false;
+      }
+    };
+
+    const loadAnimation = async () => {
+      let loaded = await tryLoad(primaryUrl);
+      if (!loaded) {
+        for (const fallbackUrl of fallbackUrls) {
+          loaded = await tryLoad(fallbackUrl);
+          if (loaded) break;
+        }
+      }
+
+      if (!loaded) {
+        setHasError(true);
+        setIsLoading(false);
+      }
+    };
+
+    loadAnimation();
+
+    return () => {
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
+  }, [url, isVisible]);
+
+  if (isLoading) {
     return (
-      <div className={`flex items-center justify-center ${className}`} style={style}>
-        <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+      <div
+        ref={elementRef}
+        className={`flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg ${className}`}
+        style={style}
+      >
+        <div className="text-center p-6">
+          <div className="w-8 h-8 mx-auto mb-3 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm font-medium text-foreground">Loading animation...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (hasError || !animationData) {
+    return (
+      <div
+        ref={elementRef}
+        className={`flex items-center justify-center bg-gradient-to-br from-secondary/20 to-muted/20 rounded-lg border border-border/50 ${className}`}
+        style={style}
+      >
+        <div className="text-center p-6">
+          <div className="w-16 h-16 mx-auto mb-3 bg-primary/10 rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 bg-primary/20 rounded-full animate-pulse" />
+          </div>
+          <p className="text-sm font-medium text-muted-foreground">Animation unavailable</p>
+          <p className="text-xs text-muted-foreground/70 mt-1">Static content displayed</p>
+        </div>
       </div>
     );
   }
@@ -40,14 +139,14 @@ const LottieAnimation = ({ url, className = "", loop = true, style }: LottieAnim
   );
 };
 
-// Centralized Lottie URLs
+// Centralized Lottie URLs - using working URLs
 export const LOTTIE_URLS = {
-  // Hero & general
+  // Hero & general - working URLs
   rocket: "https://assets2.lottiefiles.com/packages/lf20_jbrw3hcz.json",
   techNetwork: "https://assets4.lottiefiles.com/packages/lf20_iorpbol0.json",
   coding: "https://assets9.lottiefiles.com/packages/lf20_w51pcehl.json",
   
-  // Services
+  // Services - working URLs
   mobileApp: "https://assets2.lottiefiles.com/packages/lf20_kkflmtur.json",
   webDev: "https://assets10.lottiefiles.com/packages/lf20_3rwasyjy.json",
   cloudServer: "https://assets1.lottiefiles.com/packages/lf20_dews3j6m.json",

@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import logo from "@/assets/logo.png";
 
 const quickLinks = [
   { label: "Services", href: "/services" },
@@ -13,11 +12,17 @@ const serviceLinks = ["Mobile Apps", "Web Platforms", "SaaS Products", "AI Syste
 
 const Footer = () => {
   return (
-    <footer className="border-t border-border bg-secondary/30 py-16">
+    <footer className="border-t border-border bg-secondary/30 py-12">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-4 gap-10">
+        <div className="grid md:grid-cols-4 gap-8">
           <div>
-            <img src={logo} alt="Fusion Engine Technology" className="w-44 h-auto mb-4" />
+            <div className="flex flex-col leading-tight mb-4">
+              <div className="flex items-baseline">
+                <span className="text-2xl font-black text-blue-500 drop-shadow-md vibrant">FUSION</span>
+                <span className="text-2xl font-black text-gray-700 drop-shadow-md vibrant ml-2">ENGINE</span>
+              </div>
+              <span className="text-xs font-black text-gray-500 tracking-wider vibrant">TECHNOLOGY</span>
+            </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Building high-performance digital systems for businesses that want to scale.
             </p>
@@ -51,20 +56,25 @@ const Footer = () => {
             <h4 className="font-semibold mb-4 text-sm">Contact</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <a href="mailto:hello@fusionengine.dev" className="hover:text-foreground transition-colors">
-                  hello@fusionengine.dev
+                <a href="mailto:contact@fusionengine.tech" className="hover:text-foreground transition-colors">
+                  contact@fusionengine.tech
                 </a>
               </li>
               <li>
-                <a href="https://wa.me/919999999999" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
-                  WhatsApp Us
+                <a href="tel:+919876543210" className="hover:text-foreground transition-colors">
+                  +91 98765 43210
+                </a>
+              </li>
+              <li>
+                <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
+                  WhatsApp Support
                 </a>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border/30 text-center text-sm text-muted-foreground">
+        <div className="mt-8 pt-6 border-t border-border/30 text-center text-sm text-muted-foreground">
           © {new Date().getFullYear()} Fusion Engine Technology. All rights reserved.
         </div>
       </div>

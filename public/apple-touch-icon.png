@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <!-- Background -->
+  <rect width="192" height="192" rx="36" fill="#3B82F6"/>
+  
+  <!-- F letter -->
+  <path d="M48 48h48c6.6 0 12 5.4 12 12s-5.4 12-12 12H60v24h30c6.6 0 12 5.4 12 12s-5.4 12-12 12H54c-3.3 0-6-2.7-6-6V54c0-3.3 2.7-6 6-6z" fill="white"/>
+  
+  <!-- E letter -->
+  <path d="M120 48h42c3.3 0 6 2.7 6 6s-2.7 6-6 6h-36v18h30c3.3 0 6 2.7 6 6s-2.7 6-6 6h-30v18h36c3.3 0 6 2.7 6 6s-2.7 6-6 6h-42c-3.3 0-6-2.7-6-6V54c0-3.3 2.7-6 6-6z" fill="white"/>
+  
+  <!-- Fusion Engine accent circles -->
+  <circle cx="144" cy="48" r="12" fill="#10B981"/>
+  <circle cx="48" cy="144" r="12" fill="#10B981"/>
+  
+  <!-- Subtle gradient overlay -->
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#1D4ED8;stop-opacity:0.9" />
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="36" fill="url(#grad)" opacity="0.3"/>
+</svg>

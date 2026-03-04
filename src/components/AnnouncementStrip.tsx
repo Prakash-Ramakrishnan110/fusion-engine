@@ -19,9 +19,9 @@ const announcements = [
 
 const AnnouncementStrip = () => {
   return (
-    <section className="py-6 border-y border-border/50 bg-secondary/20">
+    <section className="py-4 border-y border-border/50 bg-secondary/20">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid md:grid-cols-2 gap-3">
           {announcements.map((a, i) => (
             <motion.div
               key={a.title}

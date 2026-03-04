@@ -10,52 +10,52 @@ const tabs = [
     id: "build",
     label: "Build",
     icon: Smartphone,
-    title: "Build and scale digital products",
-    desc: "From mobile apps to SaaS platforms — build production-ready products with modern architecture, CI/CD, and auto-scaling infrastructure. Ship in weeks, not months.",
-    cta: "Start building now",
-    ctaLink: "/services",
-    learnMore: "/products",
+    title: "Launch Your MVP in 14 Days",
+    desc: "From idea to market-ready product in just 2 weeks. Our startup-focused development framework gets you to customers faster with proven tech stacks and scalable architecture.",
+    cta: "Start Building Now",
+    ctaLink: "/contact",
+    learnMore: "/process",
     lottieUrl: LOTTIE_URLS.coding,
     testimonial: {
-      quote: "Fusion Engine delivered our entire platform in 8 weeks — what our previous agency quoted 6 months for. The quality exceeded expectations.",
-      name: "Arjun Mehta",
-      role: "Founder, LogiTrack Solutions",
+      quote: "We went from concept to paying customers in 3 weeks. Fusion Engine's speed is unmatched in the startup ecosystem.",
+      name: "Alex Kumar",
+      role: "Founder, QuickStart AI",
     },
-    related: ["SaaS Starter Kit", "Mobile App Development"],
+    related: ["MVP Development", "Rapid Prototyping"],
   },
   {
     id: "automate",
     label: "Automate",
     icon: Brain,
-    title: "Automate operations with AI agents",
-    desc: "Remove manual workflows with intelligent automation. From WhatsApp bots to predictive analytics — we make your operations run on autopilot with AI-powered systems.",
-    cta: "Explore automation",
+    title: "Scale Operations with AI",
+    desc: "Automate everything from customer support to data analysis. Our AI agents work 24/7 so your lean team can focus on growth and product innovation.",
+    cta: "Explore Automation",
     ctaLink: "/services",
-    learnMore: "/process",
+    learnMore: "/products",
     lottieUrl: LOTTIE_URLS.automation,
     testimonial: {
-      quote: "The automation system reduced our manual processing time by 70%. Our team can now focus on strategy instead of repetitive tasks.",
-      name: "Priya Sharma",
-      role: "COO, EduManager",
+      quote: "Our support costs dropped 80% while customer satisfaction increased. The AI automation transformed our business model.",
+      name: "Maya Patel",
+      role: "CEO, SaaScale",
     },
-    related: ["Workflow Automation", "AI Chatbots"],
+    related: ["AI Chatbots", "Workflow Automation"],
   },
   {
     id: "secure",
     label: "Secure",
     icon: Shield,
-    title: "Secure and protect your systems",
-    desc: "Enterprise-grade security baked into every product. 256-bit encryption, role-based access, audit logs, and compliance-ready infrastructure — protecting your business from day one.",
-    cta: "View security features",
+    title: "Enterprise Security for Startups",
+    desc: "Bank-level security that builds investor confidence. SOC 2 compliance, data encryption, and security audits included — no enterprise pricing required.",
+    cta: "View Security Features",
     ctaLink: "/why-us",
     learnMore: "/services",
     lottieUrl: LOTTIE_URLS.security,
     testimonial: {
-      quote: "Bank-grade security without the enterprise price tag. Fusion Engine's security-first approach gives us complete peace of mind.",
-      name: "Vikram Singh",
-      role: "CTO, FinSecure",
+      quote: "We passed our enterprise security audit on the first try. Fusion Engine's security-first approach closed our biggest deals.",
+      name: "David Lee",
+      role: "CTO, SecureFlow",
     },
-    related: ["256-bit Encryption", "RBAC Systems"],
+    related: ["SOC 2 Compliance", "Data Protection"],
   },
 ];
 
@@ -64,16 +64,16 @@ const SolutionsTabs = () => {
   const tab = tabs[activeTab];
 
   return (
-    <section className="py-24">
+    <section className="py-12 bg-background">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-4"
+          className="text-center mb-8"
         >
           <h2 className="text-3xl md:text-5xl font-bold leading-tight max-w-4xl mx-auto">
-            Our engineering studio is the best place to{" "}
+            Everything Your Startup Needs to{" "}
             <span className="block mt-2">
               {tabs.map((t, i) => (
                 <span key={t.id}>
@@ -84,7 +84,7 @@ const SolutionsTabs = () => {
                       activeTab === i ? "text-primary" : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    {t.label.toLowerCase()} your {t.id === "build" ? "products" : t.id === "automate" ? "operations" : "systems"}
+                    {t.label.toLowerCase()}
                   </button>
                 </span>
               ))}
@@ -96,13 +96,13 @@ const SolutionsTabs = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="text-center text-muted-foreground max-w-2xl mx-auto mb-12 text-lg"
+          className="text-center text-muted-foreground max-w-2xl mx-auto mb-8 text-lg"
         >
-          Full-stack product engineering on one unified platform. We call it the startup engine.
+          Stop wasting time on technical decisions. Focus on your customers while we handle the engineering.
         </motion.p>
 
         {/* Tab buttons */}
-        <div className="flex justify-center gap-2 mb-12">
+        <div className="flex justify-center gap-2 mb-8">
           {tabs.map((t, i) => (
             <button
               key={t.id}
@@ -127,7 +127,7 @@ const SolutionsTabs = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.3 }}
-            className="grid lg:grid-cols-2 gap-12 items-start"
+            className="grid lg:grid-cols-2 gap-8 items-start"
           >
             {/* Left: Content */}
             <div>
