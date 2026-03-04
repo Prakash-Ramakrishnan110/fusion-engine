@@ -21,16 +21,16 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/98 backdrop-blur-lg border-b border-border shadow-sm" role="navigation" aria-label="Main navigation">
       <div className="container mx-auto flex items-center justify-between h-20 px-4">
-        <Link to="/" className="flex items-center shrink-0 hover:scale-105 transition-transform duration-200" aria-label="Fusion Engine Technology homepage">
+        <Link to="/" className="flex items-center shrink-0 hover:scale-105 transition-transform duration-200 mr-4" aria-label="Fusion Engine Technology homepage">
           <img 
             src={logo} 
             alt="Fusion Engine Technology" 
-            className="h-8 w-auto md:h-10 lg:h-12 transition-all duration-300"
+            className="h-6 w-auto md:h-8 lg:h-9 max-w-[120px] md:max-w-[150px] lg:max-w-[180px] transition-all duration-300"
           />
         </Link>
 
         {/* Desktop nav */}
-        <div className="hidden xl:flex items-center gap-2" role="menubar">
+        <div className="hidden xl:flex items-center gap-2 flex-1" role="menubar">
           {navLinks.map((link) => (
             <Link
               key={link.label}

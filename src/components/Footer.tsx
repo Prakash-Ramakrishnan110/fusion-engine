@@ -21,7 +21,7 @@ const Footer = () => {
               <img 
                 src={logo} 
                 alt="Fusion Engine Technology" 
-                className="h-10 w-auto mb-3"
+                className="h-8 w-auto max-w-[150px]"
               />
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
