@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import logo from "@/assets/logo.svg";
 
 const quickLinks = [
   { label: "Services", href: "/services" },
@@ -16,12 +17,12 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-8">
           <div>
-            <div className="flex flex-col leading-tight mb-4">
-              <div className="flex items-baseline">
-                <span className="text-2xl font-black text-blue-500 drop-shadow-md vibrant">FUSION</span>
-                <span className="text-2xl font-black text-gray-700 drop-shadow-md vibrant ml-2">ENGINE</span>
-              </div>
-              <span className="text-xs font-black text-gray-500 tracking-wider vibrant">TECHNOLOGY</span>
+            <div className="mb-4">
+              <img 
+                src={logo} 
+                alt="Fusion Engine Technology" 
+                className="h-10 w-auto mb-3"
+              />
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Your technical co-founder for startup success. We build, launch, and scale startups that get funded.

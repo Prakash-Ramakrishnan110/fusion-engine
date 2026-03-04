@@ -160,7 +160,7 @@ const SolutionsTabs = () => {
             <div className="space-y-6">
               <LottieAnimation
                 url={tab.lottieUrl}
-                className="w-full max-w-xs mx-auto"
+                className="w-full max-w-xs mx-auto sm:max-w-sm md:max-w-md"
                 style={{ height: 200 }}
               />
               <div className="glass-card p-6 relative">

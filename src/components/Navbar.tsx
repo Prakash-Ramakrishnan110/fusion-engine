@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo.svg";
 
 const navLinks = [
   { label: "Services", href: "/services" },
@@ -22,13 +22,11 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/98 backdrop-blur-lg border-b border-border shadow-sm" role="navigation" aria-label="Main navigation">
       <div className="container mx-auto flex items-center justify-between h-20 px-4">
         <Link to="/" className="flex items-center shrink-0 hover:scale-105 transition-transform duration-200" aria-label="Fusion Engine Technology homepage">
-          <div className="flex flex-col leading-tight">
-            <div className="flex items-baseline">
-              <span className="text-xl md:text-2xl mega-bold text-blue-500 drop-shadow-lg vibrant" aria-hidden="true">FUSION</span>
-              <span className="text-xl md:text-2xl mega-bold text-gray-700 drop-shadow-lg vibrant ml-2" aria-hidden="true">ENGINE</span>
-            </div>
-            <span className="text-xs md:text-xs mega-bold text-gray-500 tracking-wider vibrant" aria-hidden="true">TECHNOLOGY</span>
-          </div>
+          <img 
+            src={logo} 
+            alt="Fusion Engine Technology" 
+            className="h-8 w-auto md:h-10 lg:h-12 transition-all duration-300"
+          />
         </Link>
 
         {/* Desktop nav */}
