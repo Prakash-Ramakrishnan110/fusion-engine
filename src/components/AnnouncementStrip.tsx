@@ -4,16 +4,16 @@ import { Link } from "react-router-dom";
 
 const announcements = [
   {
-    tag: "New",
-    title: "AI-Powered Business Automation",
-    desc: "Automate workflows with intelligent agents",
-    link: "/services",
+    tag: "Limited",
+    title: "3 Spots Left This Month",
+    desc: "14-day startup launch program",
+    link: "/contact",
   },
   {
-    tag: "Launch",
-    title: "SaaS Starter Kit for Startups",
-    desc: "Ship your MVP in weeks, not months",
-    link: "/products",
+    tag: "Funding",
+    title: "Seed-Ready MVP Package",
+    desc: "Build what investors want to see",
+    link: "/pricing",
   },
 ];
 

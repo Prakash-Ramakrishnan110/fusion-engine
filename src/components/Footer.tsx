@@ -24,7 +24,7 @@ const Footer = () => {
               <span className="text-xs font-black text-gray-500 tracking-wider vibrant">TECHNOLOGY</span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Building high-performance digital systems for businesses that want to scale.
+              Your technical co-founder for startup success. We build, launch, and scale startups that get funded.
             </p>
           </div>
 

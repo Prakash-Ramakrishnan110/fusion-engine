@@ -6,39 +6,39 @@ const TrustSignals = () => {
   const stats = [
     {
       icon: TrendingUp,
-      value: "95%",
-      label: "Client Success Rate",
-      description: "Startups that achieve their goals"
+      value: "98%",
+      label: "Get Funded",
+      description: "Startups that raise their next round"
     },
     {
       icon: Star,
       value: "4.9/5",
-      label: "Client Rating",
+      label: "Founder Rating",
       description: "Average satisfaction score"
     },
     {
       icon: Award,
-      value: "50+",
-      label: "Products Launched",
+      value: "75+",
+      label: "Startups Launched",
       description: "Successful MVPs and platforms"
     },
     {
       icon: Shield,
-      value: "100%",
-      label: "Security Compliance",
-      description: "Enterprise-grade standards"
+      value: "$0",
+      label: "Upfront Cost",
+      description: "Pay only when you see results"
     }
   ];
 
   const testimonials = [
     {
-      quote: "Fusion Engine took our concept and delivered a fully functional MVP in just 12 days. Incredible speed and quality!",
+      quote: "Fusion Engine took our concept and delivered a fully functional MVP in 12 days. We closed our seed round 2 months later. Game changer!",
       author: "Sarah Chen",
-      role: "CEO, TechStart",
-      result: "Launched 3 months ahead of schedule"
+      role: "CEO, QuickStart AI",
+      result: "Raised $2.5M seed round"
     },
     {
-      quote: "Their team understood our startup needs perfectly. We scaled from 100 to 10,000 users without any issues.",
+      quote: "They're not just developers, they're technical co-founders. Our user growth went from 100 to 10,000 in 6 months. Incredible partnership!",
       author: "Raj Patel",
       role: "Founder, DataFlow",
       result: "100x user growth in 6 months"

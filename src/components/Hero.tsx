@@ -4,12 +4,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import LottieAnimation, { LOTTIE_URLS } from "./LottieAnimation";
 
-const highlights = [
-  "Revenue",
-  "Success",
-  "Growth",
-  "Innovation",
-];
+const highlights = ["Fast", "Funded", "Scalable", "Profitable"];
 
 const Hero = () => {
   const [highlightIndex, setHighlightIndex] = useState(0);
@@ -36,9 +31,9 @@ const Hero = () => {
             transition={{ duration: 0.7 }}
           >
             <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.1] mb-4 colorful">
-              Transform Your Startup Idea{" "}
+              Your Startup Idea,{" "}
               <br className="hidden md:block" />
-              Into{" "}
+              Built & Launched{" "}
               <span className="relative inline-block">
                 <AnimatePresence mode="wait">
                   <motion.span
@@ -55,31 +50,31 @@ const Hero = () => {
               </span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground max-w-xl mb-6 leading-relaxed">
-              🚀 From MVP to scale in weeks, not months. We help startups launch faster, 
-              iterate quicker, and grow exponentially with our proven development framework.
+              🚀 Stop dreaming, start building. We turn your startup vision into a market-ready product in 14 days. 
+              No technical headaches, no endless delays - just results that investors love.
             </p>
             <div className="flex flex-wrap gap-3 mb-4">
               <Link
                 to="/contact"
                 className="inline-flex items-center gap-2 px-7 py-3.5 rounded-lg bg-primary text-primary-foreground font-semibold text-base hover:bg-primary/90 transition-all hover:shadow-lg hover:shadow-primary/20"
               >
-                Book Free Strategy Call
+                Start Your 14-Day Launch
                 <ArrowRight size={18} />
               </Link>
               <Link
                 to="/pricing"
                 className="inline-flex items-center gap-2 px-7 py-3.5 rounded-lg border border-border text-foreground font-medium text-base hover:bg-secondary transition-all"
               >
-                View Startup Plans
+                View Startup Pricing
               </Link>
             </div>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <span className="flex items-center gap-1">
                 <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                Available for new projects
+                3 spots available this month
               </span>
               <span>•</span>
-              <span>14-day delivery guarantee</span>
+              <span>$0 consultation fee</span>
             </div>
           </motion.div>
 

@@ -18,7 +18,7 @@ const CTASection = () => {
               viewport={{ once: true }}
               className="text-3xl md:text-5xl font-bold mb-4 max-w-3xl"
             >
-              Ready to build your next product?
+              Ready to launch your startup?
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -27,7 +27,7 @@ const CTASection = () => {
               transition={{ delay: 0.1 }}
               className="text-lg text-muted-foreground mb-10 max-w-xl"
             >
-              Get started in minutes. Our team will help you ship faster than you thought possible.
+              Join 75+ founders who've launched with us. Your 14-day journey to market starts with a free consultation.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -40,14 +40,14 @@ const CTASection = () => {
                 to="/contact"
                 className="inline-flex items-center gap-2 px-8 py-4 rounded-lg bg-primary text-primary-foreground font-semibold text-lg hover:bg-primary/90 transition-all hover:shadow-lg hover:shadow-primary/20"
               >
-                Start a Project
+                Start Your 14-Day Launch
                 <ArrowRight size={20} />
               </Link>
               <Link
                 to="/pricing"
                 className="inline-flex items-center gap-2 px-8 py-4 rounded-lg border border-border text-foreground font-semibold text-lg hover:bg-secondary transition-all"
               >
-                View Pricing
+                View Startup Plans
               </Link>
             </motion.div>
           </div>

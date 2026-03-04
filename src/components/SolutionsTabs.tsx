@@ -98,7 +98,7 @@ const SolutionsTabs = () => {
           viewport={{ once: true }}
           className="text-center text-muted-foreground max-w-2xl mx-auto mb-8 text-lg"
         >
-          Stop wasting time on technical decisions. Focus on your customers while we handle the engineering.
+          Stop wasting time on technical decisions. Focus on your customers while we handle the engineering that gets you funded.
         </motion.p>
 
         {/* Tab buttons */}

@@ -7,22 +7,22 @@ const StartupBenefits = () => {
     {
       icon: Clock,
       title: "Launch in 14 Days",
-      description: "From idea to MVP in just 2 weeks. Our proven framework accelerates your time to market."
+      description: "From napkin sketch to paying customers. Our startup accelerator framework gets you to market faster than anyone else."
     },
     {
       icon: Users,
-      title: "Dedicated Team",
-      description: "Get a full-stack development team focused exclusively on your startup's success."
+      title: "Technical Co-founder",
+      description: "Get a full-stack development team that acts like your technical co-founder. We're invested in your success."
     },
     {
       icon: Zap,
-      title: "Scale Ready",
-      description: "Built with enterprise-grade architecture that grows with your user base."
+      title: "Investor-Ready",
+      description: "Build with enterprise-grade architecture that investors trust. Perfect for seed rounds and Series A."
     },
     {
       icon: CheckCircle,
-      title: "Risk-Free Trial",
-      description: "Start with a paid pilot. Only continue if you're 100% satisfied with the results."
+      title: "Zero Risk",
+      description: "Start with a paid pilot. Only continue if you're 100% satisfied. We believe in earning your trust."
     }
   ];
 
