@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Quote } from "lucide-react";
 import { Link } from "react-router-dom";
+import LottieAnimation, { LOTTIE_URLS } from "./LottieAnimation";
 
 const testimonials = [
   {
@@ -30,15 +31,27 @@ const StartupToolkit = () => {
     <section className="py-24">
       <div className="container mx-auto px-4">
         {/* Testimonials */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-12"
-        >
-          <span className="text-sm font-semibold text-primary uppercase tracking-widest">What Clients Say</span>
-          <h2 className="text-3xl md:text-4xl font-bold mt-3">Trusted by Founders</h2>
-        </motion.div>
+        <div className="grid lg:grid-cols-2 gap-12 items-center mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <span className="text-sm font-semibold text-primary uppercase tracking-widest">What Clients Say</span>
+            <h2 className="text-3xl md:text-4xl font-bold mt-3">Trusted by Founders</h2>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="hidden lg:block"
+          >
+            <LottieAnimation
+              url={LOTTIE_URLS.success}
+              className="w-full max-w-xs ml-auto"
+            />
+          </motion.div>
+        </div>
 
         <div className="grid md:grid-cols-3 gap-6 mb-20">
           {testimonials.map((t, i) => (

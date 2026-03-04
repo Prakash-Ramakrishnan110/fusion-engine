@@ -1,11 +1,11 @@
 import Navbar from "@/components/Navbar";
 import PageHero from "@/components/PageHero";
-import PricingVisual from "@/components/animations/PricingVisual";
 import Pricing from "@/components/Pricing";
 import StartupAdvantage from "@/components/StartupAdvantage";
 import PageStats from "@/components/PageStats";
 import Footer from "@/components/Footer";
 import usePageMeta from "@/hooks/usePageMeta";
+import { LOTTIE_URLS } from "@/components/LottieAnimation";
 
 const stats = [
   { value: "30%", label: "Avg Cost Savings vs Agencies" },
@@ -25,7 +25,7 @@ const PricingPage = () => {
           title="Simple, Transparent"
           highlight="Engagement Models"
           description="No hidden fees, no surprises. Flexible pricing tailored to your project scope and business stage — from startup MVPs to enterprise systems."
-          animation={<PricingVisual />}
+          lottieUrl={LOTTIE_URLS.calculator}
         />
         <Pricing />
         <StartupAdvantage />

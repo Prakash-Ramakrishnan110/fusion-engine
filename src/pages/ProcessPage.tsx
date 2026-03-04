@@ -1,11 +1,11 @@
 import Navbar from "@/components/Navbar";
 import PageHero from "@/components/PageHero";
-import ProcessFlow from "@/components/animations/ProcessFlow";
 import Process from "@/components/Process";
 import StartupAdvantage from "@/components/StartupAdvantage";
 import PageStats from "@/components/PageStats";
 import Footer from "@/components/Footer";
 import usePageMeta from "@/hooks/usePageMeta";
+import { LOTTIE_URLS } from "@/components/LottieAnimation";
 
 const stats = [
   { value: "98%", label: "On-Time Delivery" },
@@ -25,7 +25,7 @@ const ProcessPage = () => {
           title="A Proven Process for"
           highlight="Predictable Results"
           description="Our 6-step engineering methodology ensures every project is delivered on time, on budget, and beyond expectations. No surprises, just results."
-          animation={<ProcessFlow />}
+          lottieUrl={LOTTIE_URLS.workflow}
         />
         <Process />
         <StartupAdvantage />

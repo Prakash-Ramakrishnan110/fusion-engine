@@ -4,6 +4,7 @@ import {
   BarChart3, Zap, ArrowRight 
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import LottieAnimation, { LOTTIE_URLS } from "./LottieAnimation";
 
 const solutions = [
   { icon: Smartphone, title: "Mobile Apps", desc: "Native & cross-platform apps built for scale", link: "/services" },
@@ -20,17 +21,29 @@ const HowWeHelp = () => {
   return (
     <section className="py-24">
       <div className="container mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-3xl md:text-5xl font-bold mb-4">How Fusion Engine can help</h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            From concept to production — everything you need to build, launch, and scale digital products.
-          </p>
-        </motion.div>
+        <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">How Fusion Engine can help</h2>
+            <p className="text-muted-foreground text-lg max-w-2xl">
+              From concept to production — everything you need to build, launch, and scale digital products.
+            </p>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="hidden lg:block"
+          >
+            <LottieAnimation
+              url={LOTTIE_URLS.innovation}
+              className="w-full max-w-xs mx-auto"
+            />
+          </motion.div>
+        </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {solutions.map((s, i) => (

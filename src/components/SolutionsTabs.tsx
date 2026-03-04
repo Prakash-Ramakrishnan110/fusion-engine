@@ -1,7 +1,9 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { ArrowRight, Smartphone, Shield, Brain, Quote } from "lucide-react";
 import { Link } from "react-router-dom";
+import LottieAnimation, { LOTTIE_URLS } from "./LottieAnimation";
 
 const tabs = [
   {
@@ -13,6 +15,7 @@ const tabs = [
     cta: "Start building now",
     ctaLink: "/services",
     learnMore: "/products",
+    lottieUrl: LOTTIE_URLS.coding,
     testimonial: {
       quote: "Fusion Engine delivered our entire platform in 8 weeks — what our previous agency quoted 6 months for. The quality exceeded expectations.",
       name: "Arjun Mehta",
@@ -29,6 +32,7 @@ const tabs = [
     cta: "Explore automation",
     ctaLink: "/services",
     learnMore: "/process",
+    lottieUrl: LOTTIE_URLS.automation,
     testimonial: {
       quote: "The automation system reduced our manual processing time by 70%. Our team can now focus on strategy instead of repetitive tasks.",
       name: "Priya Sharma",
@@ -45,6 +49,7 @@ const tabs = [
     cta: "View security features",
     ctaLink: "/why-us",
     learnMore: "/services",
+    lottieUrl: LOTTIE_URLS.security,
     testimonial: {
       quote: "Bank-grade security without the enterprise price tag. Fusion Engine's security-first approach gives us complete peace of mind.",
       name: "Vikram Singh",
@@ -151,15 +156,22 @@ const SolutionsTabs = () => {
               </div>
             </div>
 
-            {/* Right: Testimonial card */}
-            <div className="glass-card p-8 relative">
-              <Quote size={32} className="text-primary/20 mb-4" />
-              <blockquote className="text-foreground leading-relaxed mb-6 text-lg italic">
-                "{tab.testimonial.quote}"
-              </blockquote>
-              <div>
-                <div className="font-semibold text-foreground">{tab.testimonial.name}</div>
-                <div className="text-sm text-muted-foreground">{tab.testimonial.role}</div>
+            {/* Right: Lottie + Testimonial */}
+            <div className="space-y-6">
+              <LottieAnimation
+                url={tab.lottieUrl}
+                className="w-full max-w-xs mx-auto"
+                style={{ height: 200 }}
+              />
+              <div className="glass-card p-6 relative">
+                <Quote size={24} className="text-primary/20 mb-3" />
+                <blockquote className="text-foreground leading-relaxed mb-4 text-base italic">
+                  "{tab.testimonial.quote}"
+                </blockquote>
+                <div>
+                  <div className="font-semibold text-foreground text-sm">{tab.testimonial.name}</div>
+                  <div className="text-xs text-muted-foreground">{tab.testimonial.role}</div>
+                </div>
               </div>
             </div>
           </motion.div>

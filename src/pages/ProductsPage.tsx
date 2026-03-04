@@ -1,11 +1,11 @@
 import Navbar from "@/components/Navbar";
 import PageHero from "@/components/PageHero";
-import ProductGrid from "@/components/animations/ProductGrid";
 import Products from "@/components/Products";
 import StartupToolkit from "@/components/StartupToolkit";
 import PageStats from "@/components/PageStats";
 import Footer from "@/components/Footer";
 import usePageMeta from "@/hooks/usePageMeta";
+import { LOTTIE_URLS } from "@/components/LottieAnimation";
 
 const stats = [
   { value: "25+", label: "Products Launched" },
@@ -25,7 +25,7 @@ const ProductsPage = () => {
           title="Products Built to"
           highlight="Scale Your Business"
           description="From GST billing systems to AI dashboards — real digital products engineered for real businesses. Each system is custom-built and battle-tested."
-          animation={<ProductGrid />}
+          lottieUrl={LOTTIE_URLS.dashboard}
         />
         <Products />
         <PageStats stats={stats} />
