@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Linkedin, Twitter, Github, Instagram, ExternalLink } from "lucide-react";
 import LottieAnimation, { LOTTIE_URLS } from "./LottieAnimation";
+import ceoImage from "@/assets/prakash-ceo.jpg";
 
 const Founder = () => {
   return (
@@ -18,7 +19,7 @@ const Founder = () => {
             <div className="glass-card p-8 md:p-12">
               <div className="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 mx-auto mb-6 overflow-hidden">
                 <img 
-                  src="/prakash-ceo.jpg" 
+                  src={ceoImage} 
                   alt="Prakash Ramakrishnan - CEO" 
                   className="w-full h-full object-cover"
                   onError={(e) => {
