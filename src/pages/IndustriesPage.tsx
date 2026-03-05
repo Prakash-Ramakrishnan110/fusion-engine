@@ -206,8 +206,6 @@ const IndustriesPage = () => {
       <main>
         <IndustriesHero />
         <Industries />
-        <StartupAdvantage />
-        <PageStats stats={stats} />
       </main>
       <Footer />
     </div>

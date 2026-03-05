@@ -207,8 +207,6 @@ const PricingPage = () => {
       <main>
         <PricingHero />
         <Pricing />
-        <StartupAdvantage />
-        <PageStats stats={stats} />
       </main>
       <Footer />
     </div>

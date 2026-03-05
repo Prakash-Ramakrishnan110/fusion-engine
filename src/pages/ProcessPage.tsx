@@ -204,8 +204,6 @@ const ProcessPage = () => {
       <main>
         <ProcessHero />
         <Process />
-        <StartupAdvantage />
-        <PageStats stats={stats} />
       </main>
       <Footer />
     </div>

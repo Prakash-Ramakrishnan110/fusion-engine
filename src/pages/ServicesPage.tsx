@@ -186,9 +186,6 @@ const ServicesPage = () => {
       <main>
         <ServicesHero />
         <Services />
-        <StartupAdvantage />
-        <PageStats stats={stats} />
-        <StartupToolkit />
       </main>
       <Footer />
     </div>

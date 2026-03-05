@@ -207,8 +207,6 @@ const ProductsPage = () => {
       <main>
         <ProductsHero />
         <Products />
-        <PageStats stats={stats} />
-        <StartupToolkit />
       </main>
       <Footer />
     </div>

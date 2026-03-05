@@ -204,8 +204,6 @@ const WhyUsPage = () => {
       <main>
         <WhyUsHero />
         <WhyFusion />
-        <PageStats stats={stats} />
-        <StartupToolkit />
       </main>
       <Footer />
     </div>
