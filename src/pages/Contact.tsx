@@ -6,11 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import usePageMeta from "@/hooks/usePageMeta";
 import LottieAnimation, { LOTTIE_URLS } from "@/components/LottieAnimation";
-
-// EmailJS configuration
-const EMAILJS_SERVICE_ID = "service_your_service_id";
-const EMAILJS_TEMPLATE_ID = "template_your_template_id";
-const EMAILJS_PUBLIC_KEY = "your_public_key";
+import emailjs from '@emailjs/browser';
 
 const ContactHero = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -202,27 +198,40 @@ const Contact = () => {
     e.preventDefault();
     
     try {
-      // For now, we'll use a simple mailto link as fallback
-      const subject = encodeURIComponent(`New Contact Form Submission from ${formData.name}`);
-      const body = encodeURIComponent(
-        `Name: ${formData.name}\n` +
-        `Email: ${formData.email}\n` +
-        `Phone: ${formData.phone}\n` +
-        `Message: ${formData.message}\n\n` +
-        `---\n` +
-        `Sent from Fusion Engine Website\n` +
-        `Time: ${new Date().toLocaleString()}`
+      // EmailJS configuration
+      const SERVICE_ID = 'service_your_service_id';
+      const TEMPLATE_ID = 'template_your_template_id';
+      const PUBLIC_KEY = 'your_public_key';
+      
+      // Prepare email template parameters
+      const templateParams = {
+        from_name: formData.name,
+        from_email: formData.email,
+        from_phone: formData.phone,
+        message: formData.message,
+        to_email: 'prakash7418r@gmail.com',
+        reply_to: formData.email,
+        time: new Date().toLocaleString()
+      };
+      
+      // Send email using EmailJS
+      const response = await emailjs.send(
+        SERVICE_ID,
+        TEMPLATE_ID,
+        templateParams,
+        PUBLIC_KEY
       );
       
-      // Open email client with pre-filled details
-      window.location.href = `mailto:prakash7418r@gmail.com?subject=${subject}&body=${body}`;
-      
-      setSubmitted(true);
-      setTimeout(() => setSubmitted(false), 5000);
-      setFormData({ name: "", email: "", phone: "", message: "" });
+      if (response.status === 200) {
+        setSubmitted(true);
+        setTimeout(() => setSubmitted(false), 5000);
+        setFormData({ name: "", email: "", phone: "", message: "" });
+      } else {
+        throw new Error('Failed to send email');
+      }
     } catch (error) {
       console.error('Error sending email:', error);
-      alert('There was an error sending your message. Please try again.');
+      alert('There was an error sending your message. Please try again or contact us directly at prakash7418r@gmail.com');
     }
   };
 
@@ -314,7 +323,7 @@ const Contact = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm text-center"
                   >
-                    ✅ Opening your email client... Please send the email to contact us directly!
+                    ✅ Message sent successfully! We'll get back to you within 2 hours.
                   </motion.div>
                 )}
 
