@@ -307,7 +307,7 @@ const Contact = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
-              <form onSubmit={handleSubmit} className="glass-card gradient-border p-6 md:p-8 space-y-5">
+              <form onSubmit={handleSubmit} className="glass-card gradient-border p-6 md:p-8 space-y-5 relative z-10">
                 {submitted && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
@@ -327,6 +327,7 @@ const Contact = () => {
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                     placeholder="John Doe"
+                    style={{ pointerEvents: 'auto', userSelect: 'auto' }}
                   />
                 </div>
 
@@ -340,6 +341,7 @@ const Contact = () => {
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="w-full px-4 py-3 rounded-lg bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                       placeholder="john@company.com"
+                      style={{ pointerEvents: 'auto', userSelect: 'auto' }}
                     />
                   </div>
                   <div>
@@ -349,7 +351,8 @@ const Contact = () => {
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       className="w-full px-4 py-3 rounded-lg bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                      placeholder="+1 (555) 000-0000"
+                      placeholder="+91 6369884331"
+                      style={{ pointerEvents: 'auto', userSelect: 'auto' }}
                     />
                   </div>
                 </div>
@@ -363,6 +366,7 @@ const Contact = () => {
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all resize-none"
                     placeholder="Tell us about your project..."
+                    style={{ pointerEvents: 'auto', userSelect: 'auto' }}
                   />
                 </div>
 
