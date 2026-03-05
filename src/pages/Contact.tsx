@@ -327,7 +327,7 @@ const Contact = () => {
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                     placeholder="John Doe"
-                    style={{ pointerEvents: 'auto', userSelect: 'auto' }}
+                    style={{ pointerEvents: 'auto', userSelect: 'auto', position: 'relative', zIndex: 10 }}
                   />
                 </div>
 
@@ -341,7 +341,7 @@ const Contact = () => {
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="w-full px-4 py-3 rounded-lg bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                       placeholder="john@company.com"
-                      style={{ pointerEvents: 'auto', userSelect: 'auto' }}
+                      style={{ pointerEvents: 'auto', userSelect: 'auto', position: 'relative', zIndex: 10 }}
                     />
                   </div>
                   <div>
@@ -352,7 +352,7 @@ const Contact = () => {
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       className="w-full px-4 py-3 rounded-lg bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                       placeholder="+91 6369884331"
-                      style={{ pointerEvents: 'auto', userSelect: 'auto' }}
+                      style={{ pointerEvents: 'auto', userSelect: 'auto', position: 'relative', zIndex: 10 }}
                     />
                   </div>
                 </div>
@@ -366,7 +366,7 @@ const Contact = () => {
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg bg-secondary/50 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all resize-none"
                     placeholder="Tell us about your project..."
-                    style={{ pointerEvents: 'auto', userSelect: 'auto' }}
+                    style={{ pointerEvents: 'auto', userSelect: 'auto', position: 'relative', zIndex: 10 }}
                   />
                 </div>
 
