@@ -58,19 +58,22 @@ const Footer = () => {
             <h4 className="font-semibold mb-4 text-sm">Contact</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <a href="mailto:contact@fusionengine.tech" className="hover:text-foreground transition-colors">
-                  contact@fusionengine.tech
+                <a href="mailto:prakash7418r@gmail.com" className="hover:text-foreground transition-colors">
+                  prakash7418r@gmail.com
                 </a>
               </li>
               <li>
-                <a href="tel:+919876543210" className="hover:text-foreground transition-colors">
-                  +91 98765 43210
+                <a href="tel:+916369884331" className="hover:text-foreground transition-colors">
+                  +91 63698 84331
                 </a>
               </li>
               <li>
-                <a href="https://wa.me/919876543210" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
-                  WhatsApp Support
+                <a href="https://wa.me/916369884331" target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
+                  WhatsApp: 63698 84331
                 </a>
+              </li>
+              <li className="text-xs">
+                Palacode, Dharamapuri
               </li>
             </ul>
           </div>

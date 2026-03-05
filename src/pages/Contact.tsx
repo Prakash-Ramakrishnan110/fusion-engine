@@ -1,5 +1,5 @@
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
-import { Mail, Phone, MapPin, Send, ArrowLeft, MessageSquare, Clock, CheckCircle } from "lucide-react";
+import { Mail, Phone, MapPin, Send, ArrowLeft, MessageSquare, Clock, CheckCircle, Download, Image } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -308,6 +308,71 @@ const Contact = () => {
                   </a>
                 ))}
               </div>
+
+              {/* Logo Download Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="mt-8 p-6 rounded-xl bg-secondary/30 border border-border/20"
+              >
+                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  <Image size={18} className="text-primary" />
+                  Download Our Logo
+                </h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Download our official logo in various formats for your use.
+                </p>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { 
+                      name: "SVG Vector", 
+                      format: "SVG", 
+                      size: "2 KB", 
+                      url: "/assets/logo.svg",
+                      desc: "Best for web"
+                    },
+                    { 
+                      name: "PNG High-Res", 
+                      format: "PNG", 
+                      size: "206 KB", 
+                      url: "/assets/logo.png",
+                      desc: "Transparent background"
+                    },
+                    { 
+                      name: "JPEG Print", 
+                      format: "JPEG", 
+                      size: "62 KB", 
+                      url: "/assets/logo.jpeg",
+                      desc: "For print media"
+                    },
+                    { 
+                      name: "Logo Final", 
+                      format: "SVG", 
+                      size: "1 KB", 
+                      url: "/assets/logo-final.svg",
+                      desc: "Latest version"
+                    }
+                  ].map((logo, index) => (
+                    <a
+                      key={index}
+                      href={logo.url}
+                      download={`fusion-engine-${logo.name.toLowerCase().replace(/\s+/g, '-')}.${logo.format.toLowerCase()}`}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-background/50 border border-border/30 hover:bg-background/80 hover:border-primary/50 transition-all group"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                        <Download size={16} className="text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm text-foreground truncate">{logo.name}</div>
+                        <div className="text-xs text-muted-foreground">{logo.format} • {logo.size}</div>
+                        <div className="text-xs text-primary">{logo.desc}</div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </motion.div>
             </motion.div>
 
             {/* Contact Form */}
