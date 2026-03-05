@@ -7,6 +7,11 @@ import Footer from "@/components/Footer";
 import usePageMeta from "@/hooks/usePageMeta";
 import LottieAnimation, { LOTTIE_URLS } from "@/components/LottieAnimation";
 
+// EmailJS configuration
+const EMAILJS_SERVICE_ID = "service_your_service_id";
+const EMAILJS_TEMPLATE_ID = "template_your_template_id";
+const EMAILJS_PUBLIC_KEY = "your_public_key";
+
 const ContactHero = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
@@ -193,11 +198,32 @@ const Contact = () => {
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 4000);
-    setFormData({ name: "", email: "", phone: "", message: "" });
+    
+    try {
+      // For now, we'll use a simple mailto link as fallback
+      const subject = encodeURIComponent(`New Contact Form Submission from ${formData.name}`);
+      const body = encodeURIComponent(
+        `Name: ${formData.name}\n` +
+        `Email: ${formData.email}\n` +
+        `Phone: ${formData.phone}\n` +
+        `Message: ${formData.message}\n\n` +
+        `---\n` +
+        `Sent from Fusion Engine Website\n` +
+        `Time: ${new Date().toLocaleString()}`
+      );
+      
+      // Open email client with pre-filled details
+      window.location.href = `mailto:prakash7418r@gmail.com?subject=${subject}&body=${body}`;
+      
+      setSubmitted(true);
+      setTimeout(() => setSubmitted(false), 5000);
+      setFormData({ name: "", email: "", phone: "", message: "" });
+    } catch (error) {
+      console.error('Error sending email:', error);
+      alert('There was an error sending your message. Please try again.');
+    }
   };
 
   return (
@@ -254,9 +280,9 @@ const Contact = () => {
 
               <div className="space-y-5">
                 {[
-                  { icon: Mail, label: "Email", value: "hello@fusionengine.dev", href: "mailto:hello@fusionengine.dev" },
-                  { icon: Phone, label: "Phone", value: "+1 (555) 123-4567", href: "tel:+15551234567" },
-                  { icon: MapPin, label: "Location", value: "San Francisco, CA", href: "#" },
+                  { icon: Mail, label: "Email", value: "prakash7418r@gmail.com", href: "mailto:prakash7418r@gmail.com" },
+                  { icon: Phone, label: "Phone", value: "+91 6369884331", href: "tel:+916369884331" },
+                  { icon: MapPin, label: "Location", value: "Palacode, Dharamapuri", href: "#" },
                 ].map((item) => (
                   <a
                     key={item.label}
@@ -288,7 +314,7 @@ const Contact = () => {
                     animate={{ opacity: 1, y: 0 }}
                     className="p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm text-center"
                   >
-                    ✅ Message sent! We'll get back to you shortly.
+                    ✅ Opening your email client... Please send the email to contact us directly!
                   </motion.div>
                 )}
 
@@ -346,6 +372,15 @@ const Contact = () => {
                 >
                   Send Message <Send size={18} />
                 </button>
+
+                <a
+                  href="https://wa.me/916369884331?text=Hi%20Prakash,%20I'm%20interested%20in%20your%20services!"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-green-600 text-white font-semibold text-base hover:bg-green-700 transition-all hover:scale-[1.02]"
+                >
+                  Chat on WhatsApp
+                </a>
               </form>
             </motion.div>
           </div>
