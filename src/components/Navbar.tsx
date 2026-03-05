@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
-import logo from "@/assets/logo.svg";
 
 const navLinks = [
   { label: "Services", href: "/services" },
@@ -22,11 +21,13 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/98 backdrop-blur-lg border-b border-border shadow-sm" role="navigation" aria-label="Main navigation">
       <div className="container mx-auto flex items-center justify-between h-20 px-4">
         <Link to="/" className="flex items-center shrink-0 hover:scale-105 transition-transform duration-200 mr-4" aria-label="Fusion Engine Technology homepage">
-          <img 
-            src={logo} 
-            alt="Fusion Engine Technology" 
-            className="h-6 w-auto md:h-8 lg:h-9 max-w-[120px] md:max-w-[150px] lg:max-w-[180px] transition-all duration-300"
-          />
+          <div className="flex flex-col leading-tight">
+            <div className="flex items-baseline">
+              <span className="text-lg md:text-xl font-bold text-blue-500" style={{ fontFamily: '"Space Grotesk", system-ui, sans-serif' }}>FUSION</span>
+              <span className="text-lg md:text-xl font-bold text-gray-700 ml-2" style={{ fontFamily: '"Space Grotesk", system-ui, sans-serif' }}>ENGINE</span>
+            </div>
+            <span className="text-xs font-bold text-gray-500 tracking-wider" style={{ fontFamily: '"Space Grotesk", system-ui, sans-serif' }}>TECHNOLOGY</span>
+          </div>
         </Link>
 
         {/* Desktop nav */}

@@ -1,5 +1,5 @@
-import { motion } from "framer-motion";
-import { ReactNode } from "react";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { ReactNode, useEffect, useState, useRef } from "react";
 import LottieAnimation, { LOTTIE_URLS } from "./LottieAnimation";
 
 interface PageHeroProps {
@@ -12,36 +12,130 @@ interface PageHeroProps {
 }
 
 const PageHero = ({ badge, title, highlight, description, animation, lottieUrl }: PageHeroProps) => {
-  return (
-    <section className="relative pt-28 pb-20 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-secondary/20" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-primary/5 blur-[100px] animate-glow-pulse" />
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  const { scrollYProgress } = useScroll();
+  const parallaxY = useTransform(scrollYProgress, [0, 1], [0, -30]);
+  const scale = useSpring(useTransform(scrollYProgress, [0, 0.5], [1, 1.05]));
+  const opacity = useTransform(scrollYProgress, [0, 0.3], [1, 0.9]);
 
-      <div className="container mx-auto px-4 relative z-10">
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        setMousePosition({
+          x: (e.clientX - rect.left) / rect.width,
+          y: (e.clientY - rect.top) / rect.height
+        });
+      }
+    };
+    
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  return (
+    <section ref={containerRef} className="relative pt-28 pb-20 overflow-hidden">
+      {/* Advanced Background Effects */}
+      <div className="absolute inset-0">
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-b from-background via-background to-secondary/20"
+          style={{ opacity }}
+        />
+        <motion.div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-primary/5 blur-[100px]"
+          style={{
+            scale: 1 + mousePosition.x * 0.2,
+            x: (mousePosition.x - 0.5) * 50,
+            y: (mousePosition.y - 0.5) * 50
+          }}
+        />
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            background: `radial-gradient(circle at ${mousePosition.x * 100}% ${mousePosition.y * 100}%, rgba(59, 130, 246, 0.08) 0%, transparent 50%)`
+          }}
+        />
+      </div>
+
+      <motion.div 
+        className="container mx-auto px-4 relative z-10"
+        style={{ scale, y: parallaxY }}
+      >
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <span className="inline-block text-xs font-semibold text-primary uppercase tracking-widest mb-4 px-3 py-1 rounded-full bg-primary/10">
+            {/* Advanced Badge */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6"
+            >
+              <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
               {badge}
-            </span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6">
+            </motion.div>
+
+            {/* Sophisticated Headline */}
+            <motion.h1 
+              className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
               {title}{" "}
-              <span className="text-primary">{highlight}</span>
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">
+              <motion.span 
+                className="text-primary"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                {highlight}
+              </motion.span>
+            </motion.h1>
+
+            {/* Advanced Description */}
+            <motion.p 
+              className="text-lg text-muted-foreground max-w-xl leading-relaxed"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+            >
               {description}
-            </p>
+            </motion.p>
           </motion.div>
 
+          {/* Advanced Lottie Animation */}
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
             className="hidden lg:block relative"
-            style={{ height: 400 }}
+            style={{ 
+              height: 400,
+              rotateY: mousePosition.x * 3 - 1.5,
+              rotateX: mousePosition.y * -3 + 1.5
+            }}
+          >
+            {animation || (
+              <LottieAnimation
+                url={lottieUrl || LOTTIE_URLS.techNetwork}
+                className="w-full h-full"
+              />
+            )}
+          </motion.div>
+
+          {/* Mobile Lottie Animation */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="lg:hidden relative mt-6"
+            style={{ height: 250 }}
           >
             {animation || (
               <LottieAnimation
@@ -51,7 +145,7 @@ const PageHero = ({ badge, title, highlight, description, animation, lottieUrl }
             )}
           </motion.div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };

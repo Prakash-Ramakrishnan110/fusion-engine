@@ -1,11 +1,205 @@
-import { motion } from "framer-motion";
-import { Mail, Phone, MapPin, Send, ArrowLeft } from "lucide-react";
-import { useState } from "react";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { Mail, Phone, MapPin, Send, ArrowLeft, MessageSquare, Clock, CheckCircle } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import usePageMeta from "@/hooks/usePageMeta";
 import LottieAnimation, { LOTTIE_URLS } from "@/components/LottieAnimation";
+
+const ContactHero = () => {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  const { scrollYProgress } = useScroll();
+  const parallaxY = useTransform(scrollYProgress, [0, 1], [0, -30]);
+  const scale = useSpring(useTransform(scrollYProgress, [0, 0.5], [1, 1.05]));
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        setMousePosition({
+          x: (e.clientX - rect.left) / rect.width,
+          y: (e.clientY - rect.top) / rect.height
+        });
+      }
+    };
+    
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  const contactBenefits = [
+    { icon: MessageSquare, title: "Quick Response", desc: "Within 2 hours" },
+    { icon: Clock, title: "Available 24/7", desc: "Always here" },
+    { icon: CheckCircle, title: "Free Consultation", desc: "No obligation" },
+    { icon: Send, title: "Start Today", desc: "Launch in 14 days" }
+  ];
+
+  return (
+    <section ref={containerRef} className="relative pt-28 pb-20 overflow-hidden">
+      {/* Advanced Background Effects */}
+      <div className="absolute inset-0">
+        <motion.div 
+          className="absolute inset-0 bg-gradient-to-br from-rose-500/5 via-transparent to-pink-500/5"
+          style={{ opacity: 0.8 }}
+        />
+        <motion.div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gradient-to-r from-rose-500/10 to-pink-500/10 blur-[120px]"
+          style={{
+            scale: 1 + Math.sin(mousePosition.x * Math.PI * 1.5) * 0.2,
+            rotate: (mousePosition.x - 0.5) * 30
+          }}
+        />
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            background: `radial-gradient(circle at ${mousePosition.x * 100}% ${mousePosition.y * 100}%, rgba(244, 63, 94, 0.12) 0%, transparent 60%)`
+          }}
+        />
+      </div>
+
+      <motion.div 
+        className="container mx-auto px-4 relative z-10"
+        style={{ scale, y: parallaxY }}
+      >
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            {/* Advanced Badge */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.2 }}
+              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-rose-500/10 to-pink-500/10 border border-rose-500/20 text-rose-600 text-sm font-medium mb-6"
+            >
+              <span className="w-2 h-2 bg-gradient-to-r from-rose-500 to-pink-500 rounded-full animate-pulse"></span>
+              Let's Connect
+            </motion.div>
+
+            {/* Sophisticated Headline */}
+            <motion.h1 
+              className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              Ready to Launch
+              <motion.span 
+                className="bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent block"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                Your Startup?
+              </motion.span>
+            </motion.h1>
+
+            {/* Advanced Description */}
+            <motion.p 
+              className="text-lg text-muted-foreground max-w-xl leading-relaxed mb-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+            >
+              <span className="font-semibold text-foreground">Start the conversation</span> — 
+              <span className="text-rose-600 font-semibold"> free consultation</span>, 
+              <span className="text-pink-600 font-semibold"> no pressure</span>. 
+              Let's discuss how we can get your MVP to market in 14 days.
+            </motion.p>
+
+            {/* Contact Benefits Grid */}
+            <motion.div 
+              className="grid grid-cols-2 gap-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+            >
+              {contactBenefits.map((benefit, index) => (
+                <motion.div
+                  key={benefit.title}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.8 + index * 0.1 }}
+                  className="bg-background/50 backdrop-blur-sm border border-border rounded-lg p-4"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-rose-500/10 to-pink-500/10 flex items-center justify-center">
+                      <benefit.icon size={18} className="text-rose-600" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-sm">{benefit.title}</div>
+                      <div className="text-xs text-muted-foreground">{benefit.desc}</div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
+
+          {/* Advanced Lottie Animation */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="hidden lg:block relative"
+            style={{ 
+              height: 450,
+              rotateY: mousePosition.x * 6 - 3,
+              rotateX: mousePosition.y * -6 + 3
+            }}
+          >
+            <LottieAnimation
+              url={LOTTIE_URLS.email}
+              className="w-full h-full"
+            />
+            {/* Floating Contact Cards */}
+            {contactBenefits.map((benefit, index) => (
+              <motion.div
+                key={benefit.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1 + index * 0.15 }}
+                className="absolute bg-background/90 backdrop-blur-sm border border-rose-500/20 rounded-lg p-3 shadow-lg"
+                style={{
+                  top: `${15 + index * 22}%`,
+                  right: index % 2 === 0 ? '-8%' : 'auto',
+                  left: index % 2 === 1 ? '-8%' : 'auto'
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <benefit.icon size={14} className="text-rose-600" />
+                  <div>
+                    <div className="font-semibold text-xs">{benefit.title}</div>
+                    <div className="text-xs text-muted-foreground">{benefit.desc}</div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Mobile Lottie Animation */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="lg:hidden relative mt-8"
+            style={{ height: 250 }}
+          >
+            <LottieAnimation
+              url={LOTTIE_URLS.email}
+              className="w-full h-full"
+            />
+          </motion.div>
+        </div>
+      </motion.div>
+    </section>
+  );
+};
 
 const Contact = () => {
   usePageMeta("Contact", "📬");
@@ -22,8 +216,10 @@ const Contact = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />
-      <main className="pt-28 pb-20">
-        <div className="container mx-auto px-4">
+      <main>
+        <ContactHero />
+        
+        <div className="container mx-auto px-4 py-16">
           <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors mb-8">
             <ArrowLeft size={16} /> Back to Home
           </Link>
@@ -34,9 +230,9 @@ const Contact = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
-                Get in <span className="text-primary glow-text">Touch</span>
-              </h1>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Send us a <span className="text-primary">Message</span>
+              </h2>
               <p className="text-lg text-muted-foreground max-w-2xl">
                 Ready to build something extraordinary? Let's talk about your next project.
               </p>

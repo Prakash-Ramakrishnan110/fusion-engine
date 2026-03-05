@@ -42,14 +42,28 @@ const StartupAdvantage = () => {
             </p>
           </motion.div>
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
             className="hidden lg:block"
           >
             <LottieAnimation
               url={LOTTIE_URLS.startup}
               className="w-full max-w-xs ml-auto"
+            />
+          </motion.div>
+
+          {/* Mobile Lottie Animation */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="lg:hidden mt-6"
+          >
+            <LottieAnimation
+              url={LOTTIE_URLS.startup}
+              className="w-full max-w-sm mx-auto"
+              style={{ height: 200 }}
             />
           </motion.div>
         </div>

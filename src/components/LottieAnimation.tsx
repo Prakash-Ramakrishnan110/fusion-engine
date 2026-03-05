@@ -46,7 +46,7 @@ const LottieAnimation = ({ url, className = "", loop = true, style }: LottieAnim
     setHasError(false);
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 6000);
+    const timeoutId = setTimeout(() => controller.abort(), 3000); // Reduced timeout
 
     const primaryUrl = url;
     const fallbackUrls = [
@@ -93,34 +93,24 @@ const LottieAnimation = ({ url, className = "", loop = true, style }: LottieAnim
     };
   }, [url, isVisible]);
 
-  if (isLoading) {
+  // Show placeholder immediately instead of loading state
+  if (isLoading || hasError || !animationData) {
     return (
       <div
         ref={elementRef}
-        className={`flex items-center justify-center bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg w-full h-full max-w-full ${className}`}
+        className={`flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 rounded-lg w-full h-full max-w-full ${className}`}
         style={style}
       >
-        <div className="text-center p-4 sm:p-6">
-          <div className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-3 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-xs sm:text-sm font-medium text-foreground">Loading animation...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (hasError || !animationData) {
-    return (
-      <div
-        ref={elementRef}
-        className={`flex items-center justify-center bg-gradient-to-br from-secondary/20 to-muted/20 rounded-lg border border-border/50 w-full h-full max-w-full ${className}`}
-        style={style}
-      >
-        <div className="text-center p-4 sm:p-6">
-          <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 bg-primary/10 rounded-full flex items-center justify-center">
-            <div className="w-4 h-4 sm:w-8 sm:h-8 bg-primary/20 rounded-full animate-pulse" />
+        <div className="w-full h-full flex items-center justify-center p-2 sm:p-4">
+          {/* Simple animated placeholder */}
+          <div className="relative w-full h-full">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-8 h-8 sm:w-12 sm:h-12 bg-primary/20 rounded-full animate-pulse"></div>
+            </div>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-4 h-4 sm:w-6 sm:h-6 bg-primary/40 rounded-full animate-ping"></div>
+            </div>
           </div>
-          <p className="text-xs sm:text-sm font-medium text-muted-foreground">Animation unavailable</p>
-          <p className="text-xs text-muted-foreground/70 mt-1">Static content displayed</p>
         </div>
       </div>
     );
@@ -130,7 +120,7 @@ const LottieAnimation = ({ url, className = "", loop = true, style }: LottieAnim
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.3 }} // Reduced animation duration
       className={`w-full h-full max-w-full ${className}`}
       style={style}
     >
