@@ -54,20 +54,7 @@ const ProcessHero = () => {
       <div className="absolute inset-0">
         <motion.div 
           className="absolute inset-0 bg-gradient-to-br from-green-500/5 via-transparent to-blue-500/5"
-          style={{ opacity: 0.8 }}
-        />
-        <motion.div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gradient-to-r from-green-500/10 to-blue-500/10 blur-[120px]"
-          style={{
-            scale: 1 + mousePosition.y * 0.3,
-            rotate: (mousePosition.y - 0.5) * -15
-          }}
-        />
-        <motion.div
-          className="absolute inset-0"
-          style={{
-            background: `radial-gradient(circle at ${mousePosition.x * 100}% ${mousePosition.y * 100}%, rgba(34, 197, 94, 0.12) 0%, transparent 60%)`
-          }}
+          style={{ opacity: 0.6 }}
         />
       </div>
 

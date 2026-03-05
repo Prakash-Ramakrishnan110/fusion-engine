@@ -49,13 +49,7 @@ const Hero = () => {
       <div className="absolute inset-0">
         <motion.div 
           className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5"
-          style={{ opacity }}
-        />
-        <motion.div
-          className="absolute inset-0"
-          style={{
-            background: `radial-gradient(circle at ${mousePosition.x * 100}% ${mousePosition.y * 100}%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)`
-          }}
+          style={{ opacity: 0.6 }}
         />
       </div>
 

@@ -54,20 +54,7 @@ const PricingHero = () => {
       <div className="absolute inset-0">
         <motion.div 
           className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-teal-500/5"
-          style={{ opacity: 0.8 }}
-        />
-        <motion.div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gradient-to-r from-emerald-500/10 to-teal-500/10 blur-[120px]"
-          style={{
-            scale: 1 + Math.cos(mousePosition.y * Math.PI) * 0.25,
-            rotate: (mousePosition.y - 0.5) * -30
-          }}
-        />
-        <motion.div
-          className="absolute inset-0"
-          style={{
-            background: `radial-gradient(circle at ${mousePosition.x * 100}% ${mousePosition.y * 100}%, rgba(16, 185, 129, 0.12) 0%, transparent 60%)`
-          }}
+          style={{ opacity: 0.6 }}
         />
       </div>
 

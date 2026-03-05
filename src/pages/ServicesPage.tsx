@@ -20,27 +20,10 @@ const stats = [
 ];
 
 const ServicesHero = () => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
-  
   const { scrollYProgress } = useScroll();
   const parallaxY = useTransform(scrollYProgress, [0, 1], [0, -30]);
   const scale = useSpring(useTransform(scrollYProgress, [0, 0.5], [1, 1.05]));
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        setMousePosition({
-          x: (e.clientX - rect.left) / rect.width,
-          y: (e.clientY - rect.top) / rect.height
-        });
-      }
-    };
-    
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
 
   const services = [
     { icon: Code2, title: "Custom Development", desc: "Tailored solutions" },
@@ -55,20 +38,7 @@ const ServicesHero = () => {
       <div className="absolute inset-0">
         <motion.div 
           className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5"
-          style={{ opacity: 0.8 }}
-        />
-        <motion.div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 blur-[120px]"
-          style={{
-            scale: 1 + mousePosition.x * 0.3,
-            rotate: (mousePosition.x - 0.5) * 15
-          }}
-        />
-        <motion.div
-          className="absolute inset-0"
-          style={{
-            background: `radial-gradient(circle at ${mousePosition.x * 100}% ${mousePosition.y * 100}%, rgba(59, 130, 246, 0.12) 0%, transparent 60%)`
-          }}
+          style={{ opacity: 0.6 }}
         />
       </div>
 
@@ -158,11 +128,7 @@ const ServicesHero = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
             className="hidden lg:block relative"
-            style={{ 
-              height: 450,
-              rotateY: mousePosition.x * 4 - 2,
-              rotateX: mousePosition.y * -4 + 2
-            }}
+            style={{ height: 450 }}
           >
             <LottieAnimation
               url={LOTTIE_URLS.coding}

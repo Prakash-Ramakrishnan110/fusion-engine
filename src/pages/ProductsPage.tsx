@@ -54,20 +54,7 @@ const ProductsHero = () => {
       <div className="absolute inset-0">
         <motion.div 
           className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-red-500/5"
-          style={{ opacity: 0.8 }}
-        />
-        <motion.div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gradient-to-r from-orange-500/10 to-red-500/10 blur-[120px]"
-          style={{
-            scale: 1 + Math.sin(mousePosition.x * Math.PI) * 0.2,
-            rotate: (mousePosition.x - 0.5) * 20
-          }}
-        />
-        <motion.div
-          className="absolute inset-0"
-          style={{
-            background: `radial-gradient(circle at ${mousePosition.x * 100}% ${mousePosition.y * 100}%, rgba(251, 146, 60, 0.12) 0%, transparent 60%)`
-          }}
+          style={{ opacity: 0.6 }}
         />
       </div>
 
