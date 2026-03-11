@@ -31,10 +31,10 @@ const AnimatedNumber = ({ target, suffix = "", prefix = "" }: { target: number; 
 };
 
 const stats = [
-  { value: 100, suffix: "+", label: "projects delivered globally" },
-  { value: 50, suffix: "+", label: "business clients served" },
-  { value: 99, suffix: ".9%", label: "uptime across all systems" },
-  { value: 24, suffix: "/7", label: "support & monitoring" },
+  { value: 3, suffix: "", label: "projects delivered" },
+  { value: 3, suffix: "", label: "happy clients" },
+  { value: 100, suffix: "%", label: "client satisfaction" },
+  { value: 24, suffix: "/7", label: "support available" },
 ];
 
 const BigStats = () => {
@@ -51,10 +51,10 @@ const BigStats = () => {
             className="text-center lg:text-left"
           >
             <h2 className="text-3xl md:text-5xl font-bold mb-4">
-              One engineering platform unlike any other
+              Building our reputation one project at a time
             </h2>
             <p className="text-muted-foreground text-lg max-w-2xl">
-              Only Fusion Engine offers end-to-end product engineering built from the ground up for speed, security, and scale.
+              As a fresh startup, we're focused on delivering quality solutions for all types of clients and building lasting relationships.
             </p>
           </motion.div>
           <motion.div

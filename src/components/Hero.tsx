@@ -37,10 +37,10 @@ const Hero = () => {
   }, []);
 
   const features = [
-    { icon: Zap, title: "Lightning Fast", desc: "Launch in 14 days" },
-    { icon: Shield, title: "Investor Ready", desc: "Built to scale" },
-    { icon: TrendingUp, title: "Growth Focused", desc: "10x your vision" },
-    { icon: Code2, title: "Clean Code", desc: "Enterprise quality" }
+    { icon: Zap, title: "All Client Types", desc: "Startups to Enterprise" },
+    { icon: Shield, title: "Quality Assured", desc: "3 successful deliveries" },
+    { icon: TrendingUp, title: "Growing Fast", desc: "Expanding our services" },
+    { icon: Code2, title: "Custom Solutions", desc: "Tailored to your needs" }
   ];
 
   return (
@@ -57,11 +57,12 @@ const Hero = () => {
         className="container mx-auto px-4 relative z-10"
         style={{ scale, y: parallaxY }}
       >
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
+            className="text-center lg:text-left"
           >
             {/* Advanced Badge */}
             <motion.div
@@ -71,24 +72,24 @@ const Hero = () => {
               className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6"
             >
               <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
-              AI-Powered Development
+              Fresh Startup • 3 Projects Delivered
             </motion.div>
 
             {/* Sophisticated Headline */}
             <motion.h1 
-              className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
             >
-              Build Your Startup
+              Your Vision,
               <motion.span 
                 className="text-primary block"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                at Enterprise Speed
+                Our Expertise
               </motion.span>
             </motion.h1>
 
@@ -99,9 +100,9 @@ const Hero = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
             >
-              Transform your vision into a market-ready product with our AI-accelerated development pipeline. 
-              <span className="font-semibold text-foreground"> 14-day launch guarantee</span> or 
-              <span className="text-primary font-semibold"> it's free.</span>
+              We're a passionate startup team delivering quality solutions for all client needs. 
+              <span className="font-semibold text-foreground"> 3 successful projects</span> and 
+              <span className="text-primary font-semibold"> growing fast!</span>
             </motion.p>
 
             {/* Advanced CTA Section */}
@@ -111,20 +112,20 @@ const Hero = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
             >
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
                 <motion.div>
                   <Link
                     to="/contact"
-                    className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-white rounded-xl font-semibold shadow-lg"
+                    className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-primary text-white rounded-xl font-semibold shadow-lg text-sm sm:text-base w-full sm:w-auto justify-center"
                   >
                     <span>Start Your Project</span>
-                    <ArrowRight size={18} />
+                    <ArrowRight size={16} className="sm:size-18" />
                   </Link>
                 </motion.div>
                 <motion.div>
                   <Link
                     to="/pricing"
-                    className="inline-flex items-center gap-2 px-8 py-4 border border-border rounded-xl font-medium"
+                    className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 border border-border rounded-xl font-medium text-sm sm:text-base w-full sm:w-auto justify-center"
                   >
                     <span>View Pricing</span>
                   </Link>
@@ -132,7 +133,7 @@ const Hero = () => {
               </div>
               
               {/* Advanced Trust Indicators */}
-              <div className="flex items-center gap-6 text-sm text-muted-foreground">
+              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-sm text-muted-foreground text-center lg:text-left">
                 <motion.div 
                   className="flex items-center gap-2"
                   initial={{ opacity: 0 }}
@@ -140,14 +141,14 @@ const Hero = () => {
                   transition={{ delay: 0.8 }}
                 >
                   <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                  <span>2 spots left this month</span>
+                  <span>Available for new projects</span>
                 </motion.div>
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.9 }}
                 >
-                  <span className="font-semibold text-foreground">$0</span> consultation
+                  <span>3 Projects Completed</span>
                 </motion.div>
               </div>
             </motion.div>
@@ -160,7 +161,7 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="relative lg:block hidden"
             style={{ 
-              height: 450,
+              height: 400,
               rotateY: mousePosition.x * 5 - 2.5,
               rotateX: mousePosition.y * -5 + 2.5
             }}

@@ -5,45 +5,45 @@ import LottieAnimation, { LOTTIE_URLS } from "./LottieAnimation";
 
 const caseStudies = [
   {
-    title: "Multi-Vendor E-commerce Platform",
+    title: "Local Business Website",
     industry: "Retail",
-    result: "300% increase in vendor onboarding speed",
-    desc: "Built a scalable marketplace with real-time inventory sync, automated vendor payouts, and AI-powered product recommendations.",
-    challenge: "The client had a manual vendor onboarding process that took 2 weeks per vendor. They needed a self-service platform that could handle thousands of vendors.",
-    solution: "We built a fully automated onboarding flow with document verification, product catalog import, and integrated payment processing.",
-    tags: ["React", "Node.js", "PostgreSQL", "AWS"],
+    result: "50% increase in customer inquiries",
+    desc: "Built a professional website with online booking system, customer testimonials, and social media integration.",
+    challenge: "The local business had no online presence and was losing customers to competitors with better digital visibility.",
+    solution: "We created a modern, mobile-responsive website with contact forms, service galleries, and Google Maps integration.",
+    tags: ["React", "Tailwind CSS", "EmailJS", "Vercel"],
     metrics: [
-      { label: "Vendors Onboarded", value: "2,500+" },
-      { label: "Monthly GMV", value: "$1.2M" },
-      { label: "Onboarding Time", value: "< 24hrs" },
+      { label: "Monthly Visitors", value: "500+" },
+      { label: "Inquiry Increase", value: "50%" },
+      { label: "Page Load Time", value: "< 2s" },
     ],
   },
   {
-    title: "Fleet Monitoring System",
-    industry: "Logistics",
-    result: "40% reduction in fuel costs",
-    desc: "Real-time GPS tracking, route optimization, and predictive maintenance alerts for a fleet of 500+ vehicles.",
-    challenge: "The logistics company was losing money on inefficient routes, unauthorized vehicle usage, and unexpected breakdowns.",
-    solution: "We deployed IoT-enabled GPS trackers with real-time dashboards, automated route optimization, and ML-based maintenance predictions.",
-    tags: ["Flutter", "Firebase", "IoT", "Maps API"],
+    title: "Small E-commerce Store",
+    industry: "Retail",
+    result: "Launched in 3 weeks with 20 products",
+    desc: "Complete online store with product catalog, shopping cart, payment integration, and order management.",
+    challenge: "Client wanted to sell products online but had limited budget and needed a quick launch.",
+    solution: "We built a cost-effective e-commerce solution using modern tools with secure payment processing.",
+    tags: ["Next.js", "Stripe", "PostgreSQL", "AWS"],
     metrics: [
-      { label: "Vehicles Tracked", value: "500+" },
-      { label: "Fuel Savings", value: "40%" },
-      { label: "Downtime Reduced", value: "60%" },
+      { label: "Products Listed", value: "20+" },
+      { label: "Launch Time", value: "3 weeks" },
+      { label: "Conversion Rate", value: "2.5%" },
     ],
   },
   {
-    title: "School ERP Platform",
-    industry: "Education",
-    result: "Digitized operations for 50+ schools",
-    desc: "End-to-end management system covering admissions, attendance, grading, fee collection, and parent communication.",
-    challenge: "Schools were managing everything on paper and Excel sheets, leading to data loss, errors, and frustrated parents.",
-    solution: "A comprehensive ERP with mobile apps for parents, web dashboards for admin, automated fee reminders, and WhatsApp notifications.",
-    tags: ["Next.js", "Supabase", "WhatsApp API"],
+    title: "Service Booking Platform",
+    industry: "Services",
+    result: "Automated 90% of booking process",
+    desc: "Online booking system with calendar integration, automated reminders, and customer management.",
+    challenge: "Service provider was managing bookings manually through phone calls and messages, causing double bookings and missed appointments.",
+    solution: "We developed an intuitive booking platform with real-time availability and automated notifications.",
+    tags: ["React", "Node.js", "MongoDB", "Twilio"],
     metrics: [
-      { label: "Schools Using", value: "50+" },
-      { label: "Students Managed", value: "25,000+" },
-      { label: "Fee Collection", value: "95%" },
+      { label: "Bookings Automated", value: "90%" },
+      { label: "No-Show Reduction", value: "75%" },
+      { label: "Customer Satisfaction", value: "4.8/5" },
     ],
   },
 ];
@@ -59,9 +59,9 @@ const CaseStudies = () => {
             viewport={{ once: true }}
           >
             <span className="text-sm font-semibold text-primary uppercase tracking-widest">Our Work</span>
-            <h2 className="text-3xl md:text-5xl font-bold mt-3 mb-4">Case Studies</h2>
+            <h2 className="text-3xl md:text-5xl font-bold mt-3 mb-4">3 Projects Delivered</h2>
             <p className="text-muted-foreground max-w-2xl text-lg">
-              Real projects. Real results. Here's how we've helped businesses scale with technology.
+              As a fresh startup, we're proud of every project we've delivered. Here's our journey so far.
             </p>
           </motion.div>
           <motion.div
@@ -85,7 +85,7 @@ const CaseStudies = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="glass-card p-8 md:p-10 hover:shadow-lg transition-all duration-300"
+              className="glass-card p-6 md:p-10 hover:shadow-lg transition-all duration-300"
             >
               <div className="grid md:grid-cols-3 gap-8">
                 <div className="md:col-span-2">
@@ -97,7 +97,7 @@ const CaseStudies = () => {
                       <TrendingUp size={12} className="text-primary" /> {cs.result}
                     </span>
                   </div>
-                  <h3 className="text-2xl font-bold mb-4">{cs.title}</h3>
+                  <h3 className="text-xl md:text-2xl font-bold mb-4">{cs.title}</h3>
                   
                   <div className="space-y-4 mb-6">
                     <div>
