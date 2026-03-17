@@ -40,7 +40,7 @@ const Navbar = () => {
         <Link to="/" className="flex items-center group">
           <div className="relative p-2">
             <img 
-              src="/src/components/mylogo.png" 
+              src="/mylogo.png" 
               alt="Fusion Engine Technology" 
               className="h-12 sm:h-14 md:h-16 lg:h-16 w-auto object-contain drop-shadow-lg"
               loading="eager" 

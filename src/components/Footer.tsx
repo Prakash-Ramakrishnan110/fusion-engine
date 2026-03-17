@@ -18,7 +18,7 @@ const Footer = () => {
           <div>
             <div className="mb-4">
               <img 
-                src="/src/components/mylogo.png" 
+                src="/mylogo.png" 
                 alt="Fusion Engine Technology" 
                 className="h-16 md:h-20 w-auto object-contain drop-shadow-lg"
                 loading="lazy"
