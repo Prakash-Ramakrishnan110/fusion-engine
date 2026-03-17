@@ -48,6 +48,39 @@
     --sidebar-border: 214 35% 82%;
     --sidebar-ring: 215 95% 50%;
   }
+
+  .dark {
+    --background: 222 47% 4%;
+    --foreground: 210 40% 98%;
+ 
+    --card: 222 47% 6%;
+    --card-foreground: 210 40% 98%;
+ 
+    --popover: 222 47% 4%;
+    --popover-foreground: 210 40% 98%;
+ 
+    --primary: 215 95% 55%;
+    --primary-foreground: 0 0% 100%;
+ 
+    --secondary: 222 47% 12%;
+    --secondary-foreground: 210 40% 98%;
+ 
+    --muted: 222 47% 12%;
+    --muted-foreground: 215 20% 65%;
+ 
+    --accent: 222 47% 12%;
+    --accent-foreground: 210 40% 98%;
+ 
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --border: 222 47% 12%;
+    --input: 222 47% 12%;
+    --ring: 215 95% 55%;
+
+    --glow-primary: 215 95% 55%;
+    --glow-secondary: 200 90% 55%;
+  }
 }
 
 @layer base {
@@ -89,7 +122,11 @@
   }
 
   .glass-card {
-    @apply bg-card border border-border rounded-xl shadow-sm;
+    @apply bg-white/70 dark:bg-slate-900/40 backdrop-blur-xl border border-slate-200/50 dark:border-white/10 rounded-3xl shadow-xl transition-all duration-500 overflow-hidden;
+  }
+
+  .glass-card:hover {
+    @apply border-primary/30 dark:border-primary/40 shadow-2xl shadow-primary/10 -translate-y-1;
   }
 
   .gradient-border {

@@ -5,7 +5,7 @@ import LottieAnimation, { LOTTIE_URLS } from "./LottieAnimation";
 
 const CTASection = () => {
   return (
-    <section id="cta" className="py-32 relative overflow-hidden">
+    <section id="cta" className="py-16 md:py-32 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/[0.03] to-background" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/5 blur-[120px] animate-glow-pulse" />
 
@@ -34,7 +34,7 @@ const CTASection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="flex flex-wrap justify-center lg:justify-start gap-4"
+              className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4"
             >
               <Link
                 to="/contact"

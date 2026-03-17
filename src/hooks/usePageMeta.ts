@@ -1,33 +1,48 @@
 import { useEffect } from "react";
 
-const createEmojiFavicon = (emoji: string) => {
-  const canvas = document.createElement("canvas");
-  canvas.width = 64;
-  canvas.height = 64;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-  ctx.font = "52px serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(emoji, 32, 36);
-  const link =
-    (document.querySelector("link[rel*='icon']") as HTMLLinkElement) ||
-    document.createElement("link");
-  link.type = "image/png";
-  link.rel = "icon";
-  link.href = canvas.toDataURL();
-  document.head.appendChild(link);
+const setFavicon = () => {
+  // Remove any existing dynamic favicons
+  const existingLinks = document.querySelectorAll("link[rel*='icon']");
+  existingLinks.forEach(link => link.remove());
+  
+  // Add the standard favicon
+  const faviconLink = document.createElement("link");
+  faviconLink.rel = "icon";
+  faviconLink.type = "image/svg+xml";
+  faviconLink.href = "/favicon.svg";
+  document.head.appendChild(faviconLink);
+  
+  // Add PNG fallbacks
+  const favicon32 = document.createElement("link");
+  favicon32.rel = "icon";
+  favicon32.type = "image/png";
+  favicon32.sizes = "32x32";
+  favicon32.href = "/favicon-32x32.png";
+  document.head.appendChild(favicon32);
+  
+  const favicon16 = document.createElement("link");
+  favicon16.rel = "icon";
+  favicon16.type = "image/png";
+  favicon16.sizes = "16x16";
+  favicon16.href = "/favicon-16x16.png";
+  document.head.appendChild(favicon16);
+  
+  // Add Apple touch icon
+  const appleTouchIcon = document.createElement("link");
+  appleTouchIcon.rel = "apple-touch-icon";
+  appleTouchIcon.href = "/apple-touch-icon.png";
+  document.head.appendChild(appleTouchIcon);
 };
 
-const usePageMeta = (title: string, emoji: string) => {
+const usePageMeta = (title: string, emoji?: string) => {
   useEffect(() => {
     document.title = `${title} | Fusion Engine Technology`;
-    createEmojiFavicon(emoji);
+    setFavicon();
 
     return () => {
       document.title = "Fusion Engine Technology | Build. Automate. Scale.";
     };
-  }, [title, emoji]);
+  }, [title]);
 };
 
 export default usePageMeta;

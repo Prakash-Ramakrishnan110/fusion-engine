@@ -10,6 +10,7 @@ import LogoStrip from "@/components/LogoStrip";
 import HowWeHelp from "@/components/HowWeHelp";
 import CaseStudies from "@/components/CaseStudies";
 import Founder from "@/components/Founder";
+import FAQ from "@/components/FAQ";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
 
@@ -28,6 +29,7 @@ const Index = () => {
         <HowWeHelp />
         <CaseStudies />
         <Founder />
+        <FAQ />
         <CTASection />
       </main>
       <Footer />

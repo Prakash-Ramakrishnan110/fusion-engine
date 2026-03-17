@@ -14,16 +14,16 @@ const Footer = () => {
   return (
     <footer className="border-t border-border bg-secondary/30 py-12">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <div className="mb-4">
-              <div className="flex flex-col leading-tight">
-                <div className="flex items-baseline">
-                  <span className="text-lg font-bold text-blue-500" style={{ fontFamily: '"Space Grotesk", system-ui, sans-serif' }}>FUSION</span>
-                  <span className="text-lg font-bold text-gray-700 ml-2" style={{ fontFamily: '"Space Grotesk", system-ui, sans-serif' }}>ENGINE</span>
-                </div>
-                <span className="text-xs font-bold text-gray-500 tracking-wider" style={{ fontFamily: '"Space Grotesk", system-ui, sans-serif' }}>TECHNOLOGY</span>
-              </div>
+              <img 
+                src="/src/components/mylogo.png" 
+                alt="Fusion Engine Technology" 
+                className="h-16 md:h-20 w-auto object-contain drop-shadow-lg"
+                loading="lazy"
+                decoding="async"
+              />
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Your technical co-founder for startup success. We build, launch, and scale startups that get funded.

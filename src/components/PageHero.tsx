@@ -7,11 +7,12 @@ interface PageHeroProps {
   title: string;
   highlight: string;
   description: string;
+  facts?: string[];
   animation?: ReactNode;
   lottieUrl?: string;
 }
 
-const PageHero = ({ badge, title, highlight, description, animation, lottieUrl }: PageHeroProps) => {
+const PageHero = ({ badge, title, highlight, description, facts = [], animation, lottieUrl }: PageHeroProps) => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -36,7 +37,7 @@ const PageHero = ({ badge, title, highlight, description, animation, lottieUrl }
   }, []);
 
   return (
-    <section ref={containerRef} className="relative pt-28 pb-20 overflow-hidden">
+    <section ref={containerRef} className="relative pt-32 lg:pt-28 pb-20 overflow-hidden">
       {/* Advanced Background Effects */}
       <div className="absolute inset-0">
         <motion.div 
@@ -100,13 +101,32 @@ const PageHero = ({ badge, title, highlight, description, animation, lottieUrl }
 
             {/* Advanced Description */}
             <motion.p 
-              className="text-lg text-muted-foreground max-w-xl leading-relaxed"
+              className="text-lg text-muted-foreground max-w-xl leading-relaxed mb-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
             >
               {description}
             </motion.p>
+
+            {/* Interesting Facts */}
+            {facts.length > 0 && (
+              <motion.div 
+                className="space-y-3 mb-8"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.7 }}
+              >
+                {facts.map((fact, index) => (
+                  <div key={index} className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <span className={`w-2 h-2 rounded-full animate-pulse ${
+                      index % 2 === 0 ? 'bg-green-500' : 'bg-blue-500'
+                    }`}></span>
+                    <span>{fact}</span>
+                  </div>
+                ))}
+              </motion.div>
+            )}
           </motion.div>
 
           {/* Advanced Lottie Animation */}
@@ -116,15 +136,16 @@ const PageHero = ({ badge, title, highlight, description, animation, lottieUrl }
             transition={{ duration: 0.8, delay: 0.4 }}
             className="hidden lg:block relative"
             style={{ 
-              height: 400,
-              rotateY: mousePosition.x * 3 - 1.5,
-              rotateX: mousePosition.y * -3 + 1.5
+              height: 400
             }}
           >
             {animation || (
               <LottieAnimation
                 url={lottieUrl || LOTTIE_URLS.techNetwork}
                 className="w-full h-full"
+                style={{
+                  transform: `rotateY(${mousePosition.x * 8 - 4}deg) rotateX(${mousePosition.y * -8 + 4}deg)`
+                }}
               />
             )}
           </motion.div>

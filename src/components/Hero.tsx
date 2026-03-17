@@ -1,40 +1,36 @@
-import { motion, useScroll, useTransform, useSpring } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
 import { ArrowRight, Zap, Shield, TrendingUp, Code2 } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import LottieAnimation, { LOTTIE_URLS } from "./LottieAnimation";
 
 const Hero = () => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [scrollY, setScrollY] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Use MotionValues for high-performance parallax (avoids React state updates on every mouse move)
+  const mouseX = useMotionValue(0.5);
+  const mouseY = useMotionValue(0.5);
+  
+  // Smoothing the mouse movement for a premium feel
+  const smoothMouseX = useSpring(mouseX, { stiffness: 50, damping: 20 });
+  const smoothMouseY = useSpring(mouseY, { stiffness: 50, damping: 20 });
   
   const { scrollYProgress } = useScroll();
   const parallaxY = useTransform(scrollYProgress, [0, 1], [0, -50]);
   const scale = useSpring(useTransform(scrollYProgress, [0, 0.5], [1, 1.1]));
-  const opacity = useTransform(scrollYProgress, [0, 0.3], [1, 0.8]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
-        setMousePosition({
-          x: (e.clientX - rect.left) / rect.width,
-          y: (e.clientY - rect.top) / rect.height
-        });
+        mouseX.set((e.clientX - rect.left) / rect.width);
+        mouseY.set((e.clientY - rect.top) / rect.height);
       }
     };
 
-    const handleScroll = () => setScrollY(window.scrollY);
-    
     window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('scroll', handleScroll);
-    
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [mouseX, mouseY]);
 
   const features = [
     { icon: Zap, title: "All Client Types", desc: "Startups to Enterprise" },
@@ -43,13 +39,29 @@ const Hero = () => {
     { icon: Code2, title: "Custom Solutions", desc: "Tailored to your needs" }
   ];
 
+  const rotateY = useTransform(smoothMouseX, [0, 1], [-10, 10]);
+  const rotateX = useTransform(smoothMouseY, [0, 1], [10, -10]);
+
   return (
-    <section ref={containerRef} className="relative min-h-screen flex items-center pt-20 overflow-hidden">
-      {/* Advanced Background Effects */}
+    <section ref={containerRef} className="relative min-h-screen flex items-center pt-28 lg:pt-20 overflow-hidden">
+      {/* Animated RGB Background */}
       <div className="absolute inset-0">
         <motion.div 
-          className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5"
-          style={{ opacity: 0.6 }}
+          className="absolute inset-0"
+          animate={{
+            background: [
+              'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(168, 85, 247, 0.3) 50%, rgba(236, 72, 153, 0.3) 100%)',
+              'linear-gradient(135deg, rgba(168, 85, 247, 0.3) 0%, rgba(236, 72, 153, 0.3) 50%, rgba(34, 197, 94, 0.3) 100%)',
+              'linear-gradient(135deg, rgba(236, 72, 153, 0.3) 0%, rgba(34, 197, 94, 0.3) 50%, rgba(59, 130, 246, 0.3) 100%)',
+              'linear-gradient(135deg, rgba(34, 197, 94, 0.3) 0%, rgba(59, 130, 246, 0.3) 50%, rgba(168, 85, 247, 0.3) 100%)',
+              'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(168, 85, 247, 0.3) 50%, rgba(236, 72, 153, 0.3) 100%)'
+            ]
+          }}
+          transition={{
+            duration: 10, // Slightly slower for better performance
+            repeat: Infinity,
+            ease: "linear"
+          }}
         />
       </div>
 
@@ -68,7 +80,7 @@ const Hero = () => {
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.1 }}
               className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6"
             >
               <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
@@ -122,14 +134,6 @@ const Hero = () => {
                     <ArrowRight size={16} className="sm:size-18" />
                   </Link>
                 </motion.div>
-                <motion.div>
-                  <Link
-                    to="/pricing"
-                    className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 border border-border rounded-xl font-medium text-sm sm:text-base w-full sm:w-auto justify-center"
-                  >
-                    <span>View Pricing</span>
-                  </Link>
-                </motion.div>
               </div>
               
               {/* Advanced Trust Indicators */}
@@ -154,7 +158,7 @@ const Hero = () => {
             </motion.div>
           </motion.div>
 
-          {/* Advanced Lottie Animation */}
+          {/* Advanced Lottie Animation with high-performance 3D parallax */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -162,8 +166,9 @@ const Hero = () => {
             className="relative lg:block hidden"
             style={{ 
               height: 400,
-              rotateY: mousePosition.x * 5 - 2.5,
-              rotateX: mousePosition.y * -5 + 2.5
+              rotateX,
+              rotateY,
+              perspective: 1000
             }}
           >
             <LottieAnimation
