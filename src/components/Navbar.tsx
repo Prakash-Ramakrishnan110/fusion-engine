@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
-import { Menu, X, Sun, Moon } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
-import { useTheme } from "next-themes";
 
 const navLinks = [
   { label: "Services", href: "/services" },
@@ -16,18 +14,12 @@ const navLinks = [
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
   const location = useLocation();
 
   // Close mobile menu on route change
   useEffect(() => {
     setOpen(false);
   }, [location]);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   return (
     <nav 
@@ -38,16 +30,29 @@ const Navbar = () => {
       <div className="container mx-auto flex items-center justify-between px-4 sm:px-6">
         {/* Logo */}
         <Link to="/" className="flex items-center group">
-          <div className="relative p-2">
+          <div className="relative p-1 sm:p-2">
             <img 
-              src="/mylogo.png" 
+              src="/src/assets/mylogo.png" 
               alt="Fusion Engine Technology" 
-              className="h-12 sm:h-14 md:h-16 lg:h-16 w-auto object-contain drop-shadow-lg"
+              className="h-10 sm:h-12 md:h-14 lg:h-16 w-auto object-contain drop-shadow-lg"
               loading="eager" 
               decoding="async"
             />
           </div>
         </Link>
+
+        {/* Mobile menu toggle */}
+        <div className="xl:hidden flex items-center">
+          <button
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            onClick={() => setOpen(!open)}
+            aria-label="Toggle mobile navigation menu"
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+          >
+            {open ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
 
         {/* Desktop nav */}
         <div className="hidden xl:flex items-center gap-2 flex-1 justify-center" role="menubar">
@@ -83,6 +88,41 @@ const Navbar = () => {
           </Link>
         </div>
       </div>
+
+      {/* Mobile menu */}
+      {open && (
+        <div className="xl:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-50">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex flex-col gap-2">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  to={link.href}
+                  className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 block ${
+                    location.pathname === link.href
+                      ? "text-primary bg-primary/5 ring-1 ring-primary/20 shadow-sm dark:bg-primary/10"
+                      : "text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-900"
+                  }`}
+                  role="menuitem"
+                  aria-current={location.pathname === link.href ? "page" : undefined}
+                  onClick={() => setOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              <Link
+                to="/contact"
+                className="px-4 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-all duration-300 shadow-lg text-center"
+                role="menuitem"
+                aria-label="Get Started - Contact us"
+                onClick={() => setOpen(false)}
+              >
+                Get Started
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
