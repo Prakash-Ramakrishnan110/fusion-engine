@@ -91,14 +91,14 @@ const Navbar = () => {
 
       {/* Mobile menu */}
       {open && (
-        <div className="xl:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-50">
+        <div className="xl:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-50 min-h-[200px]">
           <div className="container mx-auto px-4 py-4">
             <div className="flex flex-col gap-2">
               {navLinks.map((link) => (
                 <Link
                   key={link.label}
                   to={link.href}
-                  className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 block ${
+                  className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 block text-left ${
                     location.pathname === link.href
                       ? "text-primary bg-primary/5 ring-1 ring-primary/20 shadow-sm dark:bg-primary/10"
                       : "text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-900"

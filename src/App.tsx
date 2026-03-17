@@ -30,29 +30,27 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <TooltipProvider>
-        <Toaster />
-        <ToasterSonner />
-        <BrowserRouter>
-          <ScrollToTop />
-          <Breadcrumbs />
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/services" element={<ServicesPage />} />
-              <Route path="/process" element={<ProcessPage />} />
-              <Route path="/products" element={<ProductsPage />} />
-              <Route path="/industries" element={<IndustriesPage />} />
-              <Route path="/why-us" element={<WhyUsPage />} />
-              <Route path="/pricing" element={<PricingPage />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ThemeProvider>
+    <TooltipProvider>
+      <Toaster />
+      <ToasterSonner />
+      <BrowserRouter>
+        <ScrollToTop />
+        <Breadcrumbs />
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/process" element={<ProcessPage />} />
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/industries" element={<IndustriesPage />} />
+            <Route path="/why-us" element={<WhyUsPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </TooltipProvider>
   </QueryClientProvider>
 );
 
