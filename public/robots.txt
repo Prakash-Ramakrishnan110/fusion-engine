@@ -12,3 +12,25 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+# Sitemap
+Sitemap: https://fusion-engine.vercel.app/sitemap.xml
+
+# Block common non-content paths
+Disallow: /src/
+Disallow: /node_modules/
+Disallow: /dist/
+Disallow: /.git/
+Disallow: /*.json$
+Disallow: /*.js.map$
+Disallow: /*.css.map$
+
+# Allow important assets
+Allow: /css/
+Allow: /js/
+Allow: /images/
+Allow: /assets/
+Allow: /mylogo.png
+
+# Crawl delay for respectful crawling
+Crawl-delay: 1
