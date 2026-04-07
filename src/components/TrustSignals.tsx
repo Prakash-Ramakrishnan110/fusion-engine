@@ -6,42 +6,27 @@ const TrustSignals = () => {
   const stats = [
     {
       icon: TrendingUp,
-      value: "98%",
-      label: "Get Funded",
-      description: "Startups that raise their next round"
+      value: "100%",
+      label: "Client Satisfaction",
+      description: "Happy clients with our work"
     },
     {
       icon: Star,
-      value: "4.9/5",
-      label: "Founder Rating",
-      description: "Average satisfaction score"
+      value: "5/5",
+      label: "Quality Commitment",
+      description: "Dedicated to excellence"
     },
     {
       icon: Award,
-      value: "75+",
-      label: "Startups Launched",
-      description: "Successful MVPs and platforms"
+      value: "2025",
+      label: "Company Established",
+      description: "Fresh perspectives and innovation"
     },
     {
       icon: Shield,
       value: "$0",
-      label: "Upfront Cost",
-      description: "Pay only when you see results"
-    }
-  ];
-
-  const testimonials = [
-    {
-      quote: "Fusion Engine took our concept and delivered a fully functional MVP in 12 days. We closed our seed round 2 months later. Game changer!",
-      author: "Sarah Chen",
-      role: "CEO, QuickStart AI",
-      result: "Raised $2.5M seed round"
-    },
-    {
-      quote: "They're not just developers, they're technical co-founders. Our user growth went from 100 to 10,000 in 6 months. Incredible partnership!",
-      author: "Raj Patel",
-      role: "Founder, DataFlow",
-      result: "100x user growth in 6 months"
+      label: "Consultation Fee",
+      description: "Free initial consultation"
     }
   ];
 
@@ -83,38 +68,6 @@ const TrustSignals = () => {
           ))}
         </div>
 
-        {/* Testimonials */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {testimonials.map((testimonial, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.2 }}
-              className="bg-gradient-to-br from-card to-secondary/20 rounded-xl p-6 border border-border"
-            >
-              <div className="flex items-center gap-1 mb-3">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
-              <blockquote className="text-foreground mb-4 leading-relaxed">
-                "{testimonial.quote}"
-              </blockquote>
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="font-semibold">{testimonial.author}</div>
-                  <div className="text-sm text-muted-foreground">{testimonial.role}</div>
-                </div>
-                <div className="text-right">
-                  <div className="text-xs font-medium text-primary">{testimonial.result}</div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
         {/* Trust Badges */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -123,17 +76,9 @@ const TrustSignals = () => {
           className="mt-12 text-center"
         >
           <div className="flex flex-wrap items-center justify-center gap-8">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Shield className="w-4 h-4 text-green-500" />
-              SOC 2 Compliant
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Award className="w-4 h-4 text-blue-500" />
-              ISO 27001 Certified
-            </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Star className="w-4 h-4 text-yellow-500" />
-              Top Rated Agency
+            <div className="flex items-center gap-2 text-sm font-bold text-primary bg-yellow-100 px-3 py-1 rounded border-2 border-yellow-400">
+              <Award className="w-4 h-4 text-yellow-600" />
+              UDYAM REGISTERED
             </div>
           </div>
         </motion.div>

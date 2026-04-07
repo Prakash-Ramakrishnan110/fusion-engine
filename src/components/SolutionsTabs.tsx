@@ -16,11 +16,6 @@ const tabs = [
     ctaLink: "/contact",
     learnMore: "/process",
     lottieUrl: LOTTIE_URLS.coding,
-    testimonial: {
-      quote: "We went from concept to paying customers in 3 weeks. Fusion Engine's speed is unmatched in the startup ecosystem.",
-      name: "Alex Kumar",
-      role: "Founder, QuickStart AI",
-    },
     related: ["MVP Development", "Rapid Prototyping"],
   },
   {
@@ -33,11 +28,6 @@ const tabs = [
     ctaLink: "/services",
     learnMore: "/products",
     lottieUrl: LOTTIE_URLS.automation,
-    testimonial: {
-      quote: "Our support costs dropped 80% while customer satisfaction increased. The AI automation transformed our business model.",
-      name: "Maya Patel",
-      role: "CEO, SaaScale",
-    },
     related: ["AI Chatbots", "Workflow Automation"],
   },
   {
@@ -50,11 +40,6 @@ const tabs = [
     ctaLink: "/why-us",
     learnMore: "/services",
     lottieUrl: LOTTIE_URLS.security,
-    testimonial: {
-      quote: "We passed our enterprise security audit on the first try. Fusion Engine's security-first approach closed our biggest deals.",
-      name: "David Lee",
-      role: "CTO, SecureFlow",
-    },
     related: ["SOC 2 Compliance", "Data Protection"],
   },
 ];
@@ -156,23 +141,13 @@ const SolutionsTabs = () => {
               </div>
             </div>
 
-            {/* Right: Lottie + Testimonial */}
-            <div className="space-y-6">
+            {/* Right: Lottie */}
+            <div className="flex justify-center">
               <LottieAnimation
                 url={tab.lottieUrl}
                 className="w-full max-w-xs mx-auto sm:max-w-sm md:max-w-md"
                 style={{ height: 200 }}
               />
-              <div className="glass-card p-6 relative">
-                <Quote size={24} className="text-primary/20 mb-3" />
-                <blockquote className="text-foreground leading-relaxed mb-4 text-base italic">
-                  "{tab.testimonial.quote}"
-                </blockquote>
-                <div>
-                  <div className="font-semibold text-foreground text-sm">{tab.testimonial.name}</div>
-                  <div className="text-xs text-muted-foreground">{tab.testimonial.role}</div>
-                </div>
-              </div>
             </div>
           </motion.div>
         </AnimatePresence>

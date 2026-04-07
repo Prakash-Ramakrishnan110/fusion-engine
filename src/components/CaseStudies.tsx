@@ -8,7 +8,7 @@ const caseStudies = [
     title: "Local Business Website",
     industry: "Retail",
     result: "50% increase in customer inquiries",
-    desc: "Built a professional website with online booking system, customer testimonials, and social media integration.",
+    desc: "Built a professional website with online booking system, contact forms, and social media integration.",
     challenge: "The local business had no online presence and was losing customers to competitors with better digital visibility.",
     solution: "We created a modern, mobile-responsive website with contact forms, service galleries, and Google Maps integration.",
     tags: ["React", "Tailwind CSS", "EmailJS", "Vercel"],

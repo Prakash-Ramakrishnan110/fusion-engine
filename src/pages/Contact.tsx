@@ -611,69 +611,6 @@ const Contact = () => {
             </div>
           </div>
         </section>
-
-        {/* Testimonials Section */}
-        <section className="py-16 bg-secondary/30">
-          <div className="container mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-              className="text-center mb-12"
-            >
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                What Our <span className="text-primary">Clients Say</span>
-              </h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Don't just take our word for it - hear from our satisfied clients.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {[
-                {
-                  name: "Sarah Johnson",
-                  role: "CEO, TechStart",
-                  content: "Exceptional work! They delivered our SaaS platform ahead of schedule and exceeded our expectations. Highly recommended!",
-                  rating: 5
-                },
-                {
-                  name: "Michael Chen",
-                  role: "Founder, InnovateLab",
-                  content: "Professional team with great communication. They understood our requirements perfectly and delivered quality work.",
-                  rating: 5
-                },
-                {
-                  name: "Emily Davis",
-                  role: "Product Manager, ScaleUp",
-                  content: "Outstanding development work and excellent support. They've been our trusted technology partner for over a year.",
-                  rating: 5
-                }
-              ].map((testimonial, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  className="bg-background/50 border border-border/30 rounded-xl p-6"
-                >
-                  <div className="flex mb-4">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <span key={i} className="text-yellow-500">★</span>
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground mb-4 italic">"{testimonial.content}"</p>
-                  <div>
-                    <div className="font-semibold">{testimonial.name}</div>
-                    <div className="text-sm text-primary">{testimonial.role}</div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
       </main>
       <Footer />
     </div>
