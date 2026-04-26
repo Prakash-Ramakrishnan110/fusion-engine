@@ -5,6 +5,15 @@
       "destination": "/index.html"
     }
   ],
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "destination": "https://fusion-engine.vercel.app/$1",
+      "has": {
+        "host": "www.fusion-engine.vercel.app"
+      }
+    }
+  ],
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "installCommand": "npm install",
