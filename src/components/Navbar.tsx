@@ -30,13 +30,17 @@ const Navbar = () => {
       <div className="container mx-auto flex items-center justify-between px-4 sm:px-6">
         {/* Logo */}
         <Link to="/" className="flex items-center group">
-          <div className="relative p-1 sm:p-2">
+          <div className="relative p-2 sm:p-3 lg:p-4">
             <img 
               src="/header-logo.png" 
               alt="Fusion Engine Technology" 
-              className="h-10 sm:h-12 md:h-14 lg:h-16 w-auto object-contain drop-shadow-lg"
+              className="h-8 w-auto sm:h-10 md:h-12 lg:h-14 xl:h-16 object-contain drop-shadow-lg transition-all duration-300 group-hover:scale-105"
               loading="eager" 
               decoding="async"
+              style={{
+                maxWidth: '160px',
+                height: 'auto'
+              }}
             />
           </div>
         </Link>

@@ -20,9 +20,13 @@ const Footer = () => {
               <img 
                 src="/header-logo.png" 
                 alt="Fusion Engine Technology" 
-                className="h-16 md:h-20 w-auto object-contain drop-shadow-lg"
+                className="h-12 w-auto sm:h-14 md:h-16 lg:h-20 xl:h-24 object-contain drop-shadow-lg transition-all duration-300 group-hover:scale-105"
                 loading="lazy"
                 decoding="async"
+                style={{
+                  maxWidth: '180px',
+                  height: 'auto'
+                }}
               />
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
