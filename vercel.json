@@ -9,9 +9,12 @@
     {
       "source": "/(.*)",
       "destination": "https://fusion-engine.vercel.app/$1",
-      "has": {
-        "host": "www.fusion-engine.vercel.app"
-      }
+      "has": [
+        {
+          "type": "host",
+          "value": "www.fusion-engine.vercel.app"
+        }
+      ]
     }
   ],
   "buildCommand": "npm run build",
