@@ -30,7 +30,9 @@ Allow: /css/
 Allow: /js/
 Allow: /images/
 Allow: /assets/
-Allow: /mylogo.png
+Allow: /header-logo.png
+Allow: /favicon.png
+Allow: /favicon.svg
 
 # Crawl delay for respectful crawling
 Crawl-delay: 1
