@@ -58,13 +58,8 @@ const Footer = () => {
             <h4 className="font-semibold mb-4 text-sm">Contact</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
-                <a href="mailto:prakash7418r@gmail.com" className="hover:text-foreground transition-colors">
-                  prakash7418r@gmail.com
-                </a>
-              </li>
-              <li>
-                <a href="tel:+916369884331" className="hover:text-foreground transition-colors">
-                  +91 63698 84331
+                <a href="mailto:fusionenginetechnology@gmail.com" className="hover:text-foreground transition-colors">
+                  fusionenginetechnology@gmail.com
                 </a>
               </li>
               <li>

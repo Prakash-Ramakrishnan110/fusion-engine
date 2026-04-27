@@ -52,7 +52,7 @@ const Contact = () => {
         from_email: formData.email,
         from_phone: formData.phone,
         message: formData.message,
-        to_email: 'prakash7418r@gmail.com',
+        to_email: 'fusionenginetechnology@gmail.com',
         reply_to: formData.email,
         time: new Date().toLocaleString()
       };
@@ -74,7 +74,7 @@ const Contact = () => {
       }
     } catch (error) {
       console.error('Error sending email:', error);
-      alert('There was an error sending your message. Please try again or contact us directly at prakash7418r@gmail.com');
+      alert('There was an error sending your message. Please try again or contact us directly at fusionenginetechnology@gmail.com');
     }
   };
 
@@ -421,16 +421,7 @@ const Contact = () => {
                       </div>
                       <div>
                         <div className="font-medium">Email</div>
-                        <div className="text-sm text-muted-foreground">prakash7418r@gmail.com</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
-                        <Phone size={20} className="text-primary" />
-                      </div>
-                      <div>
-                        <div className="font-medium">Phone</div>
-                        <div className="text-sm text-muted-foreground">+91 6369884331</div>
+                        <div className="text-sm text-muted-foreground">fusionenginetechnology@gmail.com</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -483,7 +474,7 @@ const Contact = () => {
                       </svg>
                     </a>
                     <a
-                      href="mailto:prakash7418r@gmail.com"
+                      href="mailto:fusionenginetechnology@gmail.com"
                       className="w-12 h-12 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center hover:bg-blue-500/30 transition-colors group"
                     >
                       <Mail size={20} className="text-blue-500" />
@@ -518,16 +509,16 @@ const Contact = () => {
                 {
                   icon: Mail,
                   title: "Email Us",
-                  content: "prakash7418r@gmail.com",
+                  content: "fusionenginetechnology@gmail.com",
                   description: "Send us an email anytime",
-                  href: "mailto:prakash7418r@gmail.com"
+                  href: "mailto:fusionenginetechnology@gmail.com"
                 },
                 {
-                  icon: Phone,
-                  title: "Call Us",
-                  content: "+91 6369884331",
-                  description: "Mon-Sat from 9am to 6pm",
-                  href: "tel:+916369884331"
+                  icon: MessageSquare,
+                  title: "WhatsApp",
+                  content: "63698 84331",
+                  description: "Chat with us on WhatsApp",
+                  href: "https://wa.me/916369884331"
                 },
                 {
                   icon: MapPin,
