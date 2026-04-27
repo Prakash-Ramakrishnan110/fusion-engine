@@ -43,7 +43,7 @@ const Hero = () => {
   const rotateX = useTransform(smoothMouseY, [0, 1], [10, -10]);
 
   return (
-    <section ref={containerRef} className="relative min-h-screen flex items-center pt-28 lg:pt-20 overflow-hidden">
+    <section ref={containerRef} className="relative h-screen flex items-center pt-20 sm:pt-24 md:pt-28 lg:pt-32 xl:pt-36 overflow-hidden">
       {/* Animated RGB Background */}
       <div className="absolute inset-0">
         <motion.div 
@@ -89,7 +89,7 @@ const Hero = () => {
 
             {/* Sophisticated Headline */}
             <motion.h1 
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-6 leading-tight"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
@@ -107,7 +107,7 @@ const Hero = () => {
 
             {/* Advanced Description */}
             <motion.p 
-              className="text-lg text-muted-foreground mb-8 max-w-lg leading-relaxed"
+              className="text-base sm:text-lg text-muted-foreground mb-6 sm:mb-8 max-w-lg leading-relaxed px-2 sm:px-0"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
@@ -124,11 +124,11 @@ const Hero = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
             >
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start px-4 sm:px-0">
                 <motion.div>
                   <Link
                     to="/contact"
-                    className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 bg-primary text-white rounded-xl font-semibold shadow-lg text-sm sm:text-base w-full sm:w-auto justify-center"
+                    className="inline-flex items-center gap-2 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-primary text-white rounded-xl font-semibold shadow-lg text-sm sm:text-base w-full sm:w-auto justify-center"
                   >
                     <span>Start Your Project</span>
                     <ArrowRight size={16} className="sm:size-18" />
@@ -137,7 +137,7 @@ const Hero = () => {
               </div>
               
               {/* Advanced Trust Indicators */}
-              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-sm text-muted-foreground text-center lg:text-left">
+              <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 md:gap-6 text-xs sm:text-sm text-muted-foreground text-center lg:text-left px-4 sm:px-0">
                 <motion.div 
                   className="flex items-center gap-2"
                   initial={{ opacity: 0 }}
@@ -165,7 +165,7 @@ const Hero = () => {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="relative lg:block hidden"
             style={{ 
-              height: 400,
+              height: '300px sm:350px md:400px lg:450px xl:500px',
               rotateX,
               rotateY,
               perspective: 1000
@@ -184,9 +184,9 @@ const Hero = () => {
                 transition={{ delay: 1 + index * 0.1 }}
                 className="absolute bg-background/90 backdrop-blur-sm border border-border rounded-lg p-3 shadow-lg"
                 style={{
-                  top: `${20 + index * 25}%`,
-                  right: index % 2 === 0 ? '-10%' : 'auto',
-                  left: index % 2 === 1 ? '-10%' : 'auto'
+                  top: `${15 + index * 20}%`,
+                  right: index % 2 === 0 ? '-5% sm:-8% md:-10%' : 'auto',
+                  left: index % 2 === 1 ? '-5% sm:-8% md:-10%' : 'auto'
                 }}
               >
                 <div className="flex items-center gap-2">
@@ -205,8 +205,8 @@ const Hero = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="lg:hidden relative mt-8"
-            style={{ height: 250 }}
+            className="lg:hidden relative mt-6 sm:mt-8"
+            style={{ height: '200px sm:225px md:250px' }}
           >
             <LottieAnimation
               url={LOTTIE_URLS.techNetwork}
