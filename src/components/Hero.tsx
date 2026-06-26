@@ -1,10 +1,35 @@
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from "framer-motion";
 import { ArrowRight, Zap, Shield, TrendingUp, Code2 } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, ReactNode } from "react";
 import { Link } from "react-router-dom";
 import LottieAnimation, { LOTTIE_URLS } from "./LottieAnimation";
 
-const Hero = () => {
+interface HeroProps {
+  badgeText?: string;
+  title1?: string;
+  title2?: string;
+  description?: ReactNode;
+  primaryCtaText?: string;
+  primaryCtaLink?: string;
+  lottieUrl?: string;
+  features?: Array<{ icon: any; title: string; desc: string }>;
+}
+
+const Hero = ({
+  badgeText = "Fresh Startup • 3 Projects Delivered",
+  title1 = "Your Vision,",
+  title2 = "Our Expertise",
+  description,
+  primaryCtaText = "Start Your Project",
+  primaryCtaLink = "/contact",
+  lottieUrl = LOTTIE_URLS.techNetwork,
+  features = [
+    { icon: Zap, title: "All Client Types", desc: "Startups to Enterprise" },
+    { icon: Shield, title: "Quality Assured", desc: "3 successful deliveries" },
+    { icon: TrendingUp, title: "Growing Fast", desc: "Expanding our services" },
+    { icon: Code2, title: "Custom Solutions", desc: "Tailored to your needs" }
+  ]
+}: HeroProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   
   // Use MotionValues for high-performance parallax (avoids React state updates on every mouse move)
@@ -31,13 +56,6 @@ const Hero = () => {
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [mouseX, mouseY]);
-
-  const features = [
-    { icon: Zap, title: "All Client Types", desc: "Startups to Enterprise" },
-    { icon: Shield, title: "Quality Assured", desc: "3 successful deliveries" },
-    { icon: TrendingUp, title: "Growing Fast", desc: "Expanding our services" },
-    { icon: Code2, title: "Custom Solutions", desc: "Tailored to your needs" }
-  ];
 
   const rotateY = useTransform(smoothMouseX, [0, 1], [-10, 10]);
   const rotateX = useTransform(smoothMouseY, [0, 1], [10, -10]);
@@ -84,7 +102,7 @@ const Hero = () => {
               className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6"
             >
               <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
-              Fresh Startup • 3 Projects Delivered
+              {badgeText}
             </motion.div>
 
             {/* Sophisticated Headline */}
@@ -94,14 +112,14 @@ const Hero = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
             >
-              Your Vision,
+              {title1}
               <motion.span 
                 className="text-primary block"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                Our Expertise
+                {title2}
               </motion.span>
             </motion.h1>
 
@@ -112,9 +130,13 @@ const Hero = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
             >
-              We're a passionate startup team delivering quality solutions for all client needs. 
-              <span className="font-semibold text-foreground"> 3 successful projects</span> and 
-              <span className="text-primary font-semibold"> growing fast!</span>
+              {description || (
+                <>
+                  We're a passionate startup team delivering quality solutions for all client needs. 
+                  <span className="font-semibold text-foreground"> 3 successful projects</span> and 
+                  <span className="text-primary font-semibold"> growing fast!</span>
+                </>
+              )}
             </motion.p>
 
             {/* Advanced CTA Section */}
@@ -127,10 +149,10 @@ const Hero = () => {
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start px-4 sm:px-0">
                 <motion.div>
                   <Link
-                    to="/contact"
+                    to={primaryCtaLink}
                     className="inline-flex items-center gap-2 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-primary text-white rounded-xl font-semibold shadow-lg text-sm sm:text-base w-full sm:w-auto justify-center"
                   >
-                    <span>Start Your Project</span>
+                    <span>{primaryCtaText}</span>
                     <ArrowRight size={16} className="sm:size-18" />
                   </Link>
                 </motion.div>
@@ -158,21 +180,18 @@ const Hero = () => {
             </motion.div>
           </motion.div>
 
-          {/* Advanced Lottie Animation with high-performance 3D parallax */}
+          {/* Advanced Lottie Animation without hover parallax */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="relative lg:block hidden"
+            className="relative lg:block hidden h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] xl:h-[500px]"
             style={{ 
-              height: '300px sm:350px md:400px lg:450px xl:500px',
-              rotateX,
-              rotateY,
               perspective: 1000
             }}
           >
             <LottieAnimation
-              url={LOTTIE_URLS.techNetwork}
+              url={lottieUrl}
               className="w-full h-full"
             />
             {/* Floating Features */}
@@ -185,8 +204,8 @@ const Hero = () => {
                 className="absolute bg-background/90 backdrop-blur-sm border border-border rounded-lg p-3 shadow-lg"
                 style={{
                   top: `${15 + index * 20}%`,
-                  right: index % 2 === 0 ? '-5% sm:-8% md:-10%' : 'auto',
-                  left: index % 2 === 1 ? '-5% sm:-8% md:-10%' : 'auto'
+                  right: index % 2 === 0 ? '-5%' : 'auto',
+                  left: index % 2 === 1 ? '-5%' : 'auto'
                 }}
               >
                 <div className="flex items-center gap-2">
@@ -205,11 +224,10 @@ const Hero = () => {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="lg:hidden relative mt-6 sm:mt-8"
-            style={{ height: '200px sm:225px md:250px' }}
+            className="lg:hidden relative mt-6 sm:mt-8 h-[200px] sm:h-[225px] md:h-[250px]"
           >
             <LottieAnimation
-              url={LOTTIE_URLS.techNetwork}
+              url={lottieUrl}
               className="w-full h-full"
             />
           </motion.div>

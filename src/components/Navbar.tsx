@@ -1,31 +1,35 @@
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
-const navLinks = [
+const primaryLinks = [
+  { label: "Why Us", href: "/why-us" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "About Us", href: "/about" },
+];
+
+const solutionsLinks = [
   { label: "Services", href: "/services" },
   { label: "Process", href: "/process" },
   { label: "Products", href: "/products" },
   { label: "Industries", href: "/industries" },
-  { label: "Why Us", href: "/why-us" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "Contact", href: "/contact" },
 ];
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [solutionsOpen, setSolutionsOpen] = useState(false);
   const location = useLocation();
 
-  // Close mobile menu on route change
   useEffect(() => {
     setOpen(false);
+    setSolutionsOpen(false);
   }, [location]);
 
   return (
     <nav 
-      className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-lg flex items-center pt-0 pb-0" 
+      className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-sm flex items-center" 
       role="navigation" 
-      aria-label="Main navigation"
     >
       <div className="container mx-auto flex items-center justify-between px-4 sm:px-6">
         {/* Logo */}
@@ -37,46 +41,84 @@ const Navbar = () => {
               className="h-8 w-auto sm:h-10 md:h-12 lg:h-14 xl:h-16 object-contain drop-shadow-lg transition-all duration-300 group-hover:scale-105"
               loading="eager" 
               decoding="async"
-              style={{
-                maxWidth: '160px',
-                height: 'auto'
-              }}
+              style={{ maxWidth: '160px', height: 'auto' }}
             />
           </div>
         </Link>
 
         {/* Mobile menu toggle */}
-        <div className="xl:hidden flex items-center">
+        <div className="xl:hidden flex items-center py-4">
           <button
             className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
             onClick={() => setOpen(!open)}
             aria-label="Toggle mobile navigation menu"
-            aria-expanded={open}
-            aria-controls="mobile-menu"
           >
             {open ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
         {/* Desktop nav */}
-        <div className="hidden xl:flex items-center gap-2 flex-1 justify-center" role="menubar">
-          {navLinks.map((link) => (
-            <div key={link.label}>
-              <div>
-                <Link
-                  to={link.href}
-                  className={`text-sm px-4 py-2 rounded-lg font-medium transition-all duration-300 block ${
-                    location.pathname === link.href
-                      ? "text-primary bg-primary/5 ring-1 ring-primary/20 shadow-sm dark:bg-primary/10"
-                      : "text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-900"
-                  }`}
-                  role="menuitem"
-                  aria-current={location.pathname === link.href ? "page" : undefined}
+        <div className="hidden xl:flex items-center gap-1 flex-1 justify-center">
+          
+          {/* Solutions Dropdown */}
+          <div 
+            className="relative"
+            onMouseEnter={() => setSolutionsOpen(true)}
+            onMouseLeave={() => setSolutionsOpen(false)}
+          >
+            <button
+              className={`flex items-center gap-1 text-sm px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                solutionsLinks.some(link => location.pathname === link.href)
+                  ? "text-primary bg-primary/5"
+                  : "text-slate-600 hover:text-primary hover:bg-slate-50"
+              }`}
+            >
+              Solutions
+              <ChevronDown size={16} className={`transition-transform duration-300 ${solutionsOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            <AnimatePresence>
+              {solutionsOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-48"
                 >
-                  {link.label}
-                </Link>
-              </div>
-            </div>
+                  <div className="bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden py-2">
+                    {solutionsLinks.map((link) => (
+                      <Link
+                        key={link.label}
+                        to={link.href}
+                        className={`block px-4 py-2 text-sm transition-colors ${
+                          location.pathname === link.href
+                            ? "text-primary bg-primary/5 font-semibold"
+                            : "text-slate-600 hover:text-primary hover:bg-slate-50"
+                        }`}
+                      >
+                        {link.label}
+                      </Link>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Regular Links */}
+          {primaryLinks.map((link) => (
+            <Link
+              key={link.label}
+              to={link.href}
+              className={`text-sm px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                location.pathname === link.href
+                  ? "text-primary bg-primary/5 ring-1 ring-primary/20 shadow-sm"
+                  : "text-slate-600 hover:text-primary hover:bg-slate-50"
+              }`}
+            >
+              {link.label}
+            </Link>
           ))}
         </div>
 
@@ -84,9 +126,7 @@ const Navbar = () => {
         <div className="hidden xl:flex items-center">
           <Link
             to="/contact"
-            className="px-6 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary/90 transition-all duration-300 shadow-lg"
-            role="menuitem"
-            aria-label="Get Started - Contact us"
+            className="px-6 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
           >
             Get Started
           </Link>
@@ -94,39 +134,60 @@ const Navbar = () => {
       </div>
 
       {/* Mobile menu */}
-      {open && (
-        <div className="xl:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-50 min-h-[200px]">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex flex-col gap-2">
-              {navLinks.map((link) => (
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="xl:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-xl z-50 overflow-hidden"
+          >
+            <div className="container mx-auto px-4 py-6 flex flex-col gap-2 max-h-[80vh] overflow-y-auto">
+              
+              <div className="px-4 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Solutions</div>
+              {solutionsLinks.map((link) => (
                 <Link
                   key={link.label}
                   to={link.href}
-                  className={`px-4 py-3 rounded-lg font-medium transition-all duration-300 block text-left ${
+                  className={`px-4 py-3 rounded-lg font-medium transition-colors ${
                     location.pathname === link.href
-                      ? "text-primary bg-primary/5 ring-1 ring-primary/20 shadow-sm dark:bg-primary/10"
-                      : "text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-900"
+                      ? "text-primary bg-primary/5"
+                      : "text-slate-600 hover:text-primary hover:bg-slate-50"
                   }`}
-                  role="menuitem"
-                  aria-current={location.pathname === link.href ? "page" : undefined}
-                  onClick={() => setOpen(false)}
                 >
                   {link.label}
                 </Link>
               ))}
-              <Link
-                to="/contact"
-                className="px-4 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-all duration-300 shadow-lg text-center"
-                role="menuitem"
-                aria-label="Get Started - Contact us"
-                onClick={() => setOpen(false)}
-              >
-                Get Started
-              </Link>
+
+              <div className="h-px bg-gray-100 my-2"></div>
+              
+              <div className="px-4 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Company</div>
+              {primaryLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  to={link.href}
+                  className={`px-4 py-3 rounded-lg font-medium transition-colors ${
+                    location.pathname === link.href
+                      ? "text-primary bg-primary/5"
+                      : "text-slate-600 hover:text-primary hover:bg-slate-50"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <Link
+                  to="/contact"
+                  className="block w-full px-4 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-colors text-center"
+                >
+                  Get Started
+                </Link>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };

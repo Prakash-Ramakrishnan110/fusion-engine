@@ -10,9 +10,10 @@ interface PageHeroProps {
   facts?: string[];
   animation?: ReactNode;
   lottieUrl?: string;
+  animatedBackground?: boolean;
 }
 
-const PageHero = ({ badge, title, highlight, description, facts = [], animation, lottieUrl }: PageHeroProps) => {
+const PageHero = ({ badge, title, highlight, description, facts = [], animation, lottieUrl, animatedBackground }: PageHeroProps) => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -40,10 +41,31 @@ const PageHero = ({ badge, title, highlight, description, facts = [], animation,
     <section ref={containerRef} className="relative pt-32 lg:pt-28 pb-20 overflow-hidden">
       {/* Advanced Background Effects */}
       <div className="absolute inset-0">
-        <motion.div 
-          className="absolute inset-0 bg-gradient-to-b from-background via-background to-secondary/20"
-          style={{ opacity }}
-        />
+        {animatedBackground ? (
+          <motion.div 
+            className="absolute inset-0"
+            animate={{
+              background: [
+                'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(168, 85, 247, 0.3) 50%, rgba(236, 72, 153, 0.3) 100%)',
+                'linear-gradient(135deg, rgba(168, 85, 247, 0.3) 0%, rgba(236, 72, 153, 0.3) 50%, rgba(34, 197, 94, 0.3) 100%)',
+                'linear-gradient(135deg, rgba(236, 72, 153, 0.3) 0%, rgba(34, 197, 94, 0.3) 50%, rgba(59, 130, 246, 0.3) 100%)',
+                'linear-gradient(135deg, rgba(34, 197, 94, 0.3) 0%, rgba(59, 130, 246, 0.3) 50%, rgba(168, 85, 247, 0.3) 100%)',
+                'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(168, 85, 247, 0.3) 50%, rgba(236, 72, 153, 0.3) 100%)'
+              ]
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          />
+        ) : (
+          <motion.div 
+            className="absolute inset-0 bg-gradient-to-b from-background via-background to-secondary/20"
+            style={{ opacity }}
+          />
+        )}
+        
         <motion.div
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-primary/5 blur-[100px]"
           style={{

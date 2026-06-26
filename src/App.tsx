@@ -19,6 +19,8 @@ const WhyUsPage = lazy(() => import("./pages/WhyUsPage"));
 const PricingPage = lazy(() => import("./pages/PricingPage"));
 const Contact = lazy(() => import("./pages/Contact"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const AboutPage = lazy(() => import("./pages/AboutPage"));
+import ChatWidget from "./components/ChatWidget";
 
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-[60vh] w-full">
@@ -46,9 +48,11 @@ const App = () => (
             <Route path="/why-us" element={<WhyUsPage />} />
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/about" element={<AboutPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
+        <ChatWidget />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

@@ -1,81 +1,62 @@
 import { motion } from "framer-motion";
-import { Linkedin, Twitter, Github, Instagram, ExternalLink } from "lucide-react";
-import LottieAnimation, { LOTTIE_URLS } from "./LottieAnimation";
+import { Facebook, Instagram, Linkedin, MessageCircle } from "lucide-react";
 import ceoImage from "@/assets/prakash-ceo.jpg";
 
 const Founder = () => {
   return (
-    <section id="founder" className="py-12 md:py-24 bg-secondary/20">
-      <div className="container mx-auto px-4">
-        <motion.div
+    <section className="py-20 bg-background">
+      <div className="container mx-auto px-4 max-w-5xl">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold mb-4">Meet the Founder</h2>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            The technical engine and vision behind our agency.
+          </p>
+        </div>
+
+        <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="max-w-4xl mx-auto"
+          className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden flex flex-col md:flex-row items-center max-w-4xl mx-auto"
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">Behind the Engine</h2>
-
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="glass-card p-8 md:p-12">
-              <div className="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 mx-auto mb-6 overflow-hidden">
-                <img 
-                  src={ceoImage} 
-                  alt="Prakash Ramakrishnan - CEO" 
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                    const fallback = target.nextElementSibling as HTMLElement;
-                    if (fallback) {
-                      fallback.style.display = 'flex';
-                    }
-                  }}
-                />
-                <div className="w-full h-full hidden items-center justify-center">
-                  <span className="text-2xl font-bold text-primary">PR</span>
-                </div>
-              </div>
-
-              <h3 className="text-xl font-bold mb-1 text-center">Prakash Ramakrishnan</h3>
-              <p className="text-sm text-primary mb-6 text-center">Founder & CEO</p>
-
-              <p className="text-muted-foreground leading-relaxed mb-8 text-center">
-                An engineer and product builder focused on creating scalable digital systems. 
-                Started Fusion Engine Technology with one goal: help businesses automate, scale, 
-                and compete with world-class technology — without the enterprise price tag.
-              </p>
-
-              <div className="flex justify-center gap-3">
-                {[
-                  { icon: ExternalLink, href: "https://prakash-portfolio-alpha.vercel.app/", label: "Portfolio" },
-                  { icon: Linkedin, href: "https://www.linkedin.com/in/prakash-ramakrishnan-ba817a2a4?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app", label: "LinkedIn" },
-                  { icon: Instagram, href: "https://www.instagram.com/prakash_r_1908?igsh=MWhzeHIyNmRpeDVobw==", label: "Instagram" },
-                ].map(({ icon: Icon, href, label }, i) => (
-                  <a
-                    key={i}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all"
-                    title={label}
-                  >
-                    <Icon size={18} />
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="hidden md:block"
-            >
-              <LottieAnimation
-                url={LOTTIE_URLS.team}
-                className="w-full max-w-sm mx-auto"
+          {/* Image Side */}
+          <div className="w-full md:w-2/5 p-6 md:p-8 flex justify-center bg-secondary/30">
+            <div className="w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border-4 border-background shadow-lg relative">
+              <img 
+                src={ceoImage} 
+                alt="Prakash Ramakrishnan" 
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
               />
-            </motion.div>
+            </div>
+          </div>
+
+          {/* Text Side */}
+          <div className="w-full md:w-3/5 p-8 md:p-12">
+            <div className="mb-6">
+              <h3 className="text-2xl font-bold mb-1">Prakash Ramakrishnan</h3>
+              <p className="text-primary font-medium">Founder & CEO</p>
+            </div>
+            
+            <p className="text-muted-foreground leading-relaxed mb-8 italic">
+              "I'm a firm believer in the combined power of technology, people, and purpose. 
+              My mission is to help businesses not just grow, but scale with clarity, impact, and purpose 
+              in today's digital-first world."
+            </p>
+
+            <div className="flex flex-wrap items-center gap-4">
+              <a href="https://www.linkedin.com/in/prakash-ramakrishnan-ba817a2a4" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors">
+                <Linkedin size={18} />
+              </a>
+              <a href="https://www.instagram.com/prakash_r_1908" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center hover:bg-pink-600 hover:text-white transition-colors">
+                <Instagram size={18} />
+              </a>
+              <a href="https://prakash-portfolio-alpha.vercel.app/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors">
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              </a>
+            </div>
           </div>
         </motion.div>
       </div>

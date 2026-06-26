@@ -10,6 +10,7 @@ import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { DollarSign, TrendingUp, Shield, Clock } from "lucide-react";
 import LottieAnimation from "@/components/LottieAnimation";
+import ROICalculator from "@/components/ROICalculator";
 
 const stats = [
   { value: "30%", label: "Avg Cost Savings vs Agencies" },
@@ -220,6 +221,7 @@ const PricingPage = () => {
       <main>
         <PricingHero />
         <Pricing />
+        <ROICalculator />
       </main>
       <Footer />
     </div>

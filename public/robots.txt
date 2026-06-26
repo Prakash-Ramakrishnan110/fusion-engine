@@ -1,38 +1,4 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
 
-# Sitemap
-Sitemap: https://fusion-engine.vercel.app/sitemap.xml
-
-# Block common non-content paths
-Disallow: /src/
-Disallow: /node_modules/
-Disallow: /dist/
-Disallow: /.git/
-Disallow: /*.json$
-Disallow: /*.js.map$
-Disallow: /*.css.map$
-
-# Allow important assets
-Allow: /css/
-Allow: /js/
-Allow: /images/
-Allow: /assets/
-Allow: /header-logo.png
-Allow: /favicon.png
-Allow: /favicon.svg
-
-# Crawl delay for respectful crawling
-Crawl-delay: 1
+Sitemap: https://fusionengine.vercel.app/sitemap.xml
