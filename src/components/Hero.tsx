@@ -16,7 +16,7 @@ interface HeroProps {
 }
 
 const Hero = ({
-  badgeText = "Fresh Startup • 3 Projects Delivered",
+  badgeText = "Tech Partner • 3 Projects Delivered",
   title1 = "Your Vision,",
   title2 = "Our Expertise",
   description,
@@ -132,7 +132,7 @@ const Hero = ({
             >
               {description || (
                 <>
-                  We're a passionate startup team delivering quality solutions for all client needs. 
+                  We're a passionate technology team delivering quality solutions to accelerate business growth. 
                   <span className="font-semibold text-foreground"> 3 successful projects</span> and 
                   <span className="text-primary font-semibold"> growing fast!</span>
                 </>

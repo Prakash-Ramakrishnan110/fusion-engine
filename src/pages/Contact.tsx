@@ -572,7 +572,7 @@ const Contact = () => {
               {[
                 {
                   question: "What services do you offer?",
-                  answer: "We offer custom web development, mobile app development, SaaS platforms, automation solutions, and API development. We work with startups to enterprises."
+                  answer: "We offer custom web development, mobile app development, SaaS platforms, automation solutions, and API development. We work with growth businesses to enterprises."
                 },
                 {
                   question: "How long does a typical project take?",

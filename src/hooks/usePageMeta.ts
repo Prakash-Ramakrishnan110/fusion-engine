@@ -29,7 +29,7 @@ const updateMetaTag = (name: string, content: string, isProperty = false) => {
 const usePageMeta = (title: string, emoji?: string, description?: string) => {
   useEffect(() => {
     const fullTitle = `${title} | Fusion Engine Technology`;
-    const fallbackDesc = "We build scalable software and robust digital platforms for modern startups and growing enterprises. No fluff. Just execution.";
+    const fallbackDesc = "We build scalable software and robust digital platforms for modern businesses and growing enterprises. No fluff. Just execution.";
     const activeDesc = description || fallbackDesc;
     
     document.title = fullTitle;

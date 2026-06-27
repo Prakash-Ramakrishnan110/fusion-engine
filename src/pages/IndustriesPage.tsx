@@ -14,7 +14,7 @@ import LottieAnimation from "@/components/LottieAnimation";
 const stats = [
   { value: "7+", label: "Industries Served" },
   { value: "150+", label: "Business Clients" },
-  { value: "40+", label: "Startups Launched" },
+  { value: "40+", label: "Businesses Launched" },
   { value: "12", label: "Countries Reached" },
 ];
 

@@ -11,7 +11,7 @@ const tabs = [
     label: "Build",
     icon: Smartphone,
     title: "Launch Your MVP in 14 Days",
-    desc: "From idea to market-ready product in just 2 weeks. Our startup-focused development framework gets you to customers faster with proven tech stacks and scalable architecture.",
+    desc: "From idea to market-ready product in just 2 weeks. Our business-focused development framework gets you to customers faster with proven tech stacks and scalable architecture.",
     cta: "Start Building Now",
     ctaLink: "/contact",
     learnMore: "/process",
@@ -34,7 +34,7 @@ const tabs = [
     id: "secure",
     label: "Secure",
     icon: Shield,
-    title: "Enterprise Security for Startups",
+    title: "Enterprise Security for Growth Businesses",
     desc: "Bank-level security that builds investor confidence. SOC 2 compliance, data encryption, and security audits included — no enterprise pricing required.",
     cta: "View Security Features",
     ctaLink: "/why-us",
@@ -58,7 +58,7 @@ const SolutionsTabs = () => {
           className="text-center mb-8"
         >
           <h2 className="text-3xl md:text-5xl font-bold leading-tight max-w-4xl mx-auto">
-            Everything Your Startup Needs to{" "}
+            Everything Your Business Needs to{" "}
             <span className="block mt-2">
               {tabs.map((t, i) => (
                 <span key={t.id}>

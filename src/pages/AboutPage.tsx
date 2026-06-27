@@ -23,7 +23,7 @@ const AboutPage = () => {
           title2="technical co-founders"
           description={
             <>
-              We build scalable software and robust digital platforms for modern startups and growing enterprises. 
+              We build scalable software and robust digital platforms for modern businesses and growing enterprises. 
               <span className="font-semibold text-foreground"> No fluff.</span> 
               <span className="text-primary font-semibold"> Just execution.</span>
             </>

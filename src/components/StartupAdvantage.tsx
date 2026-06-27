@@ -35,10 +35,10 @@ const StartupAdvantage = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <span className="text-sm font-semibold text-primary uppercase tracking-widest">Startup Advantage</span>
-            <h2 className="text-3xl md:text-4xl font-bold mt-3 mb-4">Built for Startups That Scale</h2>
+            <span className="text-sm font-semibold text-primary uppercase tracking-widest">Business Advantage</span>
+            <h2 className="text-3xl md:text-4xl font-bold mt-3 mb-4">Built for Businesses That Scale</h2>
             <p className="text-muted-foreground max-w-2xl">
-              We understand the startup game — speed, cost, and scalability matter more than anything else.
+              We understand the business game — speed, cost, and scalability matter more than anything else.
             </p>
           </motion.div>
           <motion.div

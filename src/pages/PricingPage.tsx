@@ -100,7 +100,7 @@ const PricingHero = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
             >
-              Startup Pricing
+              Business Pricing
               <motion.span 
                 className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent block"
                 initial={{ opacity: 0, x: -20 }}

@@ -7,7 +7,7 @@ const StartupBenefits = () => {
     {
       icon: Clock,
       title: "Launch in 14 Days",
-      description: "From napkin sketch to paying customers. Our startup accelerator framework gets you to market faster than anyone else."
+      description: "From idea to paying customers. Our rapid development framework gets you to market faster than anyone else."
     },
     {
       icon: Users,
@@ -36,10 +36,10 @@ const StartupBenefits = () => {
           className="text-center mb-8"
         >
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Why Startups Choose <span className="text-primary">Fusion Engine</span>
+            Why Businesses Choose <span className="text-primary">Fusion Engine</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            We understand startup challenges because we've been there. Our approach is designed for speed, quality, and growth.
+            We understand business challenges because we've been there. Our approach is designed for speed, quality, and growth.
           </p>
         </motion.div>
 
@@ -73,7 +73,7 @@ const StartupBenefits = () => {
           <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl p-6 border border-primary/20">
             <div className="flex items-center justify-center gap-2 mb-2">
               <span className="text-2xl font-bold text-primary">50+</span>
-              <span className="text-muted-foreground">Startups Launched</span>
+              <span className="text-muted-foreground">Projects Launched</span>
             </div>
             <p className="text-sm text-muted-foreground">
               Join successful founders who trusted us with their vision

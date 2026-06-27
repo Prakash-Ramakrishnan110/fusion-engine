@@ -22,7 +22,7 @@ const StartupToolkit = () => {
           <span className="text-sm font-semibold text-primary uppercase tracking-widest">Technology</span>
           <h2 className="text-3xl md:text-4xl font-bold mt-3 mb-4">Our Tech Stack</h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            We use battle-tested technologies trusted by startups and enterprises worldwide.
+            We use battle-tested technologies trusted by businesses and enterprises worldwide.
           </p>
         </motion.div>
 

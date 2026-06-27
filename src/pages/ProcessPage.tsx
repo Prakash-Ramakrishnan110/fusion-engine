@@ -94,7 +94,7 @@ const ProcessHero = () => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                Startup Success
+                Business Success
               </motion.span>
             </motion.h1>
 
@@ -107,7 +107,7 @@ const ProcessHero = () => {
             >
               From idea to launch in <span className="font-semibold text-foreground">structured sprints</span>. 
               Our agile process ensures <span className="text-green-600 font-semibold">transparency, speed, and quality</span> 
-              at every step of your startup journey.
+              at every step of your business journey.
             </motion.p>
 
             {/* Process Steps */}

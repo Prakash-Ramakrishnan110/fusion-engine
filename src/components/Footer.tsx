@@ -31,8 +31,31 @@ const Footer = () => {
               />
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Your technical co-founder for startup success. We build, launch, and scale startups that get funded.
+              Your technical partner for business growth and success. We build, launch, and scale digital solutions that drive measurable results.
             </p>
+            <div className="mt-6 space-y-4">
+              <div className="flex flex-wrap items-center gap-4">
+                <img 
+                  src="/assets/msme.png" 
+                  alt="MSME Registered" 
+                  className="h-12 w-auto object-contain bg-white rounded-md p-1.5 border border-border shadow-sm transition-transform hover:scale-105"
+                />
+                <img 
+                  src="/assets/gem-logo.png" 
+                  alt="GeM Portal" 
+                  className="h-12 w-auto object-contain bg-white rounded-md p-1.5 border border-border shadow-sm transition-transform hover:scale-105"
+                />
+                <img 
+                  src="/assets/duns.png" 
+                  alt="DUNS Registered" 
+                  className="h-12 w-auto object-contain bg-white rounded-md p-1.5 border border-border shadow-sm transition-transform hover:scale-105"
+                />
+              </div>
+              <div className="text-xs text-muted-foreground bg-secondary/50 p-2.5 rounded border border-border/50">
+                <span className="font-semibold text-foreground">DUNS Number:</span> Applied 
+                <span className="block mt-0.5 opacity-80">(Reference number available, pending 30 days)</span>
+              </div>
+            </div>
           </div>
 
           <div>

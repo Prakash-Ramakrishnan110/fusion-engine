@@ -6,9 +6,9 @@ interface PageMetadata {
 
 export const pageMetadata: Record<string, PageMetadata> = {
   "/": {
-    title: "Fusion Engine Technology - Build, Launch & Scale Startups",
-    description: "Technical co-founder for startup success. We build, launch, and scale startups that get funded with cutting-edge technology solutions.",
-    keywords: "startup, technology, funding, launch, scale, fusion engine"
+    title: "Fusion Engine Technology - Build, Launch & Scale Businesses",
+    description: "Technical partner for business success. We build, launch, and scale digital products that drive results with cutting-edge technology solutions.",
+    keywords: "business growth, technology, funding, launch, scale, fusion engine"
   },
   "/services": {
     title: "Technology Services - Fusion Engine",
@@ -17,13 +17,13 @@ export const pageMetadata: Record<string, PageMetadata> = {
   },
   "/process": {
     title: "Our Process - Fusion Engine Technology",
-    description: "Our proven process for building and launching successful technology startups from concept to scale.",
-    keywords: "startup process, technology development, launch process, scaling strategy"
+    description: "Our proven process for building and launching successful technology solutions from concept to scale.",
+    keywords: "development process, technology development, launch process, scaling strategy"
   },
   "/products": {
     title: "Technology Products - Fusion Engine",
-    description: "Innovative technology products designed to accelerate your startup growth and success.",
-    keywords: "technology products, startup tools, SaaS products, automation tools"
+    description: "Innovative technology products designed to accelerate your business growth and success.",
+    keywords: "technology products, business tools, SaaS products, automation tools"
   },
   "/industries": {
     title: "Industries We Serve - Fusion Engine Technology",
@@ -32,18 +32,18 @@ export const pageMetadata: Record<string, PageMetadata> = {
   },
   "/why-us": {
     title: "Why Choose Fusion Engine - Technology Partner",
-    description: "Learn why Fusion Engine Technology is the perfect technical co-founder for your startup success story.",
-    keywords: "technical cofounder, startup partner, technology expertise, fusion engine advantages"
+    description: "Learn why Fusion Engine Technology is the perfect technical partner for your business success story.",
+    keywords: "technical partner, business partner, technology expertise, fusion engine advantages"
   },
   "/pricing": {
     title: "Pricing Plans - Fusion Engine Technology",
-    description: "Transparent pricing plans for our technology services and startup partnership programs.",
-    keywords: "technology pricing, startup costs, service pricing, partnership plans"
+    description: "Transparent pricing plans for our technology services and business partnership programs.",
+    keywords: "technology pricing, project costs, service pricing, partnership plans"
   },
   "/contact": {
     title: "Contact Fusion Engine Technology",
-    description: "Get in touch with our technical team to discuss your startup project or partnership opportunities.",
-    keywords: "contact technology team, startup consultation, partnership inquiry, fusion engine contact"
+    description: "Get in touch with our technical team to discuss your project or partnership opportunities.",
+    keywords: "contact technology team, project consultation, partnership inquiry, fusion engine contact"
   }
 };
 
