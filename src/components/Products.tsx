@@ -1,8 +1,26 @@
 import { motion } from "framer-motion";
-import { Receipt, Package, Truck, GraduationCap, ShoppingCart, Activity, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Receipt, Package, Truck, GraduationCap, ShoppingCart, Activity, ArrowRight, CheckCircle2, CreditCard, Map } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const products = [
+  {
+    icon: CreditCard,
+    title: "MemberPay",
+    desc: "A powerful subscription and membership management platform. Automate WhatsApp reminders, process secure online and UPI QR payments, and manage members from a cloud dashboard.",
+    features: ["WhatsApp Reminders", "UPI QR Payments", "Cloud Dashboard", "Automated Billing"],
+  },
+  {
+    icon: Activity,
+    title: "HoofCare",
+    desc: "An innovative digital solution focused on livestock and veterinary management. Streamlining animal health tracking and farm operations.",
+    features: ["Health Tracking", "Veterinary Records", "Farm Operations", "Digital Health Cards"],
+  },
+  {
+    icon: Map,
+    title: "GEOMMAND",
+    desc: "An AI-powered geospatial land intelligence platform. Built to analyze and interpret geospatial data for smart decision-making and sustainable planetary impact.",
+    features: ["Geospatial AI", "Land Intelligence", "Predictive Modeling", "Satellite Data"],
+  },
   {
     icon: Receipt,
     title: "GST Billing Systems",
@@ -20,24 +38,6 @@ const products = [
     title: "Fleet Monitoring Systems",
     desc: "GPS tracking, route optimization, driver management, fuel monitoring, and predictive maintenance for logistics companies.",
     features: ["Live GPS Tracking", "Route Optimization", "Fuel Analytics", "Maintenance Alerts"],
-  },
-  {
-    icon: GraduationCap,
-    title: "School ERP Systems",
-    desc: "Complete school management — admissions, attendance, grading, fee collection, timetable, and parent communication portals.",
-    features: ["Online Admissions", "Attendance Tracking", "Grade Management", "Parent Portal"],
-  },
-  {
-    icon: ShoppingCart,
-    title: "Multi-Vendor E-commerce",
-    desc: "Scalable marketplace platforms with vendor onboarding, product management, payment splits, and buyer dashboards.",
-    features: ["Vendor Dashboard", "Payment Splits", "Product Catalog", "Buyer Reviews"],
-  },
-  {
-    icon: Activity,
-    title: "AI Monitoring Dashboards",
-    desc: "Intelligent dashboards with anomaly detection, predictive insights, real-time alerts, and customizable KPI tracking.",
-    features: ["Anomaly Detection", "Predictive Analytics", "Real-time Alerts", "Custom KPIs"],
   },
 ];
 

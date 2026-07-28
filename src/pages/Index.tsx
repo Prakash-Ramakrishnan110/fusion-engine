@@ -13,6 +13,7 @@ import Founder from "@/components/Founder";
 import FAQ from "@/components/FAQ";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
+import RecentActivities from "@/components/RecentActivities";
 
 const Index = () => {
   return (
@@ -21,6 +22,7 @@ const Index = () => {
       <main>
         <Hero />
         <AnnouncementStrip />
+        <RecentActivities />
         <StartupBenefits />
         <TrustSignals />
         <SolutionsTabs />

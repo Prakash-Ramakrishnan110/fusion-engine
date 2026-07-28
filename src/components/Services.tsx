@@ -4,7 +4,7 @@ import {
   Globe,
   Cloud,
   Brain,
-  Cog,
+  Cpu,
   Server,
   ArrowRight,
   CheckCircle2,
@@ -13,52 +13,58 @@ import { Link } from "react-router-dom";
 
 const services = [
   {
-    icon: Smartphone,
-    title: "Mobile Application Development",
-    desc: "High-performance mobile apps built for scale. We craft native and cross-platform experiences that delight users and drive engagement.",
-    features: ["Native Android Apps", "Flutter Cross-Platform", "Real-time Data Sync", "GPS & IoT Integration", "Offline-first Architecture", "Secure Authentication"],
-    stat: "50+",
-    statLabel: "Apps Delivered",
-  },
-  {
-    icon: Globe,
-    title: "Web Platform Engineering",
-    desc: "Enterprise-grade web systems with robust architecture. From admin panels to full-blown marketplaces, we build it all.",
-    features: ["Admin Dashboards", "Role-Based Systems", "ERP & CRM Platforms", "Multi-Vendor Marketplaces", "Subscription Platforms", "API-Driven Architecture"],
-    stat: "99.9%",
-    statLabel: "Uptime SLA",
-  },
-  {
     icon: Cloud,
-    title: "SaaS Product Development",
-    desc: "Build and launch scalable SaaS products with multi-tenant architecture, billing integrations, and analytics built right in.",
-    features: ["Multi-tenant Architecture", "Subscription Billing", "Usage-Based Pricing", "Analytics Dashboards", "Cloud Deployment", "DevOps Integration"],
+    title: "SaaS Development",
+    desc: "Build and launch scalable SaaS products with multi-tenant architecture, billing integrations, and powerful analytics built right in.",
+    features: ["Multi-tenant Architecture", "Subscription Billing", "Usage-Based Pricing", "Analytics Dashboards"],
     stat: "10x",
     statLabel: "Faster Launch",
+    image: "/services/saas.png",
   },
   {
     icon: Brain,
-    title: "AI & Intelligent Systems",
-    desc: "Integrate intelligence into your business workflows. From chatbots to predictive analytics, we make your data work harder.",
-    features: ["AI Chatbots", "Predictive Analytics", "Smart Monitoring", "AI-Powered Dashboards", "Automated Insights", "Computer Vision"],
+    title: "AI Solutions",
+    desc: "Integrate intelligence into your business workflows. From autonomous agents to predictive analytics, we make your data work harder.",
+    features: ["AI Chatbots", "Predictive Analytics", "Smart Monitoring", "Computer Vision"],
     stat: "40%",
     statLabel: "Cost Reduction",
+    image: "/services/ai.png",
   },
   {
-    icon: Cog,
-    title: "Business Automation Systems",
-    desc: "Remove manual processes and increase efficiency. Automate repetitive tasks so your team can focus on what matters.",
-    features: ["Workflow Automation", "WhatsApp Automation", "CRM Automation", "Invoice Automation", "Payment Integration", "API Integration"],
-    stat: "500+",
-    statLabel: "Hours Saved / Month",
+    icon: Globe,
+    title: "Web Development",
+    desc: "Enterprise-grade web systems with robust architecture. From complex dashboards to full-blown marketplaces, we build it all.",
+    features: ["Admin Dashboards", "ERP & CRM Platforms", "Multi-Vendor Marketplaces", "API-Driven Architecture"],
+    stat: "99.9%",
+    statLabel: "Uptime SLA",
+    image: "/services/web.png",
+  },
+  {
+    icon: Smartphone,
+    title: "Mobile Applications",
+    desc: "High-performance mobile apps built for scale. We craft native and cross-platform experiences that delight users and drive engagement.",
+    features: ["Native iOS/Android", "Flutter Cross-Platform", "GPS & IoT Integration", "Offline-first Architecture"],
+    stat: "50+",
+    statLabel: "Apps Delivered",
+    image: "/services/mobile.png",
+  },
+  {
+    icon: Cpu,
+    title: "Firmware Development",
+    desc: "Embedded systems and IoT solutions that bridge hardware and software. We write robust firmware for connected devices and edge computing.",
+    features: ["IoT Architecture", "Embedded Systems", "Hardware Integration", "Real-time Processing"],
+    stat: "Zero",
+    statLabel: "Latency Focus",
+    image: "/services/firmware.png",
   },
   {
     icon: Server,
-    title: "Cloud & Infrastructure",
+    title: "Cloud Solutions",
     desc: "Reliable backend architecture for scaling products. We set up, manage, and optimize your cloud infrastructure for peak performance.",
-    features: ["AWS / GCP / Azure", "Firebase / Supabase", "Secure Auth", "Role-Based Access", "Data Encryption", "Performance Optimization"],
+    features: ["AWS / GCP / Azure", "Serverless Architecture", "Secure Auth", "Performance Optimization"],
     stat: "256-bit",
     statLabel: "Encryption",
+    image: "/services/cloud.png",
   },
 ];
 
@@ -109,27 +115,37 @@ const Services = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="glass-card p-8 group hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+              className="glass-card overflow-hidden group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col"
             >
-              <div className="flex items-center justify-between mb-5">
-                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                  <service.icon className="text-primary" size={26} />
-                </div>
-                <div className="text-right">
-                  <div className="text-xl font-bold text-primary">{service.stat}</div>
-                  <div className="text-[11px] text-muted-foreground">{service.statLabel}</div>
+              <div className="h-48 w-full overflow-hidden relative">
+                <img 
+                  src={service.image} 
+                  alt={service.title} 
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent"></div>
+                <div className="absolute bottom-4 right-4 text-right">
+                  <div className="text-xl font-bold text-white drop-shadow-md">{service.stat}</div>
+                  <div className="text-[11px] text-white/90 drop-shadow-md font-medium">{service.statLabel}</div>
                 </div>
               </div>
-              <h3 className="text-xl font-bold mb-3">{service.title}</h3>
-              <p className="text-sm text-muted-foreground mb-5 leading-relaxed">{service.desc}</p>
-              <ul className="space-y-2">
-                {service.features.map((f) => (
-                  <li key={f} className="text-sm text-muted-foreground flex items-center gap-2">
-                    <CheckCircle2 size={14} className="text-primary shrink-0" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
+              <div className="p-8 flex-1 flex flex-col">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <service.icon className="text-primary" size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold leading-tight">{service.title}</h3>
+                </div>
+                <p className="text-sm text-muted-foreground mb-6 leading-relaxed flex-1">{service.desc}</p>
+                <ul className="space-y-2 mt-auto pt-4 border-t border-border/50">
+                  {service.features.map((f) => (
+                    <li key={f} className="text-sm text-muted-foreground flex items-center gap-2">
+                      <CheckCircle2 size={14} className="text-primary shrink-0" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </motion.div>
           ))}
         </div>
