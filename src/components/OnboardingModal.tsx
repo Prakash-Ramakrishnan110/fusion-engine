@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles, Send, CheckCircle, Cookie, Mail, Phone, MessageSquare, Clock, Laptop, Smartphone, Cpu, Cloud } from "lucide-react";
+import { X, Sparkles, Send, CheckCircle, Cookie, Clock, Laptop, Smartphone, Cpu, Cloud } from "lucide-react";
 import emailjs from '@emailjs/browser';
 
 const OnboardingModal = () => {
@@ -116,18 +116,6 @@ const OnboardingModal = () => {
             <p className="text-muted-foreground text-xs sm:text-sm mt-1">
               Tell us your idea or project scope for a free roadmap & quote in 5 mins.
             </p>
-
-            {/* Quick Contact Info Strip */}
-            <div className="mt-3.5 pt-3 border-t border-border/40 flex flex-wrap items-center justify-between gap-2 text-[11px] text-muted-foreground">
-              <a href="mailto:fusionenginetechnology@gmail.com" className="flex items-center gap-1.5 hover:text-primary transition-colors">
-                <Mail size={13} className="text-primary shrink-0" />
-                <span>fusionenginetechnology@gmail.com</span>
-              </a>
-              <a href="https://wa.me/916369884331" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-green-600 transition-colors">
-                <MessageSquare size={13} className="text-green-500 shrink-0" />
-                <span className="font-semibold">+91 63698 84331</span>
-              </a>
-            </div>
           </div>
 
           {/* Form / Submitted Body */}
