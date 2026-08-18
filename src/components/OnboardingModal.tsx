@@ -50,6 +50,8 @@ const OnboardingModal = () => {
       const TEMPLATE_ID = 'template_p8i38d6';
       const PUBLIC_KEY = 'QNzyFmRohhj8Soht0';
 
+      emailjs.init(PUBLIC_KEY);
+
       const templateParams = {
         from_name: formData.name,
         from_email: formData.contact,
@@ -112,7 +114,7 @@ const OnboardingModal = () => {
               Let's Build Your <span className="text-primary">Next Project</span>
             </h3>
             <p className="text-muted-foreground text-xs sm:text-sm mt-1">
-              Tell us your idea or project scope for a free roadmap & quote in 2 hours.
+              Tell us your idea or project scope for a free roadmap & quote in 5 mins.
             </p>
 
             {/* Quick Contact Info Strip */}
@@ -141,7 +143,7 @@ const OnboardingModal = () => {
                 </div>
                 <h4 className="text-xl font-bold text-foreground">Inquiry Received!</h4>
                 <p className="text-muted-foreground text-sm max-w-xs mx-auto">
-                  Thank you! Our technical lead will reach out to you within <span className="text-foreground font-semibold">2 hours</span>.
+                  Thank you! Our technical lead will reach out to you within <span className="text-foreground font-semibold">5 mins</span>.
                 </p>
               </motion.div>
             ) : (
@@ -224,7 +226,7 @@ const OnboardingModal = () => {
                 <div className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-secondary/30 text-[11px] text-muted-foreground border border-border/40">
                   <div className="flex items-center gap-1.5">
                     <Clock size={13} className="text-blue-500 shrink-0" />
-                    <span>Response guaranteed in <strong className="text-foreground">2 hours</strong></span>
+                    <span>Response guaranteed in <strong className="text-foreground">5 mins</strong></span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Cookie size={13} className="text-primary shrink-0" />

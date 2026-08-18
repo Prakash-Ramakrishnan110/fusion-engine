@@ -24,6 +24,8 @@ const ChatWidget = () => {
       const TEMPLATE_ID = 'template_p8i38d6';
       const PUBLIC_KEY = 'QNzyFmRohhj8Soht0';
 
+      emailjs.init(PUBLIC_KEY);
+
       await emailjs.send(
         SERVICE_ID,
         TEMPLATE_ID,
@@ -44,7 +46,7 @@ const ChatWidget = () => {
     setTimeout(() => {
       setMessages(prev => [
         ...prev, 
-        { text: "Thanks for reaching out! Our team has received your message and will reply within 2 hours. You can also WhatsApp us directly at +91 63698 84331.", sender: 'bot' }
+        { text: "Thanks for reaching out! Our team has received your message and will reply within 5 mins. You can also WhatsApp us directly at +91 63698 84331.", sender: 'bot' }
       ]);
     }, 1000);
   };
@@ -65,7 +67,7 @@ const ChatWidget = () => {
             <div className="bg-primary p-4 text-primary-foreground flex justify-between items-center">
               <div>
                 <h3 className="font-semibold text-sm sm:text-base">Live Technical Support</h3>
-                <p className="text-xs opacity-90">We guarantee a reply within 2 hours</p>
+                <p className="text-xs opacity-90">We guarantee a reply within 5 mins</p>
               </div>
               <button onClick={() => setIsOpen(false)} className="hover:bg-white/20 p-1 rounded-full transition-colors">
                 <X size={20} />
