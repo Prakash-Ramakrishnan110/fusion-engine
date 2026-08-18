@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
-import { Mail, Phone, MapPin, Send, Clock, CheckCircle, MessageSquare, ArrowRight, ShieldCheck, Zap } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Clock, CheckCircle, MessageSquare, ShieldCheck, Zap } from "lucide-react";
 import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import usePageMeta from "@/hooks/usePageMeta";
+import LottieAnimation, { LOTTIE_URLS } from "@/components/LottieAnimation";
 import emailjs from '@emailjs/browser';
 
 const Contact = () => {
@@ -58,8 +59,8 @@ const Contact = () => {
       <Navbar />
       
       <main className="flex-1">
-        {/* Full Contact Hero Section */}
-        <section className="relative pt-32 lg:pt-36 pb-20 overflow-hidden border-b border-border/40 bg-secondary/10">
+        {/* Contact Hero Section with Animation */}
+        <section className="relative pt-32 lg:pt-36 pb-16 md:pb-20 overflow-hidden border-b border-border/40 bg-secondary/10">
           {/* Animated Background Gradients */}
           <div className="absolute inset-0">
             <motion.div 
@@ -75,69 +76,90 @@ const Contact = () => {
             />
           </div>
 
-          <div className="container mx-auto px-4 max-w-5xl relative z-10 text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              {/* Hero Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs sm:text-sm font-semibold uppercase tracking-wider mb-6">
-                <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
-                Get In Touch • Let's Connect
-              </div>
+          <div className="container mx-auto px-4 max-w-6xl relative z-10">
+            <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+              
+              {/* Left Side: Title & CTAs (7 cols) */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6 }}
+                className="lg:col-span-7 text-center lg:text-left"
+              >
+                {/* Hero Badge */}
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs sm:text-sm font-semibold uppercase tracking-wider mb-6">
+                  <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+                  Get In Touch • Let's Connect
+                </div>
 
-              {/* Main Hero Title */}
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 tracking-tight leading-tight">
-                Let's Build <span className="text-primary bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">Something Amazing</span>
-              </h1>
+                {/* Main Hero Title */}
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 tracking-tight leading-tight">
+                  Let's Build <span className="text-primary bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">Something Amazing</span>
+                </h1>
 
-              {/* Hero Description */}
-              <p className="text-muted-foreground text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed mb-8">
-                Ready to transform your idea into a market-ready platform? We're here to help you build, launch, and scale fast.
-              </p>
+                {/* Hero Description */}
+                <p className="text-muted-foreground text-lg sm:text-xl max-w-xl mx-auto lg:mx-0 leading-relaxed mb-8">
+                  Ready to transform your idea into a market-ready platform? We're here to help you build, launch, and scale fast.
+                </p>
 
-              {/* Hero Quick Action Buttons */}
-              <div className="flex flex-wrap items-center justify-center gap-4 mb-10">
-                <a
-                  href="#contact-form"
-                  className="px-7 py-3.5 bg-primary text-primary-foreground font-semibold rounded-xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 inline-flex items-center gap-2 text-base"
-                >
-                  <span>Send Message</span>
-                  <Send size={18} />
-                </a>
+                {/* Hero Action Buttons */}
+                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-8">
+                  <a
+                    href="#contact-form"
+                    className="px-7 py-3.5 bg-primary text-primary-foreground font-semibold rounded-xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 inline-flex items-center gap-2 text-base"
+                  >
+                    <span>Send Message</span>
+                    <Send size={18} />
+                  </a>
 
-                <a
-                  href="https://wa.me/916369884331?text=Hi%20Fusion%20Engine,%20I'm%20interested%20in%20a%20project!"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-7 py-3.5 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 inline-flex items-center gap-2 text-base"
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.149-.67.149-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.058-.371-.025-.521-.075-.149-.669-1.611-.916-1.996-.243-.381-.495-.299-.673-.305-.173-.006-.371-.009-.57-.009-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.413-.074-.122-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.89-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                  </svg>
-                  <span>Chat on WhatsApp</span>
-                </a>
-              </div>
+                  <a
+                    href="https://wa.me/916369884331?text=Hi%20Fusion%20Engine,%20I'm%20interested%20in%20a%20project!"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-7 py-3.5 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 inline-flex items-center gap-2 text-base"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.149-.67.149-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.058-.371-.025-.521-.075-.149-.669-1.611-.916-1.996-.243-.381-.495-.299-.673-.305-.173-.006-.371-.009-.57-.009-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.413-.074-.122-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.89-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                    </svg>
+                    <span>Chat on WhatsApp</span>
+                  </a>
+                </div>
 
-              {/* Hero Features Strip */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-6 border-t border-border/50 text-left">
-                {[
-                  { icon: Clock, title: "2-Hour Response", desc: "Guaranteed quick reply" },
-                  { icon: CheckCircle, title: "Free Consultation", desc: "No obligation discovery" },
-                  { icon: ShieldCheck, title: "Quality Assured", desc: "Clean & secure builds" },
-                  { icon: Zap, title: "Rapid Execution", desc: "Launch in weeks" }
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border/60 shadow-sm">
-                    <item.icon size={20} className="text-primary shrink-0" />
-                    <div>
-                      <div className="text-xs font-bold text-foreground">{item.title}</div>
-                      <div className="text-[11px] text-muted-foreground">{item.desc}</div>
+                {/* Hero Features Strip */}
+                <div className="grid grid-cols-2 gap-3 pt-6 border-t border-border/50 max-w-lg mx-auto lg:mx-0">
+                  {[
+                    { icon: Clock, title: "2-Hour Response", desc: "Guaranteed quick reply" },
+                    { icon: CheckCircle, title: "Free Consultation", desc: "No obligation discovery" },
+                    { icon: ShieldCheck, title: "Quality Assured", desc: "Clean & secure builds" },
+                    { icon: Zap, title: "Rapid Execution", desc: "Launch in weeks" }
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-2.5 p-2.5 rounded-xl bg-card border border-border/60 shadow-sm">
+                      <item.icon size={18} className="text-primary shrink-0" />
+                      <div>
+                        <div className="text-xs font-bold text-foreground leading-tight">{item.title}</div>
+                        <div className="text-[11px] text-muted-foreground leading-tight">{item.desc}</div>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Right Side: Hero Lottie Animation (5 cols) */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="lg:col-span-5 flex justify-center items-center"
+              >
+                <div className="w-full max-w-md h-72 sm:h-80 md:h-96 relative">
+                  <LottieAnimation
+                    url={LOTTIE_URLS.email}
+                    className="w-full h-full"
+                  />
+                </div>
+              </motion.div>
+
+            </div>
           </div>
         </section>
 
