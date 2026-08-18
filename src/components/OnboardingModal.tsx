@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles, Send, CheckCircle, Cookie, Clock, Laptop, Smartphone, Cpu, Cloud } from "lucide-react";
+import { X, Sparkles, Send, CheckCircle, Cookie, Clock, Globe, Smartphone, Cloud, User, Mail, FileText } from "lucide-react";
 import emailjs from '@emailjs/browser';
 
 const OnboardingModal = () => {
@@ -143,63 +143,70 @@ const OnboardingModal = () => {
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     {[
-                      { name: "Web Platform", icon: Laptop },
+                      { name: "Web Platform", icon: Globe },
                       { name: "Mobile App", icon: Smartphone },
-                      { name: "AI Solution", icon: Cpu },
+                      { name: "AI Solution", icon: Sparkles },
                       { name: "Cloud / SaaS", icon: Cloud },
                     ].map((item) => (
                       <button
                         type="button"
                         key={item.name}
                         onClick={() => setFormData({ ...formData, service: item.name })}
-                        className={`flex items-center gap-2 p-2.5 rounded-xl border text-xs font-semibold transition-all ${
+                        className={`flex items-center gap-2.5 p-2.5 rounded-xl border text-xs font-semibold transition-all ${
                           formData.service === item.name
                             ? "bg-primary text-primary-foreground border-primary shadow-sm"
                             : "bg-background/80 text-foreground border-border hover:border-primary/50"
                         }`}
                       >
-                        <item.icon size={16} />
+                        <item.icon size={16} className={formData.service === item.name ? "text-primary-foreground" : "text-primary"} />
                         <span>{item.name}</span>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Name & Contact Fields */}
+                {/* Name & Contact Fields with Input Icons */}
                 <div className="grid sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-foreground mb-1">
-                      Your Name *
+                    <label className="block text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5">
+                      <User size={13} className="text-primary" />
+                      <span>Your Name *</span>
                     </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="e.g. Alex"
-                      className="w-full px-3.5 py-2.5 bg-background border border-input rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        required
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        placeholder="e.g. Alex"
+                        className="w-full pl-3.5 pr-3.5 py-2.5 bg-background border border-input rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-foreground mb-1">
-                      Email or Phone *
+                    <label className="block text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5">
+                      <Mail size={13} className="text-primary" />
+                      <span>Email or Phone *</span>
                     </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.contact}
-                      onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
-                      placeholder="alex@company.com"
-                      className="w-full px-3.5 py-2.5 bg-background border border-input rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        required
+                        value={formData.contact}
+                        onChange={(e) => setFormData({ ...formData, contact: e.target.value })}
+                        placeholder="alex@company.com"
+                        className="w-full pl-3.5 pr-3.5 py-2.5 bg-background border border-input rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
                   </div>
                 </div>
 
-                {/* Brief Message (Optional) */}
+                {/* Brief Message (Optional) with Icon */}
                 <div>
-                  <label className="block text-xs font-semibold text-foreground mb-1">
-                    Project Details / Requirements (Optional)
+                  <label className="block text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1.5">
+                    <FileText size={13} className="text-primary" />
+                    <span>Project Details / Requirements (Optional)</span>
                   </label>
                   <textarea
                     rows={2}

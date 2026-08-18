@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 
-
 const quickLinks = [
   { label: "Services", href: "/services" },
   { label: "Process", href: "/process" },
@@ -119,8 +118,19 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-border/30 text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} Fusion Engine Technology. All rights reserved.
+        {/* Footer Bottom Bar with Copyright & Legal Links */}
+        <div className="mt-8 pt-6 border-t border-border/30 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+          <div>
+            © {new Date().getFullYear()} Fusion Engine Technology. All rights reserved.
+          </div>
+          <div className="flex items-center gap-6 text-xs">
+            <Link to="/privacy" className="hover:text-foreground transition-colors font-medium">
+              Privacy Policy
+            </Link>
+            <Link to="/terms" className="hover:text-foreground transition-colors font-medium">
+              Terms & Conditions
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
