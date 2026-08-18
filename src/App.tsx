@@ -8,6 +8,8 @@ import ScrollToTop from "./components/ScrollToTop";
 import Breadcrumbs from "./components/Breadcrumbs";
 import { ThemeProvider } from "next-themes";
 import { Loader2 } from "lucide-react";
+import ChatWidget from "./components/ChatWidget";
+import OnboardingModal from "./components/OnboardingModal";
 
 // Lazy load pages
 const Index = lazy(() => import("./pages/Index"));
@@ -20,7 +22,6 @@ const PricingPage = lazy(() => import("./pages/PricingPage"));
 const Contact = lazy(() => import("./pages/Contact"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
-import ChatWidget from "./components/ChatWidget";
 
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-[60vh] w-full">
@@ -53,6 +54,7 @@ const App = () => (
           </Routes>
         </Suspense>
         <ChatWidget />
+        <OnboardingModal />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
