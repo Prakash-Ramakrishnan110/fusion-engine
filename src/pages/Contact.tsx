@@ -13,6 +13,13 @@ const Contact = () => {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const contactFeatures = [
+    { icon: Clock, title: "2-Hour Response", desc: "Guaranteed quick reply" },
+    { icon: CheckCircle, title: "Free Consultation", desc: "No obligation discovery" },
+    { icon: ShieldCheck, title: "Quality Assured", desc: "Clean & secure builds" },
+    { icon: Zap, title: "Rapid Execution", desc: "Launch in weeks" }
+  ];
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -59,7 +66,7 @@ const Contact = () => {
       <Navbar />
       
       <main className="flex-1">
-        {/* Contact Hero Section with Animation */}
+        {/* Contact Hero Section with Floating Animation Cards */}
         <section className="relative pt-32 lg:pt-36 pb-16 md:pb-20 overflow-hidden border-b border-border/40 bg-secondary/10">
           {/* Animated Background Gradients */}
           <div className="absolute inset-0">
@@ -103,7 +110,7 @@ const Contact = () => {
                 </p>
 
                 {/* Hero Action Buttons */}
-                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-8">
+                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-4">
                   <a
                     href="#contact-form"
                     className="px-7 py-3.5 bg-primary text-primary-foreground font-semibold rounded-xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 inline-flex items-center gap-2 text-base"
@@ -124,40 +131,56 @@ const Contact = () => {
                     <span>Chat on WhatsApp</span>
                   </a>
                 </div>
-
-                {/* Hero Features Strip */}
-                <div className="grid grid-cols-2 gap-3 pt-6 border-t border-border/50 max-w-lg mx-auto lg:mx-0">
-                  {[
-                    { icon: Clock, title: "2-Hour Response", desc: "Guaranteed quick reply" },
-                    { icon: CheckCircle, title: "Free Consultation", desc: "No obligation discovery" },
-                    { icon: ShieldCheck, title: "Quality Assured", desc: "Clean & secure builds" },
-                    { icon: Zap, title: "Rapid Execution", desc: "Launch in weeks" }
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center gap-2.5 p-2.5 rounded-xl bg-card border border-border/60 shadow-sm">
-                      <item.icon size={18} className="text-primary shrink-0" />
-                      <div>
-                        <div className="text-xs font-bold text-foreground leading-tight">{item.title}</div>
-                        <div className="text-[11px] text-muted-foreground leading-tight">{item.desc}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
               </motion.div>
 
-              {/* Right Side: Hero Lottie Animation (5 cols) */}
+              {/* Right Side: Hero Lottie Animation with Floating Surround Cards (5 cols) */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="lg:col-span-5 flex justify-center items-center"
+                className="lg:col-span-5 relative hidden lg:block"
+                style={{ height: 420 }}
               >
-                <div className="w-full max-w-md h-72 sm:h-80 md:h-96 relative">
-                  <LottieAnimation
-                    url={LOTTIE_URLS.email}
-                    className="w-full h-full"
-                  />
-                </div>
+                {/* Main Lottie Animation */}
+                <LottieAnimation
+                  url={LOTTIE_URLS.email}
+                  className="w-full h-full"
+                />
+
+                {/* Floating Feature Cards Surrounded Around Animation */}
+                {contactFeatures.map((feature, index) => (
+                  <motion.div
+                    key={feature.title}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8 + index * 0.15 }}
+                    className="absolute bg-background/95 backdrop-blur-md border border-primary/20 rounded-xl p-3 shadow-lg z-20 hover:scale-105 transition-transform"
+                    style={{
+                      top: `${10 + index * 22}%`,
+                      right: index % 2 === 0 ? '-4%' : 'auto',
+                      left: index % 2 === 1 ? '-4%' : 'auto'
+                    }}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                        <feature.icon size={16} />
+                      </div>
+                      <div>
+                        <div className="font-bold text-xs text-foreground whitespace-nowrap">{feature.title}</div>
+                        <div className="text-[11px] text-muted-foreground whitespace-nowrap">{feature.desc}</div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
               </motion.div>
+
+              {/* Mobile Animation */}
+              <div className="lg:hidden relative h-64 mt-4">
+                <LottieAnimation
+                  url={LOTTIE_URLS.email}
+                  className="w-full h-full"
+                />
+              </div>
 
             </div>
           </div>
