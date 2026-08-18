@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles, Send, CheckCircle, Cookie, Shield, ArrowRight, Laptop, Smartphone, Cpu, Cloud } from "lucide-react";
+import { X, Sparkles, Send, CheckCircle, Cookie, Mail, Phone, MessageSquare, Clock, Laptop, Smartphone, Cpu, Cloud } from "lucide-react";
 import emailjs from '@emailjs/browser';
 
 const OnboardingModal = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState<"form" | "cookies">("form");
   
   const [formData, setFormData] = useState({
     name: "",
@@ -32,11 +31,8 @@ const OnboardingModal = () => {
   }, []);
 
   const saveCookieConsent = (status: "accepted" | "dismissed" | "submitted") => {
-    // Save to localStorage
     localStorage.setItem("fusion_onboard_status", status);
     localStorage.setItem("fusion_cookie_consent", "true");
-
-    // Set standard browser cookie (valid for 30 days)
     document.cookie = `fusion_onboard=${status}; max-age=${30 * 24 * 60 * 60}; path=/; SameSite=Lax`;
   };
 
@@ -75,7 +71,6 @@ const OnboardingModal = () => {
       }, 2500);
     } catch (err) {
       console.error("EmailJS submission error:", err);
-      // Fallback close gracefully if error
       setSubmitted(true);
       saveCookieConsent("submitted");
       setTimeout(() => setIsOpen(false), 2500);
@@ -119,6 +114,18 @@ const OnboardingModal = () => {
             <p className="text-muted-foreground text-xs sm:text-sm mt-1">
               Tell us your idea or project scope for a free roadmap & quote in 2 hours.
             </p>
+
+            {/* Quick Contact Info Strip */}
+            <div className="mt-3.5 pt-3 border-t border-border/40 flex flex-wrap items-center justify-between gap-2 text-[11px] text-muted-foreground">
+              <a href="mailto:fusionenginetechnology@gmail.com" className="flex items-center gap-1.5 hover:text-primary transition-colors">
+                <Mail size={13} className="text-primary shrink-0" />
+                <span>fusionenginetechnology@gmail.com</span>
+              </a>
+              <a href="https://wa.me/916369884331" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 hover:text-green-600 transition-colors">
+                <MessageSquare size={13} className="text-green-500 shrink-0" />
+                <span className="font-semibold">+91 63698 84331</span>
+              </a>
+            </div>
           </div>
 
           {/* Form / Submitted Body */}
@@ -213,12 +220,16 @@ const OnboardingModal = () => {
                   />
                 </div>
 
-                {/* Cookie & Privacy Notice */}
-                <div className="flex items-start gap-2 p-2.5 rounded-lg bg-secondary/30 text-[11px] text-muted-foreground border border-border/40">
-                  <Cookie size={14} className="shrink-0 text-primary mt-0.5" />
-                  <span>
-                    We use cookies to save your site preferences and process requests smoothly. By submitting or closing, you accept essential cookies.
-                  </span>
+                {/* Cookie & Response Time Guarantee */}
+                <div className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-secondary/30 text-[11px] text-muted-foreground border border-border/40">
+                  <div className="flex items-center gap-1.5">
+                    <Clock size={13} className="text-blue-500 shrink-0" />
+                    <span>Response guaranteed in <strong className="text-foreground">2 hours</strong></span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Cookie size={13} className="text-primary shrink-0" />
+                    <span>Cookie preference saved</span>
+                  </div>
                 </div>
 
                 {/* Actions: Submit OR Cancel/Decline */}
