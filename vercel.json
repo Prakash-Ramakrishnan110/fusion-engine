@@ -8,11 +8,21 @@
   "redirects": [
     {
       "source": "/(.*)",
-      "destination": "https://fusion-engine.vercel.app/$1",
+      "destination": "https://www.fusionengine.in/$1",
       "has": [
         {
           "type": "host",
-          "value": "www.fusion-engine.vercel.app"
+          "value": "fusionengine.vercel.app"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "destination": "https://www.fusionengine.in/$1",
+      "has": [
+        {
+          "type": "host",
+          "value": "fusion-engine.vercel.app"
         }
       ]
     }
