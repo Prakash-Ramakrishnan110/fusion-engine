@@ -108,7 +108,7 @@ const Footer = () => {
               </li>
             </ul>
             <div className="flex items-center gap-3 mt-4">
-              <a href="https://www.linkedin.com/in/prakash110" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors" title="LinkedIn">
+              <a href="https://www.linkedin.com/in/fusion-engine-technology-815b1a403/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors" title="LinkedIn">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
               </a>
               <a href="https://www.instagram.com/prakash_r_1908" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center hover:bg-pink-600 hover:text-white transition-colors" title="Instagram">
@@ -123,12 +123,18 @@ const Footer = () => {
           <div>
             © {new Date().getFullYear()} Fusion Engine Technology. All rights reserved.
           </div>
-          <div className="flex items-center gap-6 text-xs">
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-xs">
             <Link to="/privacy" className="hover:text-foreground transition-colors font-medium">
               Privacy Policy
             </Link>
             <Link to="/terms" className="hover:text-foreground transition-colors font-medium">
               Terms & Conditions
+            </Link>
+            <Link to="/cookies" className="hover:text-foreground transition-colors font-medium">
+              Cookie Policy
+            </Link>
+            <Link to="/refund-policy" className="hover:text-foreground transition-colors font-medium">
+              Refund & Cancellation
             </Link>
           </div>
         </div>

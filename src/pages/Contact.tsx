@@ -404,7 +404,7 @@ const Contact = () => {
                     <Mail size={18} />
                   </a>
                   <a
-                    href="https://www.linkedin.com/in/prakash110"
+                    href="https://www.linkedin.com/in/fusion-engine-technology-815b1a403/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-10 h-10 rounded-full bg-secondary text-foreground flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors"

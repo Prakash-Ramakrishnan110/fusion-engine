@@ -1,4 +1,45 @@
-User-agent: *
+# Allow search engine crawlers
+User-agent: Googlebot
 Allow: /
 
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+# Allow AI crawlers for Search Generative Experience (SGE) & Perplexity
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Standard User-agent rules
+User-agent: *
+Allow: /
+Disallow: /500
+Disallow: /maintenance
+Disallow: /admin
+Disallow: /*?*query=
+
+# Crawl Delay
+Crawl-delay: 1
+
+# Sitemap Location
 Sitemap: https://www.fusionengine.in/sitemap.xml

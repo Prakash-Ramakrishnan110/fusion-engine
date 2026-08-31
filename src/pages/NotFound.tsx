@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Home, Search, ArrowLeft } from "lucide-react";
+import usePageMeta from "@/hooks/usePageMeta";
 
 const NotFound = () => {
+  usePageMeta("Page Not Found", "🔍");
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
       <motion.div

@@ -24,6 +24,11 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const AboutPage = lazy(() => import("./pages/AboutPage"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsConditions = lazy(() => import("./pages/TermsConditions"));
+const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
+const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
+const ServerError = lazy(() => import("./pages/ServerError"));
+const Maintenance = lazy(() => import("./pages/Maintenance"));
+import CookieBanner from "./components/CookieBanner";
 
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-[60vh] w-full">
@@ -54,11 +59,16 @@ const App = () => (
             <Route path="/about" element={<AboutPage />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsConditions />} />
+            <Route path="/cookies" element={<CookiePolicy />} />
+            <Route path="/refund-policy" element={<RefundPolicy />} />
+            <Route path="/500" element={<ServerError />} />
+            <Route path="/maintenance" element={<Maintenance />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
         <ChatWidget />
         <OnboardingModal />
+        <CookieBanner />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

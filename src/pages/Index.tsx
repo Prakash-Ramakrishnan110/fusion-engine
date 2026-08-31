@@ -13,8 +13,10 @@ import Founder from "@/components/Founder";
 import FAQ from "@/components/FAQ";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
+import usePageMeta from "@/hooks/usePageMeta";
 
 const Index = () => {
+  usePageMeta("Home");
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar />

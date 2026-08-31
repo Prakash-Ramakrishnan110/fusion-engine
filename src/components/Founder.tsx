@@ -47,7 +47,7 @@ const Founder = () => {
             </p>
 
             <div className="flex flex-wrap items-center gap-4">
-              <a href="https://www.linkedin.com/in/prakash110" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors">
+              <a href="https://www.linkedin.com/in/fusion-engine-technology-815b1a403/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors">
                 <Linkedin size={18} />
               </a>
               <a href="https://www.instagram.com/prakash_r_1908" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center hover:bg-pink-600 hover:text-white transition-colors">
