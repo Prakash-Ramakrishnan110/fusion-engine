@@ -58,10 +58,7 @@ const Footer = () => {
                   </div>
                 </div>
               </div>
-              <div className="text-xs text-muted-foreground bg-secondary/50 p-2.5 rounded border border-border/50">
-                <span className="font-semibold text-foreground">DUNS Number:</span> Applied 
-                <span className="block mt-0.5 opacity-80">(Reference number available, pending 30 days)</span>
-              </div>
+
             </div>
           </div>
 
