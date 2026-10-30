@@ -3,6 +3,17 @@ import { useSearchParams } from 'react-router-dom';
 import { usePortal } from '../context/PortalContext';
 import { generateFreelancerAgreementText } from '../services/freelancerAgreementService';
 import { JobApplication } from '../types';
+
+export interface CandidateAgreementProfile extends JobApplication {
+  agreementTermsAccepted?: boolean;
+  agreementSignature?: string;
+  agreementAffirmationWord?: string;
+  agreementStatus?: 'pending' | 'signed' | 'rejected';
+  agreementRejectedAt?: string;
+  agreementRejectionReason?: string;
+  agreementSignedAt?: string;
+  agreementSignerIp?: string;
+}
 import emailjs from '@emailjs/browser';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -46,7 +57,7 @@ export const CandidateAgreementSignPage: React.FC = () => {
 
   // If candidate record not in this browser's localStorage, but refCode is provided,
   // construct a resolved candidate profile so the candidate can sign
-  const fallbackCandidate: JobApplication | null = refCode
+  const fallbackCandidate: CandidateAgreementProfile | null = refCode
     ? {
         id: refCode,
         referenceCode: refCode,
@@ -64,10 +75,18 @@ export const CandidateAgreementSignPage: React.FC = () => {
         status: 'Shortlisted',
         submittedAt: new Date().toISOString(),
         agreementStatus: 'pending',
+        agreementTermsAccepted: false,
+        agreementSignature: undefined,
+        agreementSignerIp: undefined,
+        agreementAffirmationWord: undefined,
+        agreementSignedAt: undefined,
+        agreementRejectedAt: undefined,
+        agreementRejectionReason: undefined,
       }
     : null;
 
-  const candidate: JobApplication | null = existingCandidate || fallbackCandidate;
+  const candidate: CandidateAgreementProfile | null =
+    (existingCandidate as CandidateAgreementProfile | undefined) || fallbackCandidate;
 
   const [decisionMode, setDecisionMode] = useState<'accept' | 'decline'>('accept');
   const [signatureName, setSignatureName] = useState(candidate?.fullName || urlCandidateName || '');
