@@ -175,7 +175,45 @@ Terms Acknowledged: Candidate confirmed they have read and agreed to the officia
 Submission Timestamp: ${new Date().toLocaleString()}
       `.trim();
 
-      const templateParams = {
+      // 2a. Dispatch automated application receipt confirmation to the candidate
+      try {
+        const applicantEmailParams = {
+          to_email: formData.email,
+          email: formData.email,
+          to_name: formData.fullName,
+          name: formData.fullName,
+          from_name: "Fusion Engine Technology",
+          reply_to: "fusionenginetechnology@gmail.com",
+          subject: `Application Confirmed: ${formData.role} — Fusion Engine Technology [${refCode}]`,
+          message: `Dear ${formData.fullName},
+
+Thank you for applying for the ${formData.role} position at Fusion Engine Technology!
+
+We have successfully received your application and attached resume (${resumeFile.name}).
+Your Unique Application Reference ID: ${refCode}
+
+Next Steps:
+1. Our technical evaluation team is currently reviewing your background, experience, and project portfolio.
+2. If your qualifications match our current project sprint requirements, you will receive an invitation to review and digitally sign your Freelancer Service Agreement.
+3. You can reply directly to this email if you need to submit additional work samples or project updates.
+
+We appreciate your interest in joining Fusion Engine Technology!
+
+Warm regards,
+Talent Acquisition & Executive Team
+Fusion Engine Technology
+https://www.fusionengine.in
+fusionenginetechnology@gmail.com`,
+          time: new Date().toLocaleString(),
+        };
+
+        await emailjs.send(SERVICE_ID, TEMPLATE_ID, applicantEmailParams, PUBLIC_KEY);
+      } catch (appErr) {
+        console.warn("Applicant direct confirmation email notice:", appErr);
+      }
+
+      // 2b. Dispatch company administrative alert to fusionenginetechnology@gmail.com
+      const adminTemplateParams = {
         from_name: `${formData.fullName} (Career Applicant)`,
         from_email: formData.email,
         from_phone: formData.phone,
@@ -188,7 +226,7 @@ Submission Timestamp: ${new Date().toLocaleString()}
         time: new Date().toLocaleString(),
       };
 
-      await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
+      await emailjs.send(SERVICE_ID, TEMPLATE_ID, adminTemplateParams, PUBLIC_KEY);
 
       setApplicationRef(refCode);
       setSubmitted(true);

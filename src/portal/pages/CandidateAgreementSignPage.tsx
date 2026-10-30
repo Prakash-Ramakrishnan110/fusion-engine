@@ -443,9 +443,29 @@ export const CandidateAgreementSignPage: React.FC = () => {
             <div
               ref={agreementContainerRef}
               onScroll={handleScrollAgreement}
-              className="h-[440px] overflow-y-auto rounded-lg border border-border/40 bg-muted/20 p-5 font-mono text-xs leading-relaxed whitespace-pre-wrap select-text shadow-inner"
+              style={{ fontFamily: '"Times New Roman", Times, Georgia, serif' }}
+              className="h-[520px] overflow-y-auto rounded-xl border border-border/60 bg-card p-6 sm:p-10 text-[15px] sm:text-base leading-relaxed text-foreground select-text shadow-inner space-y-6"
             >
-              {fullAgreementText}
+              {/* Formal Contract Header Letterhead */}
+              <div className="text-center pb-6 border-b-2 border-border/60 space-y-1">
+                <h2 className="text-xl sm:text-2xl font-bold tracking-wider uppercase text-foreground">
+                  FUSION ENGINE TECHNOLOGY
+                </h2>
+                <p className="text-sm font-bold text-primary uppercase tracking-widest mt-0.5">
+                  Freelancer Onboarding & Service Agreement
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Innovate • Integrate • Accelerate | https://fusionengine.in | fusionenginetechnology@gmail.com
+                </p>
+                <p className="text-xs italic text-muted-foreground pt-1">
+                  Enforceable under Section 10A of the Indian Information Technology Act, 2000 & Indian Contract Act, 1872
+                </p>
+              </div>
+
+              {/* Legal Agreement Clauses with Proper Alignment & Times New Roman */}
+              <div className="text-left sm:text-justify leading-relaxed whitespace-pre-wrap text-foreground/95 space-y-4">
+                {fullAgreementText}
+              </div>
             </div>
           </CardContent>
 

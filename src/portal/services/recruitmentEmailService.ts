@@ -3,8 +3,8 @@ import { JobApplication } from '../types';
 
 export const EMAIL_CONFIG = {
   SERVICE_ID: 'service_vtbrgi5',
-  TEMPLATE_ID: 'jbuc3li', // The active template configured in your EmailJS dashboard
-  FALLBACK_TEMPLATE_ID: 'template_p8i38d6',
+  TEMPLATE_ID: 'template_p8i38d6', // The active verified template in EmailJS
+  FALLBACK_TEMPLATE_ID: 'jbuc3li',
   PUBLIC_KEY: 'QNzyFmRohhj8Soht0',
   COMPANY_NAME: 'Fusion Engine Technology',
   COMPANY_EMAIL: 'fusionenginetechnology@gmail.com',
@@ -200,16 +200,16 @@ export async function sendCandidateEmail(payload: CandidateEmailPayload): Promis
 
     const templateParams = {
       to_email: payload.toEmail,
+      email: payload.toEmail, // Covers templates using {{email}}
       to_name: payload.toName,
+      name: payload.toName, // Covers templates using {{name}}
+      from_name: 'Fusion Engine Technology',
       subject: payload.subject,
       title: payload.subject,
-      name: payload.subject, // Fills {{name}} in EmailJS template subject line
-      from_name: payload.subject, // Fills {{from_name}} in EmailJS template subject line
       message: payload.body,
       content: payload.body,
       from_email: EMAIL_CONFIG.COMPANY_EMAIL,
       reply_to: EMAIL_CONFIG.COMPANY_EMAIL,
-      email: EMAIL_CONFIG.COMPANY_EMAIL,
       role: payload.roleTitle,
       ref_code: payload.referenceCode,
       status: payload.status,
