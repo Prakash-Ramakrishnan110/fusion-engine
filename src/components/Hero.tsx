@@ -11,8 +11,14 @@ interface HeroProps {
   description?: ReactNode;
   primaryCtaText?: string;
   primaryCtaLink?: string;
+  onPrimaryCtaClick?: () => void;
+  secondaryCtaText?: string;
+  secondaryCtaLink?: string;
+  onSecondaryCtaClick?: () => void;
   lottieUrl?: string;
   features?: Array<{ icon: any; title: string; desc: string }>;
+  trustText1?: string;
+  trustText2?: string;
 }
 
 const Hero = ({
@@ -22,13 +28,19 @@ const Hero = ({
   description,
   primaryCtaText = "Start Your Project",
   primaryCtaLink = "/contact",
+  onPrimaryCtaClick,
+  secondaryCtaText,
+  secondaryCtaLink,
+  onSecondaryCtaClick,
   lottieUrl = LOTTIE_URLS.techNetwork,
   features = [
     { icon: Zap, title: "All Client Types", desc: "Startups to Enterprise" },
     { icon: Shield, title: "Quality Assured", desc: "3 successful deliveries" },
     { icon: TrendingUp, title: "Growing Fast", desc: "Expanding our services" },
     { icon: Code2, title: "Custom Solutions", desc: "Tailored to your needs" }
-  ]
+  ],
+  trustText1 = "Available for new projects",
+  trustText2 = "3 Projects Completed"
 }: HeroProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -61,7 +73,7 @@ const Hero = ({
   const rotateX = useTransform(smoothMouseY, [0, 1], [10, -10]);
 
   return (
-    <section ref={containerRef} className="relative h-screen flex items-center pt-20 sm:pt-24 md:pt-28 lg:pt-32 xl:pt-36 overflow-hidden">
+    <section ref={containerRef} className="relative min-h-[90vh] lg:min-h-screen flex items-center pt-24 pb-12 sm:pt-28 md:pt-32 lg:pt-36 overflow-hidden">
       {/* Animated RGB Background */}
       <div className="absolute inset-0">
         <motion.div 
@@ -148,14 +160,46 @@ const Hero = ({
             >
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start px-4 sm:px-0">
                 <motion.div>
-                  <Link
-                    to={primaryCtaLink}
-                    className="inline-flex items-center gap-2 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-primary text-white rounded-xl font-semibold shadow-lg text-sm sm:text-base w-full sm:w-auto justify-center"
-                  >
-                    <span>{primaryCtaText}</span>
-                    <ArrowRight size={16} className="sm:size-18" />
-                  </Link>
+                  {onPrimaryCtaClick ? (
+                    <button
+                      type="button"
+                      onClick={onPrimaryCtaClick}
+                      className="inline-flex items-center gap-2 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-primary text-white rounded-xl font-semibold shadow-lg text-sm sm:text-base w-full sm:w-auto justify-center hover:bg-primary/90 transition-all hover:shadow-xl hover:-translate-y-0.5 cursor-pointer"
+                    >
+                      <span>{primaryCtaText}</span>
+                      <ArrowRight size={16} className="sm:size-18" />
+                    </button>
+                  ) : (
+                    <Link
+                      to={primaryCtaLink}
+                      className="inline-flex items-center gap-2 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-primary text-white rounded-xl font-semibold shadow-lg text-sm sm:text-base w-full sm:w-auto justify-center hover:bg-primary/90 transition-all hover:shadow-xl hover:-translate-y-0.5"
+                    >
+                      <span>{primaryCtaText}</span>
+                      <ArrowRight size={16} className="sm:size-18" />
+                    </Link>
+                  )}
                 </motion.div>
+
+                {secondaryCtaText && (
+                  <motion.div>
+                    {onSecondaryCtaClick ? (
+                      <button
+                        type="button"
+                        onClick={onSecondaryCtaClick}
+                        className="inline-flex items-center gap-2 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-background/90 hover:bg-secondary text-foreground border border-border rounded-xl font-semibold shadow-sm text-sm sm:text-base w-full sm:w-auto justify-center transition-all hover:shadow-md hover:-translate-y-0.5 cursor-pointer backdrop-blur-sm"
+                      >
+                        <span>{secondaryCtaText}</span>
+                      </button>
+                    ) : (
+                      <Link
+                        to={secondaryCtaLink || "#"}
+                        className="inline-flex items-center gap-2 px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-4 bg-background/90 hover:bg-secondary text-foreground border border-border rounded-xl font-semibold shadow-sm text-sm sm:text-base w-full sm:w-auto justify-center transition-all hover:shadow-md hover:-translate-y-0.5 backdrop-blur-sm"
+                      >
+                        <span>{secondaryCtaText}</span>
+                      </Link>
+                    )}
+                  </motion.div>
+                )}
               </div>
               
               {/* Advanced Trust Indicators */}
@@ -167,14 +211,14 @@ const Hero = ({
                   transition={{ delay: 0.8 }}
                 >
                   <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                  <span>Available for new projects</span>
+                  <span>{trustText1}</span>
                 </motion.div>
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.9 }}
                 >
-                  <span>3 Projects Completed</span>
+                  <span>{trustText2}</span>
                 </motion.div>
               </div>
             </motion.div>

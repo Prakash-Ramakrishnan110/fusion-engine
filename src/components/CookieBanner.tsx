@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Cookie, X, Check, Settings, ShieldCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const COOKIE_CONSENT_KEY = "fusion_cookie_consent_v1";
 
 const CookieBanner = () => {
+  const location = useLocation();
+  if (location.pathname.startsWith('/portal')) return null;
   const [showBanner, setShowBanner] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
   const [analyticsConsent, setAnalyticsConsent] = useState(true);

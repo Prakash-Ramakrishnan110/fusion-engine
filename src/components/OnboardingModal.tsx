@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLocation } from "react-router-dom";
 import { X, Sparkles, Send, CheckCircle, Cookie, Clock, Globe, Smartphone, Cloud, User, Mail, FileText } from "lucide-react";
 import emailjs from '@emailjs/browser';
 
 const OnboardingModal = () => {
+  const location = useLocation();
+  if (location.pathname.startsWith('/portal')) return null;
   const [isOpen, setIsOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);

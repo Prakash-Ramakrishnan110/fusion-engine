@@ -7,6 +7,7 @@ const primaryLinks = [
   { label: "Why Us", href: "/why-us" },
   { label: "Pricing", href: "/pricing" },
   { label: "About Us", href: "/about" },
+  { label: "Careers", href: "/careers", badge: "Hiring" },
 ];
 
 const solutionsLinks = [
@@ -111,19 +112,31 @@ const Navbar = () => {
             <Link
               key={link.label}
               to={link.href}
-              className={`text-sm px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+              className={`text-sm px-4 py-2 rounded-lg font-medium transition-all duration-300 inline-flex items-center gap-1.5 ${
                 location.pathname === link.href
                   ? "text-primary bg-primary/5 ring-1 ring-primary/20 shadow-sm"
                   : "text-slate-600 hover:text-primary hover:bg-slate-50"
               }`}
             >
               {link.label}
+              {link.badge && (
+                <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.2 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                  {link.badge}
+                </span>
+              )}
             </Link>
           ))}
         </div>
 
-        {/* Get Started Button */}
-        <div className="hidden xl:flex items-center">
+        {/* Action Buttons */}
+        <div className="hidden xl:flex items-center gap-2.5">
+          <Link
+            to="/portal"
+            className="px-4 py-2 text-xs font-semibold rounded-lg border border-primary/20 text-primary bg-primary/5 hover:bg-primary/10 transition-all duration-300 flex items-center gap-1.5"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            Workforce Portal
+          </Link>
           <Link
             to="/contact"
             className="px-6 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary/90 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
@@ -166,17 +179,28 @@ const Navbar = () => {
                 <Link
                   key={link.label}
                   to={link.href}
-                  className={`px-4 py-3 rounded-lg font-medium transition-colors ${
+                  className={`px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-between ${
                     location.pathname === link.href
                       ? "text-primary bg-primary/5"
                       : "text-slate-600 hover:text-primary hover:bg-slate-50"
                   }`}
                 >
-                  {link.label}
+                  <span>{link.label}</span>
+                  {link.badge && (
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
+                      {link.badge}
+                    </span>
+                  )}
                 </Link>
               ))}
 
-              <div className="mt-4 pt-4 border-t border-gray-100">
+              <div className="mt-4 pt-4 border-t border-gray-100 space-y-2">
+                <Link
+                  to="/portal"
+                  className="block w-full px-4 py-2.5 rounded-lg border border-primary/20 text-primary bg-primary/5 font-semibold text-center text-sm"
+                >
+                  Workforce Portal (Internal)
+                </Link>
                 <Link
                   to="/contact"
                   className="block w-full px-4 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-colors text-center"

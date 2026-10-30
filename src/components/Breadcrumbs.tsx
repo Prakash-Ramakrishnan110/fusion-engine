@@ -9,6 +9,10 @@ interface BreadcrumbItem {
 const Breadcrumbs = () => {
   const location = useLocation();
   
+  if (location.pathname.startsWith('/portal')) {
+    return null;
+  }
+  
   const pathSegments = location.pathname.split('/').filter(segment => segment);
   
   const breadcrumbs: BreadcrumbItem[] = [

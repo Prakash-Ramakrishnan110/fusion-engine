@@ -7,6 +7,7 @@ const quickLinks = [
   { label: "Industries", href: "/industries" },
   { label: "Why Us", href: "/why-us" },
   { label: "About Us", href: "/about" },
+  { label: "Careers (We're Hiring)", href: "/careers" },
 ];
 
 const serviceLinks = ["Mobile Apps", "Web Platforms", "SaaS Products", "AI Systems", "Automation", "Cloud"];

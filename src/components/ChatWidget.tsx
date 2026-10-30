@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { MessageCircle, X, Send } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useLocation } from "react-router-dom";
 import emailjs from '@emailjs/browser';
 
 const ChatWidget = () => {
+  const location = useLocation();
+  if (location.pathname.startsWith('/portal')) return null;
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{text: string, sender: 'user' | 'bot'}[]>([
     { text: "Hi there! 👋 How can we help you today? Leave your query or contact details below.", sender: 'bot' }

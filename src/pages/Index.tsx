@@ -1,13 +1,10 @@
 import React from "react";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import AnnouncementStrip from "@/components/AnnouncementStrip";
 import StartupBenefits from "@/components/StartupBenefits";
 import TrustSignals from "@/components/TrustSignals";
 import SolutionsTabs from "@/components/SolutionsTabs";
-import BigStats from "@/components/BigStats";
 import LogoStrip from "@/components/LogoStrip";
-import HowWeHelp from "@/components/HowWeHelp";
 import CaseStudies from "@/components/CaseStudies";
 import Founder from "@/components/Founder";
 import FAQ from "@/components/FAQ";
@@ -22,13 +19,10 @@ const Index = () => {
       <Navbar />
       <main>
         <Hero />
-        <AnnouncementStrip />
         <StartupBenefits />
         <TrustSignals />
         <SolutionsTabs />
-        <BigStats />
         <LogoStrip />
-        <HowWeHelp />
         <CaseStudies />
         <Founder />
         <FAQ />
