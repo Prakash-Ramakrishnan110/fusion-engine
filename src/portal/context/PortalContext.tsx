@@ -45,41 +45,7 @@ const isUuid = (str: string) =>
 
 const INITIAL_DAILY_STANDUPS: DailyStandupUpdate[] = [];
 
-const DEFAULT_JOB_APPLICATIONS: JobApplication[] = [
-  {
-    id: 'app_demo_001',
-    referenceCode: 'FET-APP-DEMO-001',
-    roleId: 'fullstack-developer',
-    roleTitle: 'Full-Stack Software Developer (React / Node.js / Supabase)',
-    department: 'engineering',
-    fullName: 'Arjun Kumar',
-    email: 'arjun.developer@gmail.com',
-    phone: '+91 98401 23456',
-    city: 'Chennai',
-    portfolioUrl: 'https://github.com/arjun-dev',
-    expectedCompensation: '₹15,000 / Milestone Sprint',
-    experienceSummary: '3+ years experience building scalable React & Node.js web applications, REST APIs, and PostgreSQL schema designs.',
-    status: 'Shortlisted',
-    submittedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-    agreementStatus: 'pending',
-  },
-  {
-    id: 'app_demo_002',
-    referenceCode: 'FET-APP-DEMO-002',
-    roleId: 'telecaller-sales-executive',
-    roleTitle: 'Telecaller & Outbound Sales Executive',
-    department: 'sales',
-    fullName: 'Pooja Sharma',
-    email: 'pooja.sales@gmail.com',
-    phone: '+91 98402 34567',
-    city: 'Coimbatore',
-    expectedCompensation: '₹150 / Verified Conversion',
-    experienceSummary: '2+ years telecalling and customer outreach experience, fluent in Tamil, English, and Hindi. Expert in lead qualification.',
-    status: 'Shortlisted',
-    submittedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-    agreementStatus: 'pending',
-  },
-];
+// Demo seed data removed — production uses real applications only.
 
 interface PortalContextType {
   // Authentication & Users
@@ -500,19 +466,22 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          // Ensure demo applications exist for seamless testing
-          const hasDemo = parsed.some((a: JobApplication) => a.referenceCode === 'FET-APP-DEMO-001');
-          if (!hasDemo) {
-            return [...DEFAULT_JOB_APPLICATIONS, ...parsed];
+        if (Array.isArray(parsed)) {
+          // One-time migration: strip any persisted demo seed entries so they never reappear
+          const DEMO_IDS = ['app_demo_001', 'app_demo_002'];
+          const cleaned = parsed.filter(
+            (a: JobApplication) => !DEMO_IDS.includes(a.id) && !a.referenceCode?.startsWith('FET-APP-DEMO-')
+          );
+          if (cleaned.length !== parsed.length) {
+            localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(cleaned));
           }
-          return parsed;
+          return cleaned;
         }
       } catch {
-        return DEFAULT_JOB_APPLICATIONS;
+        return [];
       }
     }
-    return DEFAULT_JOB_APPLICATIONS;
+    return [];
   });
 
   const [recruitmentSettings, setRecruitmentSettings] = useState<RecruitmentSettings>(() => {
@@ -2617,7 +2586,11 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         submittedAt: new Date().toISOString(),
       };
 
-      setApplications((prev) => [newApp, ...prev]);
+      setApplications((prev) => {
+        const updated = [newApp, ...prev];
+        localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated));
+        return updated;
+      });
 
       await addAuditLog(
         'RECRUITMENT_APPLICATION_SUBMITTED',
@@ -2839,7 +2812,11 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const deleteJobApplication = async (applicationId: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      setApplications((prev) => prev.filter((a) => a.id !== applicationId));
+      setApplications((prev) => {
+        const updated = prev.filter((a) => a.id !== applicationId);
+        localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated));
+        return updated;
+      });
       await addAuditLog('JOB_APPLICATION_DELETED', 'JobApplication', `Deleted application ${applicationId}`);
       toast.success('Candidate application removed.');
       return { success: true };
@@ -3052,6 +3029,65 @@ export const usePortal = (): PortalContextType => {
       };
     };
 
+    // Public sign: candidate signs agreement via personalized link (no auth required)
+    const signCandidateAgreementPublic = async (
+      applicationId: string,
+      signatureName: string,
+      _signerIp?: string,
+      affirmationWord?: string
+    ): Promise<{ success: boolean; error?: string }> => {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEYS.APPLICATIONS);
+        const apps: JobApplication[] = saved ? JSON.parse(saved) : [];
+        const updated = apps.map((app) =>
+          app.id.toLowerCase() === applicationId.toLowerCase() ||
+          app.referenceCode.toLowerCase() === applicationId.toLowerCase()
+            ? {
+                ...app,
+                agreementSignedAt: new Date().toISOString(),
+                agreementSignature: signatureName,
+                agreementSignerIp: '(Verified Web)',
+                agreementTermsAccepted: true,
+                agreementAffirmationWord: affirmationWord || 'I AGREE AND ACCEPT',
+                agreementStatus: 'signed' as const,
+              }
+            : app
+        );
+        localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated));
+        return { success: true };
+      } catch (e: any) {
+        return { success: false, error: e?.message || 'Failed to sign agreement.' };
+      }
+    };
+
+    // Public reject: candidate declines agreement via personalized link (no auth required)
+    const rejectCandidateAgreementPublic = async (
+      applicationId: string,
+      reason: string,
+      notes?: string
+    ): Promise<{ success: boolean; error?: string }> => {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEYS.APPLICATIONS);
+        const apps: JobApplication[] = saved ? JSON.parse(saved) : [];
+        const updated = apps.map((app) =>
+          app.id.toLowerCase() === applicationId.toLowerCase() ||
+          app.referenceCode.toLowerCase() === applicationId.toLowerCase()
+            ? {
+                ...app,
+                status: 'Rejected' as const,
+                agreementStatus: 'rejected' as const,
+                agreementRejectedAt: new Date().toISOString(),
+                agreementRejectionReason: reason + (notes ? ` - ${notes}` : ''),
+              }
+            : app
+        );
+        localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated));
+        return { success: true };
+      } catch (e: any) {
+        return { success: false, error: e?.message || 'Failed to record decline.' };
+      }
+    };
+
     const submitPublicApp = async (
       applicationData: Omit<JobApplication, 'id' | 'referenceCode' | 'status' | 'submittedAt'>
     ) => {
@@ -3159,7 +3195,14 @@ export const usePortal = (): PortalContextType => {
       applications: (() => {
         try {
           const s = localStorage.getItem(STORAGE_KEYS.APPLICATIONS);
-          return s ? JSON.parse(s) : [];
+          if (!s) return [];
+          const parsed = JSON.parse(s);
+          if (!Array.isArray(parsed)) return [];
+          // Strip any leftover demo seed entries
+          const DEMO_IDS = ['app_demo_001', 'app_demo_002'];
+          return parsed.filter(
+            (a: JobApplication) => !DEMO_IDS.includes(a.id) && !a.referenceCode?.startsWith('FET-APP-DEMO-')
+          );
         } catch {
           return [];
         }
@@ -3167,8 +3210,8 @@ export const usePortal = (): PortalContextType => {
       recruitmentSettings: getSavedSettings(),
       submitJobApplication: submitPublicApp,
       updateApplicationStatus: async () => ({ success: false }),
-      signCandidateAgreement: async () => ({ success: false }),
-      rejectCandidateAgreement: async () => ({ success: false }),
+      signCandidateAgreement: signCandidateAgreementPublic,
+      rejectCandidateAgreement: rejectCandidateAgreementPublic,
       toggleRecruitmentLock: async () => ({ success: false }),
       updateRecruitmentSettings: async () => ({ success: false }),
       deleteJobApplication: async () => ({ success: false }),

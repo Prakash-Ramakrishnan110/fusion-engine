@@ -227,7 +227,7 @@ Submission Timestamp: ${new Date().toLocaleString()}
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl max-h-[88vh] overflow-y-auto overscroll-contain p-6 bg-background border-border shadow-2xl">
+        <DialogContent className="max-w-2xl w-[calc(100vw-1rem)] max-h-[92vh] overflow-y-auto overscroll-contain p-4 sm:p-6 bg-background border-border shadow-2xl">
           {submitted ? (
             <div className="py-8 text-center flex flex-col items-center">
               <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mb-4">
