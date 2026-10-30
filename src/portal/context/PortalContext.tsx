@@ -484,6 +484,37 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return [];
   });
 
+  // Real-time synchronization across browser tabs and navigation events
+  useEffect(() => {
+    const syncApplications = () => {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEYS.APPLICATIONS);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            const DEMO_IDS = ['app_demo_001', 'app_demo_002'];
+            const cleaned = parsed.filter(
+              (a: JobApplication) => !DEMO_IDS.includes(a.id) && !a.referenceCode?.startsWith('FET-APP-DEMO-')
+            );
+            setApplications(cleaned);
+          }
+        }
+      } catch (err) {
+        console.warn('Error syncing applications from storage:', err);
+      }
+    };
+
+    window.addEventListener('storage', syncApplications);
+    window.addEventListener('focus', syncApplications);
+    window.addEventListener('fet_applications_updated', syncApplications);
+
+    return () => {
+      window.removeEventListener('storage', syncApplications);
+      window.removeEventListener('focus', syncApplications);
+      window.removeEventListener('fet_applications_updated', syncApplications);
+    };
+  }, []);
+
   const [recruitmentSettings, setRecruitmentSettings] = useState<RecruitmentSettings>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.RECRUITMENT_SETTINGS);
     if (saved) {
@@ -2591,7 +2622,14 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
       setApplications((prev) => {
         const updated = [newApp, ...prev];
-        localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated));
+        try {
+          localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated));
+        } catch (quotaErr) {
+          console.warn('LocalStorage quota exceeded with resume binary; saving candidate without base64 binary', quotaErr);
+          const safe = updated.map((a) => ({ ...a, resumeFileData: undefined }));
+          localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(safe));
+        }
+        window.dispatchEvent(new CustomEvent('fet_applications_updated'));
         return updated;
       });
 
@@ -3175,11 +3213,17 @@ export const usePortal = (): PortalContextType => {
 
         const existingAppsStr = localStorage.getItem(STORAGE_KEYS.APPLICATIONS);
         const existingApps: JobApplication[] = existingAppsStr ? JSON.parse(existingAppsStr) : [];
-        localStorage.setItem(
-          STORAGE_KEYS.APPLICATIONS,
-          JSON.stringify([newApp, ...existingApps])
-        );
+        const updatedList = [newApp, ...existingApps];
 
+        try {
+          localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updatedList));
+        } catch (quotaErr) {
+          console.warn('LocalStorage quota exceeded in public submission; saving candidate metadata without heavy base64', quotaErr);
+          const safeList = updatedList.map((a) => ({ ...a, resumeFileData: undefined }));
+          localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(safeList));
+        }
+
+        window.dispatchEvent(new CustomEvent('fet_applications_updated'));
         return { success: true, referenceCode };
       } catch (e: any) {
         return { success: false, error: e?.message || 'Failed to submit application' };

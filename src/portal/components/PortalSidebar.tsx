@@ -13,6 +13,7 @@ import {
   Receipt,
   BookOpen,
   Clock,
+  Briefcase,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -99,6 +100,16 @@ export const PortalSidebar: React.FC<PortalSidebarProps> = ({ className, onNavig
           path: '/portal/team',
           icon: Users,
           badge: (ctx) => ctx.users.length,
+          allowedRoles: ['admin', 'super_admin'],
+        },
+        {
+          name: 'Hiring & Candidates',
+          path: '/portal/team?tab=hiring',
+          icon: Briefcase,
+          badge: (ctx) => {
+            const count = ctx.applications.length;
+            return count > 0 ? count : null;
+          },
           allowedRoles: ['admin', 'super_admin'],
         },
         {

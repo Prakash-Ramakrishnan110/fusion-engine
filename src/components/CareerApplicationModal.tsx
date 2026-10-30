@@ -126,6 +126,12 @@ export const CareerApplicationModal: React.FC<CareerApplicationModalProps> = ({
 
     try {
       // 1. Submit directly to Admin Dashboard database & localStorage
+      // Protect browser localStorage quota: if PDF base64 is larger than 600KB,
+      // save resumeFileName and metadata in localStorage while emailing full details
+      const safeResumeData = resumeFile.dataUrl && resumeFile.dataUrl.length > 600000 
+        ? undefined 
+        : resumeFile.dataUrl;
+
       const appRes = await submitJobApplication({
         roleId: isSalesRole ? "telecaller-sales-executive" : "developer-contractor",
         roleTitle: formData.role,
@@ -137,8 +143,8 @@ export const CareerApplicationModal: React.FC<CareerApplicationModalProps> = ({
         portfolioUrl: formData.portfolioUrl || undefined,
         expectedCompensation: formData.expectedCompensation || undefined,
         experienceSummary: formData.experience,
-        resumeFileName: resumeFile.name,
-        resumeFileData: resumeFile.dataUrl,
+        resumeFileName: `${resumeFile.name} (${resumeFile.size})`,
+        resumeFileData: safeResumeData,
       });
 
       const refCode = appRes.referenceCode || `FET-APP-${Math.floor(100000 + Math.random() * 900000)}`;

@@ -70,6 +70,7 @@ export const TeamPage: React.FC = () => {
     updateApplicationStatus,
     toggleRecruitmentLock,
     deleteJobApplication,
+    submitJobApplication,
     deleteUser,
   } = usePortal();
 
@@ -97,6 +98,28 @@ export const TeamPage: React.FC = () => {
   const [selectedUserForReset, setSelectedUserForReset] = useState<UserPersona | null>(null);
   const [newResetPassword, setNewResetPassword] = useState('');
   const [isResetting, setIsResetting] = useState(false);
+
+  // Sample Candidate Creation helper
+  const handleCreateSampleCandidate = async () => {
+    const res = await submitJobApplication({
+      roleId: 'fullstack-developer',
+      roleTitle: 'Full-Stack Developer (React & Node.js)',
+      department: 'engineering',
+      fullName: 'Aravind Swaminathan',
+      email: 'aravind.developer@gmail.com',
+      phone: '+91 98401 23456',
+      city: 'Chennai, Tamil Nadu',
+      portfolioUrl: 'https://github.com/aravind-dev',
+      expectedCompensation: '₹25,000 / milestone sprint',
+      experienceSummary: '3+ years experience building scalable React, TypeScript, and Node.js REST API services.',
+      resumeFileName: 'Aravind_FullStack_Resume.pdf',
+    });
+    if (res.success) {
+      toast.success(`Candidate application created: Aravind Swaminathan (${res.referenceCode})`);
+    } else {
+      toast.error(res.error || 'Failed to create candidate.');
+    }
+  };
 
   // Hiring & Candidate Applications Tab States
   const [hiringFilter, setHiringFilter] = useState<'All' | 'New' | 'Shortlisted' | 'Hired' | 'Rejected'>('All');
@@ -697,6 +720,14 @@ export const TeamPage: React.FC = () => {
                     onChange={(e) => hiringSearch !== e.target.value && setHiringSearch(e.target.value)}
                     className="h-8 text-xs w-full sm:w-64"
                   />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleCreateSampleCandidate}
+                    className="h-8 text-xs gap-1.5 shrink-0 hidden sm:flex text-primary hover:text-primary"
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Add Test Candidate
+                  </Button>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-1.5">
@@ -755,6 +786,23 @@ export const TeamPage: React.FC = () => {
                             ? 'When prospective developers or telecallers apply via the Careers page (/careers), their full profile, contact details, and resume files (.pdf, .doc, .docx) will automatically appear here.'
                             : 'Try clearing your search query or switching the status filter.'}
                         </p>
+                        {applications.length === 0 && (
+                          <div className="flex flex-wrap items-center justify-center gap-2 pt-3">
+                            <Button asChild size="sm" className="text-xs gap-1.5 bg-primary hover:bg-primary/90">
+                              <Link to="/careers" target="_blank">
+                                <Briefcase className="w-3.5 h-3.5" /> Open Public Careers Page
+                              </Link>
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-xs gap-1.5"
+                              onClick={handleCreateSampleCandidate}
+                            >
+                              <Plus className="w-3.5 h-3.5" /> Add Test Candidate
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </Card>
                   );
