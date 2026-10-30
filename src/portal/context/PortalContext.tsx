@@ -1,6 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { supabase, isSupabaseConfigured, formatPortalEmail, extractUserIdFromEmail } from '../../lib/supabase';
 import {
+  fetchApplicationsFromSupabase,
+  saveApplicationToSupabase,
+  updateApplicationInSupabase,
+  deleteApplicationFromSupabase,
+} from '../services/applicationSyncService';
+import {
   UserPersona,
   UserRole,
   Project,
@@ -886,6 +892,21 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           defaultModules: t.default_modules || [],
           defaultMilestones: t.default_milestones || [],
         })));
+      }
+
+      // 7.5 Fetch Applications from Supabase
+      try {
+        const remoteApps = await fetchApplicationsFromSupabase();
+        if (remoteApps && remoteApps.length > 0) {
+          setApplications(remoteApps);
+          try {
+            localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(remoteApps));
+          } catch (e) {
+            console.warn('Applications storage write note:', e);
+          }
+        }
+      } catch (appErr) {
+        console.warn('Supabase application sync note:', appErr);
       }
 
       // 7. Fetch Audit Log
@@ -2752,6 +2773,16 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         return updated;
       });
 
+      updateApplicationInSupabase(applicationId, {
+        agreementSignedAt: signedTimestamp,
+        agreementSignature: signatureName,
+        agreementSignerIp: signerIp || 'Verified Web Session',
+        agreementTermsAccepted: true,
+        agreementAffirmationWord: affirmationWord || 'I AGREE AND ACCEPT',
+        agreementStatus: 'signed',
+        agreementDocumentText: agreementDocumentText,
+      }).catch((err) => console.warn('Supabase sign update note:', err));
+
       // Automatically archive executed agreement in Document Vault (/portal/documents)
       const agreementDocId = `doc_agreement_${applicationId.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
       const newAgreementDoc: DocumentItem = {
@@ -3219,6 +3250,15 @@ export const usePortal = (): PortalContextType => {
         }
 
         window.dispatchEvent(new CustomEvent('fet_applications_updated'));
+        updateApplicationInSupabase(applicationId, {
+          agreementSignedAt: signedTimestamp,
+          agreementSignature: signatureName,
+          agreementSignerIp: '(Verified Web)',
+          agreementTermsAccepted: true,
+          agreementAffirmationWord: affirmationWord || 'I AGREE AND ACCEPT',
+          agreementStatus: 'signed',
+          agreementDocumentText: agreementDocumentText,
+        }).catch((err) => console.warn('Public Supabase sign update note:', err));
         return { success: true };
       } catch (e: any) {
         return { success: false, error: e?.message || 'Failed to sign agreement.' };
@@ -3294,6 +3334,7 @@ export const usePortal = (): PortalContextType => {
         }
 
         window.dispatchEvent(new CustomEvent('fet_applications_updated'));
+        saveApplicationToSupabase(newApp).catch((err) => console.warn('Public Supabase save note:', err));
         return { success: true, referenceCode };
       } catch (e: any) {
         return { success: false, error: e?.message || 'Failed to submit application' };
