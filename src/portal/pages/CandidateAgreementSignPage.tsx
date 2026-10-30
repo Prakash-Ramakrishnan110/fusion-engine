@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { usePortal } from '../context/PortalContext';
 import { generateFreelancerAgreementText } from '../services/freelancerAgreementService';
+import { JobApplication } from '../types';
 import emailjs from '@emailjs/browser';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -45,20 +46,28 @@ export const CandidateAgreementSignPage: React.FC = () => {
 
   // If candidate record not in this browser's localStorage, but refCode is provided,
   // construct a resolved candidate profile so the candidate can sign
-  const candidate = existingCandidate || (refCode ? {
-    id: refCode,
-    referenceCode: refCode,
-    roleId: urlCandidateRole ? urlCandidateRole.toLowerCase().replace(/\s+/g, '-') : 'fullstack-developer',
-    roleTitle: urlCandidateRole || 'Software Developer & Independent Contractor',
-    department: (urlCandidateRole.toLowerCase().includes('telecaller') || urlCandidateRole.toLowerCase().includes('sales')) ? 'sales' as const : 'engineering' as const,
-    fullName: urlCandidateName || '',
-    email: urlCandidateEmail || '',
-    phone: '',
-    city: '',
-    status: 'Shortlisted' as const,
-    submittedAt: new Date().toISOString(),
-    agreementStatus: 'pending' as const,
-  } : null);
+  const fallbackCandidate: JobApplication | null = refCode
+    ? {
+        id: refCode,
+        referenceCode: refCode,
+        roleId: urlCandidateRole ? urlCandidateRole.toLowerCase().replace(/\s+/g, '-') : 'fullstack-developer',
+        roleTitle: urlCandidateRole || 'Software Developer & Independent Contractor',
+        department:
+          urlCandidateRole.toLowerCase().includes('telecaller') || urlCandidateRole.toLowerCase().includes('sales')
+            ? 'sales'
+            : 'engineering',
+        fullName: urlCandidateName || '',
+        email: urlCandidateEmail || '',
+        phone: '',
+        city: '',
+        experienceSummary: 'Candidate profile accessed via digital signing link.',
+        status: 'Shortlisted',
+        submittedAt: new Date().toISOString(),
+        agreementStatus: 'pending',
+      }
+    : null;
+
+  const candidate: JobApplication | null = existingCandidate || fallbackCandidate;
 
   const [decisionMode, setDecisionMode] = useState<'accept' | 'decline'>('accept');
   const [signatureName, setSignatureName] = useState(candidate?.fullName || urlCandidateName || '');
