@@ -43,7 +43,7 @@ export function getCandidateEmailTemplate(
 
   switch (status) {
     case 'Shortlisted': {
-      const agreementLink = `${EMAIL_CONFIG.PORTAL_URL}/agreement?ref=${ref}`;
+      const agreementLink = `${EMAIL_CONFIG.PORTAL_URL}/agreement?ref=${ref}&name=${encodeURIComponent(name)}&role=${encodeURIComponent(role)}&email=${encodeURIComponent(candidate.email || '')}`;
       return {
         subject: `Application Shortlisted & Freelancer Agreement — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`,
         body: `Dear ${name},

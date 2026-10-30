@@ -227,7 +227,7 @@ Submission Timestamp: ${new Date().toLocaleString()}
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl w-[calc(100vw-1rem)] max-h-[92vh] overflow-y-auto overscroll-contain p-4 sm:p-6 bg-background border-border shadow-2xl">
+        <DialogContent className="w-[96vw] max-w-2xl max-h-[90vh] overflow-y-auto overscroll-contain p-4 sm:p-6 bg-background border-border shadow-2xl rounded-2xl">
           {submitted ? (
             <div className="py-8 text-center flex flex-col items-center">
               <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mb-4">
@@ -457,7 +457,7 @@ Submission Timestamp: ${new Date().toLocaleString()}
                 {/* Explicit Legal & Policy Acknowledgment Box */}
                 <div className="pt-2">
                   <div className="p-4 rounded-2xl bg-secondary/40 border border-primary/20 space-y-3">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <ShieldCheck className="w-4 h-4 text-primary" />
                         <span className="text-xs font-bold text-foreground uppercase tracking-wider">
@@ -502,7 +502,7 @@ Submission Timestamp: ${new Date().toLocaleString()}
                   </div>
                 )}
 
-                <div className="flex items-center justify-end gap-3 pt-3 border-t border-border">
+                <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 pt-3 border-t border-border">
                   <Button type="button" variant="ghost" onClick={() => onOpenChange(false)} className="cursor-pointer">
                     Cancel
                   </Button>

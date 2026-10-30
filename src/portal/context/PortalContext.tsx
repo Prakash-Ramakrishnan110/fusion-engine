@@ -2655,20 +2655,47 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   ): Promise<{ success: boolean; error?: string }> => {
     try {
       setApplications((prev) => {
-        const updated = prev.map((app) =>
-          app.id.toLowerCase() === applicationId.toLowerCase() ||
-          app.referenceCode.toLowerCase() === applicationId.toLowerCase()
-            ? {
-                ...app,
-                agreementSignedAt: new Date().toISOString(),
-                agreementSignature: signatureName,
-                agreementSignerIp: signerIp || '127.0.0.1 (Verified Web)',
-                agreementTermsAccepted: true,
-                agreementAffirmationWord: affirmationWord || 'I AGREE AND ACCEPT',
-                agreementStatus: 'signed' as const,
-              }
-            : app
+        const found = prev.some(
+          (app) =>
+            app.id.toLowerCase() === applicationId.toLowerCase() ||
+            app.referenceCode.toLowerCase() === applicationId.toLowerCase()
         );
+        let updated: JobApplication[];
+        if (found) {
+          updated = prev.map((app) =>
+            app.id.toLowerCase() === applicationId.toLowerCase() ||
+            app.referenceCode.toLowerCase() === applicationId.toLowerCase()
+              ? {
+                  ...app,
+                  agreementSignedAt: new Date().toISOString(),
+                  agreementSignature: signatureName,
+                  agreementSignerIp: signerIp || '127.0.0.1 (Verified Web)',
+                  agreementTermsAccepted: true,
+                  agreementAffirmationWord: affirmationWord || 'I AGREE AND ACCEPT',
+                  agreementStatus: 'signed' as const,
+                }
+              : app
+          );
+        } else {
+          const newEntry: JobApplication = {
+            id: applicationId,
+            referenceCode: applicationId,
+            roleId: 'developer-contractor',
+            roleTitle: 'Software Developer & Independent Contractor',
+            department: 'engineering',
+            fullName: signatureName,
+            email: '',
+            status: 'Shortlisted',
+            submittedAt: new Date().toISOString(),
+            agreementSignedAt: new Date().toISOString(),
+            agreementSignature: signatureName,
+            agreementSignerIp: signerIp || '(Verified Web)',
+            agreementTermsAccepted: true,
+            agreementAffirmationWord: affirmationWord || 'I AGREE AND ACCEPT',
+            agreementStatus: 'signed',
+          };
+          updated = [newEntry, ...prev];
+        }
         localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated));
         return updated;
       });
@@ -3039,20 +3066,47 @@ export const usePortal = (): PortalContextType => {
       try {
         const saved = localStorage.getItem(STORAGE_KEYS.APPLICATIONS);
         const apps: JobApplication[] = saved ? JSON.parse(saved) : [];
-        const updated = apps.map((app) =>
-          app.id.toLowerCase() === applicationId.toLowerCase() ||
-          app.referenceCode.toLowerCase() === applicationId.toLowerCase()
-            ? {
-                ...app,
-                agreementSignedAt: new Date().toISOString(),
-                agreementSignature: signatureName,
-                agreementSignerIp: '(Verified Web)',
-                agreementTermsAccepted: true,
-                agreementAffirmationWord: affirmationWord || 'I AGREE AND ACCEPT',
-                agreementStatus: 'signed' as const,
-              }
-            : app
+        const exists = apps.some(
+          (app) =>
+            app.id.toLowerCase() === applicationId.toLowerCase() ||
+            app.referenceCode.toLowerCase() === applicationId.toLowerCase()
         );
+        let updated: JobApplication[];
+        if (exists) {
+          updated = apps.map((app) =>
+            app.id.toLowerCase() === applicationId.toLowerCase() ||
+            app.referenceCode.toLowerCase() === applicationId.toLowerCase()
+              ? {
+                  ...app,
+                  agreementSignedAt: new Date().toISOString(),
+                  agreementSignature: signatureName,
+                  agreementSignerIp: '(Verified Web)',
+                  agreementTermsAccepted: true,
+                  agreementAffirmationWord: affirmationWord || 'I AGREE AND ACCEPT',
+                  agreementStatus: 'signed' as const,
+                }
+              : app
+          );
+        } else {
+          const newEntry: JobApplication = {
+            id: applicationId,
+            referenceCode: applicationId,
+            roleId: 'developer-contractor',
+            roleTitle: 'Software Developer & Independent Contractor',
+            department: 'engineering',
+            fullName: signatureName,
+            email: '',
+            status: 'Shortlisted',
+            submittedAt: new Date().toISOString(),
+            agreementSignedAt: new Date().toISOString(),
+            agreementSignature: signatureName,
+            agreementSignerIp: '(Verified Web)',
+            agreementTermsAccepted: true,
+            agreementAffirmationWord: affirmationWord || 'I AGREE AND ACCEPT',
+            agreementStatus: 'signed',
+          };
+          updated = [newEntry, ...apps];
+        }
         localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated));
         return { success: true };
       } catch (e: any) {

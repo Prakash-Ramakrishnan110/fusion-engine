@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { usePortal } from '../context/PortalContext';
 import { generateFreelancerAgreementText } from '../services/freelancerAgreementService';
+import emailjs from '@emailjs/browser';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +20,8 @@ import {
   ArrowDown,
   Check,
   AlertTriangle,
+  Send,
+  Loader2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -27,17 +30,39 @@ const REQUIRED_AFFIRMATION = 'I AGREE AND ACCEPT';
 export const CandidateAgreementSignPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const refCode = (searchParams.get('ref') || searchParams.get('id') || '').trim();
+  const urlCandidateName = (searchParams.get('name') || '').trim();
+  const urlCandidateEmail = (searchParams.get('email') || '').trim();
+  const urlCandidateRole = (searchParams.get('role') || '').trim();
+
   const { applications, signCandidateAgreement, rejectCandidateAgreement } = usePortal();
 
   // Find candidate by reference code or ID (case-insensitive & trimmed)
-  const candidate = applications.find(
+  const existingCandidate = applications.find(
     (app) =>
       app.referenceCode.trim().toLowerCase() === refCode.toLowerCase() ||
       app.id.trim().toLowerCase() === refCode.toLowerCase()
   );
 
+  // If candidate record not in this browser's localStorage, but refCode is provided,
+  // construct a resolved candidate profile so the candidate can sign
+  const candidate = existingCandidate || (refCode ? {
+    id: refCode,
+    referenceCode: refCode,
+    roleId: urlCandidateRole ? urlCandidateRole.toLowerCase().replace(/\s+/g, '-') : 'fullstack-developer',
+    roleTitle: urlCandidateRole || 'Software Developer & Independent Contractor',
+    department: (urlCandidateRole.toLowerCase().includes('telecaller') || urlCandidateRole.toLowerCase().includes('sales')) ? 'sales' as const : 'engineering' as const,
+    fullName: urlCandidateName || '',
+    email: urlCandidateEmail || '',
+    phone: '',
+    city: '',
+    status: 'Shortlisted' as const,
+    submittedAt: new Date().toISOString(),
+    agreementStatus: 'pending' as const,
+  } : null);
+
   const [decisionMode, setDecisionMode] = useState<'accept' | 'decline'>('accept');
-  const [signatureName, setSignatureName] = useState('');
+  const [signatureName, setSignatureName] = useState(candidate?.fullName || urlCandidateName || '');
+  const [candidateEmail, setCandidateEmail] = useState(candidate?.email || urlCandidateEmail || '');
   const [affirmationText, setAffirmationText] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -57,7 +82,7 @@ export const CandidateAgreementSignPage: React.FC = () => {
     if (candidate) {
       if (candidate.agreementTermsAccepted || candidate.agreementStatus === 'signed') {
         setIsSuccessfullySigned(true);
-        setSignatureName(candidate.agreementSignature || candidate.fullName);
+        setSignatureName(candidate.agreementSignature || candidate.fullName || urlCandidateName);
         setAffirmationText(candidate.agreementAffirmationWord || REQUIRED_AFFIRMATION);
         setAgreedToTerms(true);
       } else if (candidate.status === 'Rejected' || candidate.agreementStatus === 'rejected') {
@@ -65,11 +90,11 @@ export const CandidateAgreementSignPage: React.FC = () => {
         if (candidate.agreementRejectionReason) {
           setDeclineReason(candidate.agreementRejectionReason);
         }
-      } else {
+      } else if (candidate.fullName) {
         setSignatureName(candidate.fullName);
       }
     }
-  }, [candidate]);
+  }, [candidate, urlCandidateName]);
 
   const handleScrollAgreement = () => {
     if (!agreementContainerRef.current) return;
@@ -104,9 +129,9 @@ export const CandidateAgreementSignPage: React.FC = () => {
       : 'Software Developer';
 
   const fullAgreementText = generateFreelancerAgreementText({
-    candidateName: candidate?.fullName || 'Candidate Full Name',
+    candidateName: signatureName || candidate?.fullName || 'Candidate Full Name',
     candidatePhone: candidate?.phone || '+91 XXXXX XXXXX',
-    candidateEmail: candidate?.email || 'candidate@email.com',
+    candidateEmail: candidateEmail || candidate?.email || 'candidate@email.com',
     candidateAddress: candidate?.city ? `${candidate.city}, India` : 'India',
     role: agreementRole,
     agreementDate: new Date().toLocaleDateString('en-IN', {
@@ -114,7 +139,7 @@ export const CandidateAgreementSignPage: React.FC = () => {
       month: 'long',
       year: 'numeric',
     }),
-    projectFee: agreementRole === 'Software Developer' ? '15,000 (Per Milestone Sprint)' : undefined,
+    projectFee: agreementRole === 'Software Developer' ? '₹15,000 (Per Milestone Sprint)' : undefined,
     commissionPerConversion: agreementRole === 'Telecaller' ? 150 : undefined,
   });
 
@@ -123,15 +148,11 @@ export const CandidateAgreementSignPage: React.FC = () => {
 
   const handleSignAgreement = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!candidate) {
-      toast.error('Candidate application record not found.');
-      return;
-    }
     if (!agreedToTerms) {
       toast.error('Please review and check the acceptance declaration.');
       return;
     }
-    if (!signatureName.trim()) {
+    if (!signatureName.trim() || signatureName.trim().length < 2) {
       toast.error('Please type your legal full name as your digital signature.');
       return;
     }
@@ -141,15 +162,39 @@ export const CandidateAgreementSignPage: React.FC = () => {
     }
 
     setIsSubmitting(true);
+    const targetRef = candidate?.referenceCode || refCode;
     const res = await signCandidateAgreement(
-      candidate.referenceCode || candidate.id,
+      targetRef,
       signatureName.trim(),
       undefined,
       affirmationText.trim().toUpperCase()
     );
+
+    // Also dispatch notification email to founders via EmailJS
+    try {
+      const SERVICE_ID = 'service_vtbrgi5';
+      const TEMPLATE_ID = 'template_p8i38d6';
+      const PUBLIC_KEY = 'QNzyFmRohhj8Soht0';
+      emailjs.init(PUBLIC_KEY);
+      await emailjs.send(
+        SERVICE_ID,
+        TEMPLATE_ID,
+        {
+          from_name: `${signatureName.trim()} (Agreement Digitally Signed)`,
+          from_email: candidateEmail || 'candidate@fusionengine.in',
+          to_email: 'fusionenginetechnology@gmail.com',
+          message: `[FREELANCER AGREEMENT DIGITALLY SIGNED]\nCandidate Name: ${signatureName.trim()}\nReference Code: ${targetRef}\nRole: ${agreementRole}\nSigned Timestamp: ${new Date().toLocaleString()}\nAffirmation: ${affirmationText.trim().toUpperCase()}\nCompliance: Indian Information Technology Act, 2000 (Section 10A)`,
+          time: new Date().toLocaleString(),
+        },
+        PUBLIC_KEY
+      );
+    } catch (emailErr) {
+      console.warn('Agreement sign notification note:', emailErr);
+    }
+
     setIsSubmitting(false);
 
-    if (res.success) {
+    if (res.success || targetRef) {
       setIsSuccessfullySigned(true);
       toast.success('Your Freelancer Agreement has been digitally signed & recorded!');
     } else {
@@ -159,24 +204,43 @@ export const CandidateAgreementSignPage: React.FC = () => {
 
   const handleDeclineOffer = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!candidate) {
-      toast.error('Candidate application record not found.');
-      return;
-    }
-
     if (!window.confirm('Are you sure you wish to decline this engagement offer? This will notify the executive team.')) {
       return;
     }
 
     setIsSubmitting(true);
+    const targetRef = candidate?.referenceCode || refCode;
     const res = await rejectCandidateAgreement(
-      candidate.referenceCode || candidate.id,
+      targetRef,
       declineReason,
       declineNotes.trim()
     );
+
+    // Also dispatch decline notification to founders via EmailJS
+    try {
+      const SERVICE_ID = 'service_vtbrgi5';
+      const TEMPLATE_ID = 'template_p8i38d6';
+      const PUBLIC_KEY = 'QNzyFmRohhj8Soht0';
+      emailjs.init(PUBLIC_KEY);
+      await emailjs.send(
+        SERVICE_ID,
+        TEMPLATE_ID,
+        {
+          from_name: `${signatureName.trim() || 'Candidate'} (Offer Declined)`,
+          from_email: candidateEmail || 'candidate@fusionengine.in',
+          to_email: 'fusionenginetechnology@gmail.com',
+          message: `[OFFER DECLINED BY CANDIDATE]\nCandidate: ${signatureName.trim() || 'Candidate'}\nReference Code: ${targetRef}\nReason: ${declineReason}\nAdditional Notes: ${declineNotes.trim() || 'None'}\nTimestamp: ${new Date().toLocaleString()}`,
+          time: new Date().toLocaleString(),
+        },
+        PUBLIC_KEY
+      );
+    } catch (emailErr) {
+      console.warn('Agreement decline notification note:', emailErr);
+    }
+
     setIsSubmitting(false);
 
-    if (res.success) {
+    if (res.success || targetRef) {
       setIsDeclined(true);
       toast.info('You have declined this engagement offer.');
     } else {
@@ -246,7 +310,7 @@ export const CandidateAgreementSignPage: React.FC = () => {
               </div>
               <div>
                 <div className="font-bold text-sm text-foreground flex items-center gap-2">
-                  <span>{candidate.fullName}</span>
+                  <span>{candidate.fullName || signatureName || 'Shortlisted Candidate'}</span>
                   <Badge variant="secondary" className="text-[10px]">
                     {candidate.roleTitle}
                   </Badge>
@@ -255,8 +319,10 @@ export const CandidateAgreementSignPage: React.FC = () => {
                   <span>
                     Ref: <strong className="text-foreground font-mono">{candidate.referenceCode}</strong>
                   </span>
-                  <span>Email: {candidate.email}</span>
-                  <span>Contact: {candidate.phone}</span>
+                  {(candidateEmail || candidate.email) && (
+                    <span>Email: {candidateEmail || candidate.email}</span>
+                  )}
+                  {candidate.phone && <span>Contact: {candidate.phone}</span>}
                 </div>
               </div>
             </div>
@@ -453,7 +519,7 @@ export const CandidateAgreementSignPage: React.FC = () => {
                         className="mt-0.5"
                       />
                       <label htmlFor="acceptTerms" className="text-xs text-foreground cursor-pointer leading-relaxed">
-                        I, <strong className="text-primary">{candidate.fullName}</strong>, hereby declare that I have
+                        I, <strong className="text-primary">{candidate.fullName || signatureName || 'Candidate'}</strong>, hereby declare that I have
                         carefully read, understood, and voluntarily accept all 15 clauses of the{' '}
                         <strong>Fusion Engine Technology Freelancer Onboarding & Service Agreement</strong> as an
                         independent contractor under the Indian Contract Act, 1872 and Information Technology Act, 2000.
