@@ -324,10 +324,11 @@ export interface AuditLogItem {
 
 export interface NotificationItem {
   id: string;
-  userId: string;
+  userId?: string | null;
   title: string;
   body: string;
   link?: string;
+  category?: 'recruitment' | 'task' | 'finance' | 'lead' | 'system' | string;
   readAt?: string | null;
   createdAt: string;
 }

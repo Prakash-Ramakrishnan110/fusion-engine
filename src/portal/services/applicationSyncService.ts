@@ -175,3 +175,4 @@ export async function deleteApplicationFromSupabase(refOrId: string): Promise<bo
     return false;
   }
 }
+

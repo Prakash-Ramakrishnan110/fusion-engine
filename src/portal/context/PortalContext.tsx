@@ -413,7 +413,24 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     localStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify(documents));
   }, [documents]);
   const [auditLogs, setAuditLogs] = useState<AuditLogItem[]>([]);
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch {}
+    return [];
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(notifications));
+    } catch (e) {
+      console.warn('Notifications storage write note:', e);
+    }
+  }, [notifications]);
   const [templates, setTemplates] = useState<ProjectTemplate[]>(PROJECT_TEMPLATES);
   const [commissions, setCommissions] = useState<TelecallerCommission[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -907,6 +924,31 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         }
       } catch (appErr) {
         console.warn('Supabase application sync note:', appErr);
+      }
+
+      // 6.8 Fetch Notifications from Supabase
+      try {
+        const { data: notifData, error: notifErr } = await supabase
+          .from('notifications')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(40);
+
+        if (!notifErr && notifData && notifData.length > 0) {
+          const mappedNotifs: NotificationItem[] = notifData.map((n: any) => ({
+            id: n.id,
+            userId: n.user_id,
+            title: n.title,
+            body: n.body,
+            link: n.link,
+            category: n.category || 'system',
+            readAt: n.read_at,
+            createdAt: n.created_at,
+          }));
+          setNotifications(mappedNotifs);
+        }
+      } catch (err) {
+        console.warn('Supabase notifications fetch note:', err);
       }
 
       // 7. Fetch Audit Log
@@ -2782,6 +2824,13 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         agreementStatus: 'signed',
         agreementDocumentText: agreementDocumentText,
       }).catch((err) => console.warn('Supabase sign update note:', err));
+
+      createNotification(
+        '✍️ Agreement Digitally Signed',
+        `${signatureName} signed Freelancer Service Agreement for ${applicationId}`,
+        '/portal/team?tab=hiring',
+        'recruitment'
+      );
 
       // Automatically archive executed agreement in Document Vault (/portal/documents)
       const agreementDocId = `doc_agreement_${applicationId.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
