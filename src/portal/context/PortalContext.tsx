@@ -998,6 +998,9 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       cleanId === 'prakash' ||
       cleanId === 'admin' ||
       cleanId === 'superadmin' ||
+      cleanId === 'admin.prakash' ||
+      rawInput.toLowerCase() === 'admin.prakash@fusionengine.in' ||
+      email.toLowerCase() === 'admin.prakash@fusionengine.in' ||
       rawInput.toLowerCase() === 'prakash.r' ||
       rawInput.toLowerCase() === 'admin' ||
       email.toLowerCase().includes('prakash') ||

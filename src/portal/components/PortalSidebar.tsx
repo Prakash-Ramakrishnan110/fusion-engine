@@ -29,7 +29,12 @@ interface NavSection {
   items: NavItem[];
 }
 
-export const PortalSidebar: React.FC = () => {
+interface PortalSidebarProps {
+  className?: string;
+  onNavigate?: () => void;
+}
+
+export const PortalSidebar: React.FC<PortalSidebarProps> = ({ className, onNavigate }) => {
   const portalContext = usePortal();
   const { currentUser, activePersona } = portalContext;
   const user = currentUser || activePersona;
@@ -241,7 +246,7 @@ export const PortalSidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-64 border-r border-border/40 bg-card/40 flex flex-col shrink-0 h-full min-h-0">
+    <aside className={className || "hidden md:flex w-64 border-r border-border/40 bg-card/40 flex-col shrink-0 h-full min-h-0"}>
       {/* Role Context Header */}
       <div className="p-3.5 border-b border-border/30 bg-muted/15 shrink-0">
         <div className="flex items-center justify-between mb-1">
@@ -285,6 +290,7 @@ export const PortalSidebar: React.FC = () => {
                 <NavLink
                   key={item.path}
                   to={item.path}
+                  onClick={() => onNavigate?.()}
                   end={item.path === '/portal'}
                   className={({ isActive: routerIsActive }) => {
                     const active = isItemActive(item.path, routerIsActive);

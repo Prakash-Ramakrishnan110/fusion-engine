@@ -227,7 +227,7 @@ Submission Timestamp: ${new Date().toLocaleString()}
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="w-[96vw] max-w-2xl max-h-[90vh] overflow-y-auto overscroll-contain p-4 sm:p-6 bg-background border-border shadow-2xl rounded-2xl">
+        <DialogContent className="w-[94vw] sm:w-full max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden overscroll-contain p-4 sm:p-6 bg-background border-border shadow-2xl rounded-2xl box-border">
           {submitted ? (
             <div className="py-8 text-center flex flex-col items-center">
               <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center mb-4">
@@ -265,7 +265,7 @@ Submission Timestamp: ${new Date().toLocaleString()}
                 </DialogDescription>
               </DialogHeader>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-full min-w-0 overflow-x-hidden box-border">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <Label htmlFor="fullName" className="text-xs font-semibold">Full Name *</Label>
@@ -408,15 +408,19 @@ Submission Timestamp: ${new Date().toLocaleString()}
                     id="resumeUploadInput"
                   />
 
-                  {resumeFile ? (
-                    <div className="flex items-center justify-between p-3 rounded-xl border border-primary/30 bg-primary/5">
-                      <div className="flex items-center gap-2.5 overflow-hidden">
+                                    {resumeFile ? (
+                    <div className="flex items-center justify-between p-3 rounded-xl border border-primary/30 bg-primary/5 w-full min-w-0 max-w-full overflow-hidden box-border">
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1 overflow-hidden mr-2">
                         <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
                           <FileCheck className="w-4 h-4" />
                         </div>
-                        <div className="truncate">
-                          <div className="text-xs font-semibold text-foreground truncate">{resumeFile.name}</div>
-                          <div className="text-[11px] text-muted-foreground">{resumeFile.size} • Attached</div>
+                        <div className="min-w-0 flex-1 overflow-hidden">
+                          <p className="text-xs font-semibold text-foreground truncate block max-w-full" title={resumeFile.name}>
+                            {resumeFile.name}
+                          </p>
+                          <p className="text-[11px] text-muted-foreground truncate">
+                            {resumeFile.size} • Attached
+                          </p>
                         </div>
                       </div>
                       <Button
@@ -424,7 +428,8 @@ Submission Timestamp: ${new Date().toLocaleString()}
                         variant="ghost"
                         size="sm"
                         onClick={handleRemoveFile}
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10 h-7 w-7 p-0 rounded-full"
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10 h-7 w-7 p-0 rounded-full shrink-0"
+                        title="Remove attached file"
                       >
                         <X className="w-4 h-4" />
                       </Button>

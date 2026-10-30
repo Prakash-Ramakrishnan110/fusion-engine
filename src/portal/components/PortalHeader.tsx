@@ -39,6 +39,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { PortalSidebar } from './PortalSidebar';
+import { Menu } from 'lucide-react';
 import { ProjectSwitcher } from './ProjectSwitcher';
 import { GlobalSearchModal } from './GlobalSearchModal';
 import { NotificationsPopover } from './NotificationsPopover';
@@ -53,6 +56,7 @@ export const PortalHeader: React.FC = () => {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isWizardOpen, setIsWizardOpen] = useState(false);
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const user = currentUser || activePersona;
   const isAdmin = user.role === 'admin' || user.role === 'super_admin';
@@ -96,8 +100,27 @@ export const PortalHeader: React.FC = () => {
     <>
       <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 lg:px-8 py-2.5 flex items-center justify-between gap-4">
         {/* Left: Organization Branding & Project Switcher */}
-        <div className="flex items-center gap-4">
-          <Link to="/portal" className="flex items-center gap-3 group">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="md:hidden h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
+                title="Toggle Navigation Menu"
+              >
+                <Menu className="w-5 h-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="p-0 w-72 max-w-[85vw] bg-card border-r border-border">
+              <PortalSidebar
+                className="flex w-full h-full flex-col border-none bg-card"
+                onNavigate={() => setIsMobileMenuOpen(false)}
+              />
+            </SheetContent>
+          </Sheet>
+
+          <Link to="/portal" className="flex items-center gap-2 sm:gap-3 group">
             <img
               src="/header-logo.png"
               alt="Fusion Engine Technology"
