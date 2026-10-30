@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { usePortal } from '../context/PortalContext';
 import { UserPersona, UserRole, JobApplication } from '../types';
 import defaultAvatar from '../../assets/default-avatar.svg';
