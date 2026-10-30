@@ -1,11 +1,17 @@
 -- ==============================================================================
--- FUSION ENGINE TECHNOLOGY - SUPABASE PROFILES PERMISSION & SEED
+-- FUSION ENGINE TECHNOLOGY - SUPABASE PROFILES FIX
 -- Migration: 006_profiles_rls_fix.sql
--- Description: Enables Admin & Portal to create/store user profiles in Supabase
+-- Description: Unlinks strict auth.users foreign key to allow direct portal profile creation & seeds Founder
 -- Run this in the Supabase SQL Editor: https://supabase.com/dashboard/project/wpmfpyjwyzawwwtvwlot/sql
 -- ==============================================================================
 
--- 1. Ensure RLS allows inserting and updating profiles
+-- 1. Drop the strict auth.users foreign key constraint that was blocking inserts
+ALTER TABLE public.profiles DROP CONSTRAINT IF EXISTS profiles_id_fkey;
+
+-- Set default UUID generator if not already set
+ALTER TABLE public.profiles ALTER COLUMN id SET DEFAULT gen_random_uuid();
+
+-- 2. Configure Row Level Security (RLS) policies for full Portal access
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "profiles_select" ON public.profiles;
@@ -13,32 +19,28 @@ DROP POLICY IF EXISTS "profiles_insert" ON public.profiles;
 DROP POLICY IF EXISTS "profiles_update" ON public.profiles;
 DROP POLICY IF EXISTS "profiles_delete" ON public.profiles;
 
--- Anyone authenticated or portal admin can read profiles
 CREATE POLICY "profiles_select" 
     ON public.profiles FOR SELECT 
     TO anon, authenticated 
     USING (true);
 
--- Allow portal and admin to create workforce / team profiles
 CREATE POLICY "profiles_insert" 
     ON public.profiles FOR INSERT 
     TO anon, authenticated 
     WITH CHECK (true);
 
--- Allow portal and admin to update profiles
 CREATE POLICY "profiles_update" 
     ON public.profiles FOR UPDATE 
     TO anon, authenticated 
     USING (true) 
     WITH CHECK (true);
 
--- Allow admin to remove deactivated profiles
 CREATE POLICY "profiles_delete" 
     ON public.profiles FOR DELETE 
     TO anon, authenticated 
     USING (true);
 
--- 2. Allow developer details (bank/UPI) management
+-- 3. Configure developer details (bank/UPI) RLS policies
 ALTER TABLE public.developer_details ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "dev_details_admin" ON public.developer_details;
 DROP POLICY IF EXISTS "dev_details_self" ON public.developer_details;
@@ -51,7 +53,7 @@ CREATE POLICY "dev_details_all"
     USING (true) 
     WITH CHECK (true);
 
--- 3. Seed Prakash Ramakrishnan as Founder & Super Admin in Supabase profiles
+-- 4. Seed Founder & Super Admin profile (Prakash Ramakrishnan)
 INSERT INTO public.profiles (
     id,
     user_id,
@@ -78,5 +80,5 @@ INSERT INTO public.profiles (
     is_active = true,
     must_change_password = false;
 
--- 4. Confirm profiles table contents
+-- 5. Confirm profiles table contents
 SELECT id, user_id, full_name, role, department, is_active FROM public.profiles;
