@@ -3,7 +3,7 @@ import { JobApplication } from '../types';
 
 export const EMAIL_CONFIG = {
   SERVICE_ID: 'service_vtbrgi5',
-  TEMPLATE_ID: 'template_p8i38d6', // The active verified template in EmailJS
+  TEMPLATE_ID: 'template_p8i38d6', // Active verified template in EmailJS
   FALLBACK_TEMPLATE_ID: 'jbuc3li',
   PUBLIC_KEY: 'QNzyFmRohhj8Soht0',
   COMPANY_NAME: 'Fusion Engine Technology',
@@ -16,20 +16,22 @@ export interface CandidateEmailPayload {
   toName: string;
   roleTitle: string;
   referenceCode: string;
-  status: 'Shortlisted' | 'Hired' | 'Rejected' | 'Under Review' | string;
+  status: 'Applied' | 'Shortlisted' | 'Signed' | 'Hired' | 'Rejected' | 'Under Review' | string;
   subject: string;
   body: string;
 }
 
 /**
- * Returns default email subject and body template tailored to each candidate status
+ * Returns default email subject and body template tailored to each recruitment lifecycle stage
  */
 export function getCandidateEmailTemplate(
   candidate: Pick<JobApplication, 'fullName' | 'roleTitle' | 'referenceCode'> & {
     email?: string;
     department?: string;
+    agreementSignedAt?: string;
+    agreementSignature?: string;
   },
-  status: 'Shortlisted' | 'Hired' | 'Rejected' | 'Under Review' | string,
+  status: 'Applied' | 'Shortlisted' | 'Signed' | 'Hired' | 'Rejected' | 'Under Review' | string,
   credentials?: {
     userId: string;
     temporaryPassword: string;
@@ -42,43 +44,112 @@ export function getCandidateEmailTemplate(
   const ref = candidate.referenceCode || 'FET-APP';
 
   switch (status) {
-    case 'Shortlisted': {
-      const agreementLink = `${EMAIL_CONFIG.PORTAL_URL}/agreement?ref=${ref}&name=${encodeURIComponent(name)}&role=${encodeURIComponent(role)}&email=${encodeURIComponent(candidate.email || '')}`;
+    case 'Applied': {
       return {
-        subject: `Application Shortlisted & Freelancer Agreement — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`,
+        subject: `Application Confirmed: ${role} — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`,
         body: `Dear ${name},
 
-Thank you for applying for the ${role} position at ${EMAIL_CONFIG.COMPANY_NAME} (Application Ref: ${ref}).
+Thank you for applying for the ${role} position at ${EMAIL_CONFIG.COMPANY_NAME}!
 
-We are pleased to inform you that your profile, portfolio, and experience have been Shortlisted by our technical and leadership review team!
+We have successfully received your candidate application and portfolio.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📌 YOUR APPLICATION DETAILS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Candidate Name:    ${name}
+• Position Applied:  ${role}
+• Application Ref:   ${ref}
+• Submission Date:   ${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+• Status:            Under Technical & Leadership Review
 
-==================================================
-📄 FREELANCER ONBOARDING & SERVICE AGREEMENT
-==================================================
-As part of our standard professional onboarding process under the Indian Information Technology Act, 2000, please review and digitally sign your Freelancer Service Agreement using your personalized link below:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 WHAT HAPPENS NEXT?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Technical Screening: Our engineering & recruitment review team is evaluating your qualifications.
+2. Shortlisting & Agreement: If your profile matches our active project deliverables, you will receive an invitation to review and digitally sign your Freelancer Service Agreement.
+3. Review Timeline: We aim to update applicants within 24 to 48 business hours.
 
-🔗 Review & Sign Your Agreement:
-${agreementLink}
-
-Summary of Agreed Engagement Terms:
-• Role: ${role}
-• Type: Independent Freelancer / Deliverable-based
-• Developer Deliverable Fee: Based on approved sprint milestone deliverables
-• Telecaller Commission: ₹150 per verified successful client conversion
-• IP & Confidentiality: Perpetual worldwide assignment of created deliverables to Fusion Engine Technology; strict non-disclosure of company code and client records.
-• Notice Period: 7 days written notice by either party.
-
-Next Steps:
-1. Open the agreement link above and type your legal name to digitally sign.
-2. Once signed, our executive team will review your countersignature and activate your workforce portal login credentials.
-
-If you have any questions, you can reply directly to this email.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️ IMPORTANT: CHECK YOUR INBOX & SPAM FOLDER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Please check your primary Inbox and Spam / Junk / Promotions folders for future communications from ${EMAIL_CONFIG.COMPANY_EMAIL}.
+Please click "Report as Not Spam" or add our email to your contacts so you do not miss your shortlisting and agreement signing link!
 
 Warm regards,
 Talent Acquisition & Executive Team
 ${EMAIL_CONFIG.COMPANY_NAME}
-${EMAIL_CONFIG.COMPANY_EMAIL}
-${EMAIL_CONFIG.PORTAL_URL}`.trim(),
+🌐 https://www.fusionengine.in
+✉️ ${EMAIL_CONFIG.COMPANY_EMAIL}`.trim(),
+      };
+    }
+
+    case 'Shortlisted': {
+      const agreementLink = `${EMAIL_CONFIG.PORTAL_URL}/agreement?ref=${ref}&name=${encodeURIComponent(name)}&role=${encodeURIComponent(role)}&email=${encodeURIComponent(candidate.email || '')}`;
+      return {
+        subject: `Congratulations! Shortlisted for ${role} — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`,
+        body: `Dear ${name},
+
+We are pleased to inform you that your application (Ref: ${ref}) for ${role} has been SHORTLISTED by our technical review team at ${EMAIL_CONFIG.COMPANY_NAME}!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 FREELANCER ONBOARDING & SERVICE AGREEMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+As part of our standard professional onboarding process pursuant to Section 10A of the Indian Information Technology Act, 2000, please review and digitally sign your Freelancer Service Agreement using your personalized secure link:
+
+🔗 REVIEW & SIGN YOUR AGREEMENT:
+${agreementLink}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📌 SUMMARY OF AGREED ENGAGEMENT TERMS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Position:          ${role}
+• Engagement Model:  Independent Freelancer / Deliverable-Based
+• Developer Pay:     Sprint & milestone compensation upon deliverable verification
+• Telecaller Pay:    ₹150 per verified client conversion
+• IP Protection:     Perpetual assignment of deliverables to Fusion Engine Technology
+• Notice Period:     7 days written notice by either party
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 NEXT STEPS TO ACTIVATE YOUR WORKSPACE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Click the agreement link above on your phone or computer.
+2. Carefully review the terms and type your legal full name to sign.
+3. Once signed, our administration team will review your countersignature and generate your Workforce Portal login credentials.
+
+⚠️ SPAM NOTICE: If you ever miss an update, please check your Spam/Junk folder and mark our emails as "Not Spam".
+
+Warm regards,
+Talent Acquisition & Executive Team
+${EMAIL_CONFIG.COMPANY_NAME}
+🌐 https://www.fusionengine.in
+✉️ ${EMAIL_CONFIG.COMPANY_EMAIL}`.trim(),
+      };
+    }
+
+    case 'Signed': {
+      return {
+        subject: `Agreement Certified & Recorded — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`,
+        body: `Dear ${name},
+
+This email certifies that your Freelancer Onboarding & Service Agreement has been DIGITALLY SIGNED AND RECORDED under Application Reference ${ref}.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📜 ELECTRONIC EXECUTION CERTIFICATE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Candidate Signature: ${candidate.agreementSignature || name}
+• Application Ref:     ${ref}
+• Role:                ${role}
+• Signed Timestamp:    ${candidate.agreementSignedAt ? new Date(candidate.agreementSignedAt).toLocaleString('en-IN') : new Date().toLocaleString('en-IN')}
+• Statutory Standard:  Section 10A, Indian Information Technology Act, 2000
+
+A permanent statutory record has been archived in our Document Vault. Our leadership team is now preparing your Workforce Portal workspace and login credentials.
+
+You will receive an email shortly with your login User ID and temporary password.
+
+Warm regards,
+Executive Administration Team
+${EMAIL_CONFIG.COMPANY_NAME}
+🌐 https://www.fusionengine.in
+✉️ ${EMAIL_CONFIG.COMPANY_EMAIL}`.trim(),
       };
     }
 
@@ -97,96 +168,90 @@ ${EMAIL_CONFIG.PORTAL_URL}`.trim(),
 
       const roleWorkspaceDetail =
         assignedRole === 'telecaller'
-          ? '• Telecaller Tools: Access your CRM leads pipeline, calling scripts, merchant records, and commission tracking.'
+          ? '• Inside Sales CRM: Access calling scripts, assigned merchants, lead activities, and commission ledger.'
           : assignedRole === 'admin'
-          ? '• Executive Tools: Access full ERP oversight, workforce management, review gates, and financial governance.'
-          : '• Developer Tools: Access your project sprint board, tasks queue, code submission review gates, and deliverables tracker.';
+          ? '• Executive ERP: Access full oversight, workforce records, client billing, and review gates.'
+          : '• Engineering Workspace: Access your project sprint board, tasks queue, code submission review gates, and deliverable specs.';
 
       return {
-        subject: `Welcome Aboard! Offer & Portal Login Credentials — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`,
+        subject: `Welcome to the Team! Workspace Login Credentials — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`,
         body: `Dear ${name},
 
-Congratulations! Following our evaluation of your application (Ref: ${ref}) and discussions, we are delighted to officially welcome you to ${EMAIL_CONFIG.COMPANY_NAME} as a ${role}!
+Congratulations and welcome to ${EMAIL_CONFIG.COMPANY_NAME}! Following the execution of your Freelancer Service Agreement, we are delighted to officially onboard you as a ${role}.
 
-We were truly impressed by your qualifications and are excited to have you contribute to our upcoming enterprise deliverables.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔑 YOUR WORKSPACE LOGIN CREDENTIALS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Portal URL:         ${loginUrl}
+• User ID:            ${userId}
+• Registered Email:   ${candidate.email || 'Your registered email'}
+• Temporary Password: ${tempPass}
+• Assigned Workspace: ${deptName}
 
-==================================================
-🔑 YOUR WORKFORCE PORTAL LOGIN CREDENTIALS
-==================================================
-Portal Login URL:   ${loginUrl}
-User ID:            ${userId}
-Registered Email:   ${candidate.email || 'Your registered email'}
-Temporary Password: ${tempPass}
-Assigned Workspace: ${deptName}
-
-==================================================
-📋 STEP-BY-STEP LOGIN & ONBOARDING GUIDE
-==================================================
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 STEP-BY-STEP FIRST LOGIN GUIDE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Step 1: Open the Portal
-Click the Login URL above or open: ${loginUrl}
+Open: ${loginUrl}
 
-Step 2: Enter Your Credentials
-Type your User ID ("${userId}") and your Temporary Password ("${tempPass}").
+Step 2: Sign In
+Enter your User ID ("${userId}") and Temporary Password ("${tempPass}").
 
-Step 3: Set Your Personal Password (Required)
-For security compliance, the portal will immediately prompt you to set your own secure permanent password on your first login.
+Step 3: Update Password (Mandatory)
+For security, the portal will immediately ask you to set your own permanent password on first login.
 
-Step 4: Access Your Workspace & Deliverables
-Once logged in, your active workspace tools will be unlocked:
+Step 4: Access Your Deliverables
 ${roleWorkspaceDetail}
 
-Step 5: Review Compliance & Documentation
-Review your deliverable specifications and agreements in your Document Vault under "My Documents".
+Step 5: Document Vault
+You can inspect your signed agreement and project briefs in your Document Vault under "My Documents".
 
-⚠️ SECURITY NOTICE:
-Please keep these login credentials strictly confidential. Fusion Engine administrators will never ask for your permanent password.
+⚠️ SECURITY NOTICE: Keep these credentials strictly confidential. Fusion Engine administrators will never ask for your personal password.
 
-If you have any questions or require onboarding assistance, reply directly to this email or reach us at ${EMAIL_CONFIG.COMPANY_EMAIL}.
-
-Welcome aboard!
+Welcome aboard, we are excited to build with you!
 
 Warm regards,
-Prakash (Founder & Super Admin)
+Prakash Ramakrishnan (Founder & Super Admin)
 ${EMAIL_CONFIG.COMPANY_NAME}
-${EMAIL_CONFIG.COMPANY_EMAIL}
-${EMAIL_CONFIG.PORTAL_URL}`.trim(),
+🌐 https://www.fusionengine.in
+✉️ ${EMAIL_CONFIG.COMPANY_EMAIL}`.trim(),
       };
     }
 
     case 'Rejected':
       return {
-        subject: `${EMAIL_CONFIG.COMPANY_NAME} Application Update — ${role} [${ref}]`,
+        subject: `Application Update: ${role} — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`,
         body: `Dear ${name},
 
-Thank you for taking the time to apply for the ${role} position at ${EMAIL_CONFIG.COMPANY_NAME} (Application Ref: ${ref}).
+Thank you for your interest in joining ${EMAIL_CONFIG.COMPANY_NAME} and for taking the time to share your background for the ${role} opening (Application Ref: ${ref}).
 
-We carefully reviewed your qualifications and background. While your profile is commendable, we have decided to proceed with other candidates whose skillsets align more closely with our immediate project deliverables at this stage.
+We have reviewed your profile and experience. While your qualifications are strong, we have chosen to proceed with candidates whose immediate technical alignment matches our active customer sprint deliverables at this time.
 
-We will keep your resume and contact details in our active talent directory for future openings as our projects expand.
+We have archived your profile in our active talent directory, and we will reach out directly should a relevant opening open up as our client projects expand.
 
-We wish you all the best in your career pursuits!
+We wish you every success in your professional endeavors!
 
 Warm regards,
 Talent Acquisition Team
 ${EMAIL_CONFIG.COMPANY_NAME}
-${EMAIL_CONFIG.COMPANY_EMAIL}
-${EMAIL_CONFIG.PORTAL_URL}`.trim(),
+🌐 https://www.fusionengine.in
+✉️ ${EMAIL_CONFIG.COMPANY_EMAIL}`.trim(),
       };
 
     default:
       return {
-        subject: `Update regarding your application for ${role} — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`,
+        subject: `Update on your application for ${role} — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`,
         body: `Dear ${name},
 
-We are writing to update you on the status of your application for the ${role} position at ${EMAIL_CONFIG.COMPANY_NAME} (Ref: ${ref}).
+We are writing to update you on your application for the ${role} opening at ${EMAIL_CONFIG.COMPANY_NAME} (Ref: ${ref}).
 
 Your application is currently Under Review by our technical hiring team. We appreciate your patience and will reach out with next steps soon.
 
 Warm regards,
 Talent Acquisition Team
 ${EMAIL_CONFIG.COMPANY_NAME}
-${EMAIL_CONFIG.COMPANY_EMAIL}
-${EMAIL_CONFIG.PORTAL_URL}`.trim(),
+🌐 https://www.fusionengine.in
+✉️ ${EMAIL_CONFIG.COMPANY_EMAIL}`.trim(),
       };
   }
 }
@@ -262,4 +327,3 @@ export function generateGmailComposeUrl(toEmail: string, subject: string, body: 
   const encBody = encodeURIComponent(body);
   return `https://mail.google.com/mail/?view=cm&fs=1&to=${encTo}&su=${encSubject}&body=${encBody}`;
 }
-

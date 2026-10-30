@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import StartupIndiaDocsModal from "@/components/StartupIndiaDocsModal";
 import { usePortal } from "@/portal/context/PortalContext";
+import { getCandidateEmailTemplate } from "@/portal/services/recruitmentEmailService";
 
 interface CareerApplicationModalProps {
   open: boolean;
@@ -177,6 +178,16 @@ Submission Timestamp: ${new Date().toLocaleString()}
 
       // 2a. Dispatch automated application receipt confirmation to the candidate
       try {
+        const candidateTemplate = getCandidateEmailTemplate(
+          {
+            fullName: formData.fullName,
+            roleTitle: formData.role,
+            referenceCode: refCode,
+            email: formData.email,
+          },
+          'Applied'
+        );
+
         const applicantEmailParams = {
           to_email: formData.email,
           email: formData.email,
@@ -184,26 +195,9 @@ Submission Timestamp: ${new Date().toLocaleString()}
           name: formData.fullName,
           from_name: "Fusion Engine Technology",
           reply_to: "fusionenginetechnology@gmail.com",
-          subject: `Application Confirmed: ${formData.role} — Fusion Engine Technology [${refCode}]`,
-          message: `Dear ${formData.fullName},
-
-Thank you for applying for the ${formData.role} position at Fusion Engine Technology!
-
-We have successfully received your application and attached resume (${resumeFile.name}).
-Your Unique Application Reference ID: ${refCode}
-
-Next Steps:
-1. Our technical evaluation team is currently reviewing your background, experience, and project portfolio.
-2. If your qualifications match our current project sprint requirements, you will receive an invitation to review and digitally sign your Freelancer Service Agreement.
-3. You can reply directly to this email if you need to submit additional work samples or project updates.
-
-We appreciate your interest in joining Fusion Engine Technology!
-
-Warm regards,
-Talent Acquisition & Executive Team
-Fusion Engine Technology
-https://www.fusionengine.in
-fusionenginetechnology@gmail.com`,
+          subject: candidateTemplate.subject,
+          message: candidateTemplate.body,
+          content: candidateTemplate.body,
           time: new Date().toLocaleString(),
         };
 
@@ -281,13 +275,36 @@ fusionenginetechnology@gmail.com`,
               <p className="text-muted-foreground text-sm max-w-md mx-auto mb-4">
                 Thank you for applying to join <span className="font-semibold text-foreground">Fusion Engine Technology</span>. Your profile and portfolio have been routed to our technical screening team.
               </p>
-              <div className="bg-secondary/50 border border-border rounded-xl p-4 w-full max-w-sm mb-6 text-left">
+              <div className="bg-secondary/50 border border-border rounded-xl p-4 w-full max-w-sm mb-4 text-left">
                 <div className="text-xs text-muted-foreground">Application Tracking Code:</div>
                 <div className="text-lg font-mono font-bold text-primary">{applicationRef}</div>
                 <div className="text-xs text-muted-foreground mt-2">
                   A verification record has been dispatched to our hiring team for review.
                 </div>
               </div>
+
+              {/* High-Visibility Spam & Inbox Alert Highlight */}
+              <div className="w-full max-w-md rounded-2xl border-2 border-amber-500/40 bg-amber-500/10 dark:bg-amber-500/15 p-4 mb-6 text-left space-y-2 shadow-sm animate-in fade-in-50">
+                <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300 font-bold text-xs uppercase tracking-wide">
+                  <AlertCircle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                  <span>Important: Check Your Inbox & Spam Folder</span>
+                </div>
+                <p className="text-xs text-foreground leading-relaxed">
+                  We have dispatched your confirmation receipt to <strong className="text-foreground underline decoration-amber-500">{formData.email}</strong>.
+                </p>
+                <div className="p-3 rounded-xl bg-background/90 border border-amber-500/20 text-[11px] text-muted-foreground leading-relaxed space-y-1.5">
+                  <p className="text-foreground font-medium">
+                    ⚠️ Email Deliverability Notice:
+                  </p>
+                  <p>
+                    1. If you do not see our email in your main inbox, check your <strong>Spam / Junk</strong> or <strong>Promotions</strong> folder.
+                  </p>
+                  <p>
+                    2. Please open the email and tap <strong>&ldquo;Report as Not Spam&rdquo;</strong> (or move to Inbox) so you receive your <strong>Shortlist & Freelancer Agreement</strong> signing link without delay!
+                  </p>
+                </div>
+              </div>
+
               <Button onClick={handleReset} className="px-6 cursor-pointer">
                 Done
               </Button>

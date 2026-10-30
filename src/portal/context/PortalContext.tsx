@@ -204,7 +204,8 @@ interface PortalContextType {
     applicationId: string,
     signatureName: string,
     signerIp?: string,
-    affirmationWord?: string
+    affirmationWord?: string,
+    agreementDocumentText?: string
   ) => Promise<{ success: boolean; error?: string }>;
   rejectCandidateAgreement: (
     applicationId: string,
@@ -2692,9 +2693,12 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     applicationId: string,
     signatureName: string,
     signerIp?: string,
-    affirmationWord?: string
+    affirmationWord?: string,
+    agreementDocumentText?: string
   ): Promise<{ success: boolean; error?: string }> => {
     try {
+      const signedTimestamp = new Date().toISOString();
+
       setApplications((prev) => {
         const found = prev.some(
           (app) =>
@@ -2708,12 +2712,13 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             app.referenceCode.toLowerCase() === applicationId.toLowerCase()
               ? {
                   ...app,
-                  agreementSignedAt: new Date().toISOString(),
+                  agreementSignedAt: signedTimestamp,
                   agreementSignature: signatureName,
-                  agreementSignerIp: signerIp || '127.0.0.1 (Verified Web)',
+                  agreementSignerIp: signerIp || 'Verified Web Session',
                   agreementTermsAccepted: true,
                   agreementAffirmationWord: affirmationWord || 'I AGREE AND ACCEPT',
                   agreementStatus: 'signed' as const,
+                  agreementDocumentText: agreementDocumentText || app.agreementDocumentText,
                 }
               : app
           );
@@ -2727,27 +2732,59 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             fullName: signatureName,
             email: '',
             status: 'Shortlisted',
-            submittedAt: new Date().toISOString(),
-            agreementSignedAt: new Date().toISOString(),
+            submittedAt: signedTimestamp,
+            agreementSignedAt: signedTimestamp,
             agreementSignature: signatureName,
-            agreementSignerIp: signerIp || '(Verified Web)',
+            agreementSignerIp: signerIp || 'Verified Web Session',
             agreementTermsAccepted: true,
             agreementAffirmationWord: affirmationWord || 'I AGREE AND ACCEPT',
             agreementStatus: 'signed',
+            agreementDocumentText: agreementDocumentText,
           };
           updated = [newEntry, ...prev];
         }
-        localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated));
+        try {
+          localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated));
+        } catch (e) {
+          console.warn('Applications storage write note:', e);
+        }
+        window.dispatchEvent(new CustomEvent('fet_applications_updated'));
         return updated;
+      });
+
+      // Automatically archive executed agreement in Document Vault (/portal/documents)
+      const agreementDocId = `doc_agreement_${applicationId.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+      const newAgreementDoc: DocumentItem = {
+        id: agreementDocId,
+        title: `Freelancer Service Agreement — ${signatureName} (${applicationId})`,
+        category: 'contract',
+        referenceCode: applicationId,
+        complianceStandard: 'Section 10A Indian Information Technology Act, 2000',
+        fileFormat: 'PDF/Contract',
+        uploadedBy: signatureName,
+        uploadedAt: signedTimestamp,
+        description: `Digitally certified freelancer onboarding contract executed by ${signatureName}. Enforceable under Section 10A IT Act 2000.`,
+        version: 1,
+      };
+
+      setDocuments((prevDocs) => {
+        const filtered = prevDocs.filter((d) => d.id !== agreementDocId && d.referenceCode !== applicationId);
+        const updatedDocs = [newAgreementDoc, ...filtered];
+        try {
+          localStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify(updatedDocs));
+        } catch (e) {
+          console.warn('Document vault archive write note:', e);
+        }
+        return updatedDocs;
       });
 
       await addAuditLog(
         'CANDIDATE_AGREEMENT_DIGITALLY_SIGNED',
         'JobApplication',
-        `Candidate digitally signed Freelancer Onboarding & Service Agreement under IT Act 2000 (Signer: ${signatureName}, Affirmation: ${affirmationWord || 'I AGREE AND ACCEPT'})`
+        `Candidate ${signatureName} digitally signed agreement (${applicationId})`
       );
 
-      toast.success('Agreement successfully signed and accepted!');
+      toast.success('Agreement successfully signed and recorded!');
       return { success: true };
     } catch (err: any) {
       return { success: false, error: err?.message || 'Failed to sign agreement.' };
@@ -3102,9 +3139,11 @@ export const usePortal = (): PortalContextType => {
       applicationId: string,
       signatureName: string,
       _signerIp?: string,
-      affirmationWord?: string
+      affirmationWord?: string,
+      agreementDocumentText?: string
     ): Promise<{ success: boolean; error?: string }> => {
       try {
+        const signedTimestamp = new Date().toISOString();
         const saved = localStorage.getItem(STORAGE_KEYS.APPLICATIONS);
         const apps: JobApplication[] = saved ? JSON.parse(saved) : [];
         const exists = apps.some(
@@ -3119,12 +3158,13 @@ export const usePortal = (): PortalContextType => {
             app.referenceCode.toLowerCase() === applicationId.toLowerCase()
               ? {
                   ...app,
-                  agreementSignedAt: new Date().toISOString(),
+                  agreementSignedAt: signedTimestamp,
                   agreementSignature: signatureName,
                   agreementSignerIp: '(Verified Web)',
                   agreementTermsAccepted: true,
                   agreementAffirmationWord: affirmationWord || 'I AGREE AND ACCEPT',
                   agreementStatus: 'signed' as const,
+                  agreementDocumentText: agreementDocumentText || app.agreementDocumentText,
                 }
               : app
           );
@@ -3138,17 +3178,47 @@ export const usePortal = (): PortalContextType => {
             fullName: signatureName,
             email: '',
             status: 'Shortlisted',
-            submittedAt: new Date().toISOString(),
-            agreementSignedAt: new Date().toISOString(),
+            submittedAt: signedTimestamp,
+            agreementSignedAt: signedTimestamp,
             agreementSignature: signatureName,
             agreementSignerIp: '(Verified Web)',
             agreementTermsAccepted: true,
             agreementAffirmationWord: affirmationWord || 'I AGREE AND ACCEPT',
             agreementStatus: 'signed',
+            agreementDocumentText: agreementDocumentText,
           };
           updated = [newEntry, ...apps];
         }
-        localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated));
+        try {
+          localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated));
+        } catch (e) {
+          console.warn('Public sign applications storage write note:', e);
+        }
+
+        // Also archive signed contract in Document Vault
+        try {
+          const agreementDocId = `doc_agreement_${applicationId.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+          const savedDocs = localStorage.getItem(STORAGE_KEYS.DOCUMENTS);
+          const docs: DocumentItem[] = savedDocs ? JSON.parse(savedDocs) : [];
+          const filteredDocs = docs.filter((d) => d.id !== agreementDocId && d.referenceCode !== applicationId);
+          const newDoc: DocumentItem = {
+            id: agreementDocId,
+            title: `Freelancer Service Agreement — ${signatureName} (${applicationId})`,
+            category: 'contract',
+            referenceCode: applicationId,
+            complianceStandard: 'Section 10A Indian Information Technology Act, 2000',
+            fileFormat: 'PDF/Contract',
+            uploadedBy: signatureName,
+            uploadedAt: signedTimestamp,
+            description: `Digitally certified freelancer onboarding contract executed by ${signatureName}. Enforceable under Section 10A IT Act 2000.`,
+            version: 1,
+          };
+          localStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify([newDoc, ...filteredDocs]));
+        } catch (docErr) {
+          console.warn('Public doc archive note:', docErr);
+        }
+
+        window.dispatchEvent(new CustomEvent('fet_applications_updated'));
         return { success: true };
       } catch (e: any) {
         return { success: false, error: e?.message || 'Failed to sign agreement.' };

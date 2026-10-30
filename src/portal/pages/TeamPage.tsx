@@ -54,6 +54,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { CandidateEmailModal } from '../components/CandidateEmailModal';
+import { SignedAgreementModal } from '../components/SignedAgreementModal';
 
 export const TeamPage: React.FC = () => {
   const {
@@ -129,6 +130,8 @@ export const TeamPage: React.FC = () => {
   const [selectedAppForEmail, setSelectedAppForEmail] = useState<JobApplication | null>(null);
   const [targetStatusForEmail, setTargetStatusForEmail] = useState<string>('Shortlisted');
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const [signedAppForView, setSignedAppForView] = useState<JobApplication | null>(null);
+  const [isSignedModalOpen, setIsSignedModalOpen] = useState(false);
 
   const handleTriggerCandidateAction = (
     app: JobApplication,
@@ -951,17 +954,22 @@ export const TeamPage: React.FC = () => {
 
                               {/* Agreement Status Indicator */}
                               {app.agreementTermsAccepted || app.agreementStatus === 'signed' ? (
-                                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
-                                  <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-                                  <span>Agreement Signed ({app.agreementSignature})</span>
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                                    <span>Agreement Signed</span>
+                                  </div>
                                   <Button
                                     type="button"
-                                    variant="ghost"
                                     size="sm"
-                                    onClick={() => window.open(`/agreement?ref=${app.referenceCode}`, '_blank')}
-                                    className="h-5 px-1 text-[10px] text-emerald-600 hover:text-emerald-700 underline"
+                                    onClick={() => {
+                                      setSignedAppForView(app);
+                                      setIsSignedModalOpen(true);
+                                    }}
+                                    className="h-7 px-2.5 text-xs gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium cursor-pointer shadow-xs"
                                   >
-                                    View
+                                    <FileText className="w-3.5 h-3.5" />
+                                    <span>View Signed Contract</span>
                                   </Button>
                                 </div>
                               ) : app.agreementStatus === 'rejected' || app.agreementRejectedAt ? (
@@ -1325,6 +1333,13 @@ export const TeamPage: React.FC = () => {
         }}
         onProvisionCandidate={handleProvisionCandidateShortcut}
         onCreateUser={createUser}
+      />
+
+      {/* MODAL 6: View / Print Certified Signed Agreement */}
+      <SignedAgreementModal
+        open={isSignedModalOpen}
+        onOpenChange={setIsSignedModalOpen}
+        application={signedAppForView}
       />
     </div>
 

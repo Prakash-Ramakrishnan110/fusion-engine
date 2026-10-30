@@ -382,6 +382,7 @@ export interface JobApplication {
   agreementStatus?: 'pending' | 'signed' | 'rejected';
   agreementRejectedAt?: string;
   agreementRejectionReason?: string;
+  agreementDocumentText?: string;
 }
 
 export interface RecruitmentSettings {

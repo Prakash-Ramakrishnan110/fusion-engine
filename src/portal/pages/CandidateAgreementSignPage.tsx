@@ -4,6 +4,7 @@ import { usePortal } from '../context/PortalContext';
 import { generateFreelancerAgreementText } from '../services/freelancerAgreementService';
 import { JobApplication } from '../types';
 import emailjs from '@emailjs/browser';
+import { getCandidateEmailTemplate } from '../services/recruitmentEmailService';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -78,6 +79,7 @@ export const CandidateAgreementSignPage: React.FC = () => {
     (existingCandidate as JobApplication | undefined) || fallbackCandidate;
 
   const [decisionMode, setDecisionMode] = useState<'accept' | 'decline'>('accept');
+  const [fontSize, setFontSize] = useState<'sm' | 'base' | 'lg'>('base');
   const [signatureName, setSignatureName] = useState(candidate?.fullName || urlCandidateName || '');
   const [candidateEmail, setCandidateEmail] = useState(candidate?.email || urlCandidateEmail || '');
   const [affirmationText, setAffirmationText] = useState('');
@@ -184,8 +186,46 @@ export const CandidateAgreementSignPage: React.FC = () => {
       targetRef,
       signatureName.trim(),
       undefined,
-      affirmationText.trim().toUpperCase()
+      affirmationText.trim().toUpperCase(),
+      fullAgreementText
     );
+
+    // Dispatch certified execution email to candidate
+    try {
+      const candidateTemplate = getCandidateEmailTemplate(
+        {
+          fullName: signatureName.trim(),
+          roleTitle: candidate?.roleTitle || agreementRole,
+          referenceCode: targetRef,
+          email: candidateEmail || candidate?.email,
+          agreementSignature: signatureName.trim(),
+          agreementSignedAt: new Date().toISOString(),
+        },
+        'Signed'
+      );
+      const destEmail = candidateEmail || candidate?.email;
+      if (destEmail) {
+        await emailjs.send(
+          'service_vtbrgi5',
+          'template_p8i38d6',
+          {
+            to_email: destEmail,
+            email: destEmail,
+            to_name: signatureName.trim(),
+            name: signatureName.trim(),
+            from_name: 'Fusion Engine Technology',
+            reply_to: 'fusionenginetechnology@gmail.com',
+            subject: candidateTemplate.subject,
+            message: candidateTemplate.body,
+            content: candidateTemplate.body,
+            time: new Date().toLocaleString(),
+          },
+          'QNzyFmRohhj8Soht0'
+        );
+      }
+    } catch (candEmailErr) {
+      console.warn('Candidate signed confirmation note:', candEmailErr);
+    }
 
     // Also dispatch notification email to founders via EmailJS
     try {
@@ -410,10 +450,46 @@ export const CandidateAgreementSignPage: React.FC = () => {
                 </CardDescription>
               </div>
 
-              {/* Reading Progress Indicator */}
-              <div className="flex items-center gap-3">
+              {/* Top Controls: Font Size Switcher & Reading Progress */}
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                {/* Font Size Adjuster (A- / A / A+) */}
+                <div className="flex items-center gap-1 bg-muted/60 p-1 rounded-lg border border-border/50 text-xs">
+                  <span className="text-[10px] text-muted-foreground px-1 font-sans">Text:</span>
+                  <button
+                    type="button"
+                    onClick={() => setFontSize('sm')}
+                    title="Small Font (14px)"
+                    className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all ${
+                      fontSize === 'sm' ? 'bg-primary text-primary-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    A-
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFontSize('base')}
+                    title="Normal Font (16px)"
+                    className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all ${
+                      fontSize === 'base' ? 'bg-primary text-primary-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    A
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFontSize('lg')}
+                    title="Large Font (18px)"
+                    className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all ${
+                      fontSize === 'lg' ? 'bg-primary text-primary-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    A+
+                  </button>
+                </div>
+
+                {/* Reading Progress Indicator */}
                 <div className="flex items-center gap-2">
-                  <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                  <div className="w-20 sm:w-24 h-2 bg-muted rounded-full overflow-hidden">
                     <div
                       className={`h-full transition-all duration-300 ${
                         hasScrolledToBottom ? 'bg-emerald-500' : 'bg-primary'
@@ -421,7 +497,7 @@ export const CandidateAgreementSignPage: React.FC = () => {
                       style={{ width: `${readProgress}%` }}
                     />
                   </div>
-                  <span className="text-[10px] font-mono text-muted-foreground">{readProgress}% read</span>
+                  <span className="text-[10px] font-mono text-muted-foreground">{readProgress}%</span>
                 </div>
 
                 {!hasScrolledToBottom && (
@@ -432,38 +508,47 @@ export const CandidateAgreementSignPage: React.FC = () => {
                     onClick={handleScrollToBottom}
                     className="text-[11px] h-7 gap-1 text-primary hover:text-primary hover:bg-primary/10"
                   >
-                    <ArrowDown className="w-3 h-3" /> Scroll to End
+                    <ArrowDown className="w-3 h-3" /> Bottom
                   </Button>
                 )}
               </div>
             </div>
           </CardHeader>
 
-          <CardContent className="pt-4">
+          <CardContent className="p-2.5 sm:p-6 pt-3">
             <div
               ref={agreementContainerRef}
               onScroll={handleScrollAgreement}
-              style={{ fontFamily: '"Times New Roman", Times, Georgia, serif' }}
-              className="h-[520px] overflow-y-auto rounded-xl border border-border/60 bg-card p-6 sm:p-10 text-[15px] sm:text-base leading-relaxed text-foreground select-text shadow-inner space-y-6"
+              style={{
+                fontFamily: '"Times New Roman", Times, Georgia, serif',
+                WebkitOverflowScrolling: 'touch',
+              }}
+              className={`h-[55vh] min-h-[350px] max-h-[580px] overflow-y-auto rounded-xl border border-border/70 bg-card/95 p-3.5 sm:p-8 md:p-10 text-foreground select-text shadow-inner space-y-6 transition-all ${
+                fontSize === 'sm'
+                  ? 'text-[14px] leading-relaxed'
+                  : fontSize === 'lg'
+                  ? 'text-[18px] leading-relaxed sm:leading-loose'
+                  : 'text-[16px] leading-relaxed'
+              }`}
             >
               {/* Formal Contract Header Letterhead */}
-              <div className="text-center pb-6 border-b-2 border-border/60 space-y-1">
-                <h2 className="text-xl sm:text-2xl font-bold tracking-wider uppercase text-foreground">
+              <div className="text-center pb-5 border-b-2 border-border/60 space-y-1">
+                <h2 className="text-lg sm:text-2xl font-bold tracking-wider uppercase text-foreground">
                   FUSION ENGINE TECHNOLOGY
                 </h2>
-                <p className="text-sm font-bold text-primary uppercase tracking-widest mt-0.5">
+                <p className="text-xs sm:text-sm font-bold text-primary uppercase tracking-widest mt-0.5">
                   Freelancer Onboarding & Service Agreement
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
                   Innovate • Integrate • Accelerate | https://fusionengine.in | fusionenginetechnology@gmail.com
                 </p>
-                <p className="text-xs italic text-muted-foreground pt-1">
+                <p className="text-[10px] sm:text-xs italic text-muted-foreground pt-1">
                   Enforceable under Section 10A of the Indian Information Technology Act, 2000 & Indian Contract Act, 1872
                 </p>
               </div>
 
-              {/* Legal Agreement Clauses with Proper Alignment & Times New Roman */}
-              <div className="text-left sm:text-justify leading-relaxed whitespace-pre-wrap text-foreground/95 space-y-4">
+              {/* Legal Agreement Clauses with Mobile-Friendly Left Alignment */}
+              <div className="text-left leading-relaxed whitespace-pre-wrap text-foreground/95 space-y-4 break-words">
                 {fullAgreementText}
               </div>
             </div>
