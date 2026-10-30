@@ -2757,7 +2757,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const newAgreementDoc: DocumentItem = {
         id: agreementDocId,
         title: `Freelancer Service Agreement — ${signatureName} (${applicationId})`,
-        category: 'contract',
+        category: 'Recruitment',
         referenceCode: applicationId,
         complianceStandard: 'Section 10A Indian Information Technology Act, 2000',
         fileFormat: 'PDF/Contract',
@@ -3204,7 +3204,7 @@ export const usePortal = (): PortalContextType => {
           const newDoc: DocumentItem = {
             id: agreementDocId,
             title: `Freelancer Service Agreement — ${signatureName} (${applicationId})`,
-            category: 'contract',
+            category: 'Recruitment',
             referenceCode: applicationId,
             complianceStandard: 'Section 10A Indian Information Technology Act, 2000',
             fileFormat: 'PDF/Contract',
