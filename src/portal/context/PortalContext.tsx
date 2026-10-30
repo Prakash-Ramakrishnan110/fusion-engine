@@ -1635,16 +1635,24 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setTasks((prev) => [...generatedTasks, ...prev]);
     setSelectedProjectId(newProjId);
 
+    // Sync project to Supabase via direct table insert (non-blocking, local-first)
     if (isSupabaseLive) {
       try {
-        const { data, error } = await supabase.rpc('create_project_from_wizard', {
-          p_payload: payload as any,
+        const { error: projErr } = await supabase.from('projects').insert({
+          code: newProject.code,
+          name: newProject.name,
+          type: payload.type,
+          description: payload.description || null,
+          contract_value: payload.contractValue,
+          start_date: payload.startDate,
+          end_date: payload.endDate,
+          status: 'active',
         });
-        if (error) {
-          console.warn('RPC create_project_from_wizard notice (local copy preserved):', error);
+        if (projErr) {
+          console.warn('Supabase create project notice (local copy preserved):', projErr.message);
         }
       } catch (err: any) {
-        console.warn('RPC create_project_from_wizard warning (local copy preserved):', err);
+        console.warn('Supabase create project error (local copy preserved):', err);
       }
     }
 
@@ -1805,6 +1813,24 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
 
     setDailyStandups((prev) => [standup, ...prev]);
+
+    // Sync standup to Supabase cloud (non-blocking, local-first)
+    if (isSupabaseLive) {
+      supabase.from('daily_standups').insert({
+        id: standup.id,
+        project_id: standup.projectId,
+        project_name: standup.projectName,
+        developer_id: standup.developerId,
+        developer_name: standup.developerName,
+        completed_today: standup.completedToday,
+        planned_tomorrow: standup.plannedTomorrow,
+        blockers: standup.blockers || null,
+        has_blocker: standup.hasBlocker,
+        created_at: standup.createdAt,
+      }).then(({ error }) => {
+        if (error) console.warn('Supabase submitDailyStandup notice:', error.message);
+      });
+    }
 
     if (hasBlocker) {
       setNotifications((prev) => [
@@ -2858,6 +2884,24 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         return updatedDocs;
       });
 
+      // Sync signed agreement document to Supabase vault (non-blocking)
+      if (isSupabaseLive) {
+        supabase.from('documents').insert({
+          id: agreementDocId,
+          title: newAgreementDoc.title,
+          category: 'other',
+          reference_code: newAgreementDoc.referenceCode || applicationId,
+          compliance_standard: newAgreementDoc.complianceStandard || null,
+          file_format: newAgreementDoc.fileFormat || 'PDF/Contract',
+          description: newAgreementDoc.description || null,
+          uploaded_by: null,
+          file_path: null,
+          created_at: newAgreementDoc.uploadedAt,
+        }).then(({ error }) => {
+          if (error) console.warn('Supabase document vault sync notice:', error.message);
+        });
+      }
+
       await addAuditLog(
         'CANDIDATE_AGREEMENT_DIGITALLY_SIGNED',
         'JobApplication',
@@ -2955,6 +2999,23 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         createdAt: new Date().toISOString().split('T')[0],
       };
       setClients((prev) => [newClient, ...prev]);
+
+      // Sync to Supabase cloud (non-blocking, local-first)
+      if (isSupabaseLive) {
+        supabase.from('clients').insert({
+          name: newClient.name,
+          contact_person: newClient.contactPerson,
+          phone: newClient.phone,
+          email: newClient.email || null,
+          gst_no: newClient.gstNo || null,
+          city: newClient.city || null,
+          industry: newClient.industry || null,
+          status: (newClient.status as any) || 'Active',
+        }).then(({ error }) => {
+          if (error) console.warn('Supabase addClient notice:', error.message);
+        });
+      }
+
       await addAuditLog('CLIENT_CREATED', 'Clients', `Created client ${newClient.name}`);
       toast.success(`Client "${newClient.name}" created successfully.`);
       return { success: true, client: newClient };
@@ -2967,6 +3028,14 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     try {
       const target = clients.find((c) => c.id === clientId);
       setClients((prev) => prev.filter((c) => c.id !== clientId));
+
+      // Sync deletion to Supabase (non-blocking)
+      if (isSupabaseLive && isUuid(clientId)) {
+        supabase.from('clients').delete().eq('id', clientId).then(({ error }) => {
+          if (error) console.warn('Supabase deleteClient notice:', error.message);
+        });
+      }
+
       await addAuditLog('CLIENT_DELETED', 'Clients', `Deleted client ${target?.name || clientId}`);
       toast.success('Client record removed successfully.');
       return { success: true };

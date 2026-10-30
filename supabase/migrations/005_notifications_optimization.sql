@@ -64,3 +64,4 @@ CREATE POLICY "Allow delete notifications"
     ON public.notifications FOR DELETE
     TO anon, authenticated
     USING (true);
+
