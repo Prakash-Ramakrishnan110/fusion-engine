@@ -65,6 +65,17 @@ export const DocumentsPage: React.FC = () => {
 
   // Build signed agreement documents from hired or digitally-signed candidates and strictly deduplicate
   const uniqueDocuments = React.useMemo(() => {
+    let deletedIdentifiers = new Set<string>();
+    try {
+      const raw = localStorage.getItem('fet_portal_deleted_documents_v1');
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr)) {
+          deletedIdentifiers = new Set(arr.map((s: string) => String(s).trim().toLowerCase()));
+        }
+      }
+    } catch {}
+
     const appAgreementDocs: DocumentItem[] = (applications || [])
       .filter(
         (app) =>
@@ -96,8 +107,19 @@ export const DocumentsPage: React.FC = () => {
 
     for (const doc of combined) {
       if (!doc || !isNotDemoDoc(doc)) continue;
+      const docIdKey = (doc.id || '').trim().toLowerCase();
       const refKey = (doc.referenceCode || '').trim().toLowerCase();
       const titleKey = (doc.title || '').trim().toLowerCase();
+
+      // Skip if explicitly removed by admin
+      if (
+        (docIdKey && deletedIdentifiers.has(docIdKey)) ||
+        (refKey && deletedIdentifiers.has(refKey)) ||
+        (titleKey && deletedIdentifiers.has(titleKey))
+      ) {
+        continue;
+      }
+
       if (refKey && seenRefs.has(refKey)) continue;
       if (titleKey && seenTitles.has(titleKey)) continue;
       if (refKey) seenRefs.add(refKey);
@@ -500,7 +522,11 @@ export const DocumentsPage: React.FC = () => {
               onClick={async () => {
                 if (!docToDelete) return;
                 setIsDeletingDoc(true);
-                await deleteDocument(docToDelete.id);
+                const targetRefOrId = docToDelete.referenceCode || docToDelete.id;
+                await deleteDocument(targetRefOrId);
+                if (docToDelete.id && docToDelete.id !== targetRefOrId) {
+                  await deleteDocument(docToDelete.id);
+                }
                 setIsDeletingDoc(false);
                 setDocToDelete(null);
               }}

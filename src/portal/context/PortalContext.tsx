@@ -302,9 +302,23 @@ const STORAGE_KEYS = {
   TASKS: 'fet_portal_tasks_v1',
   VOUCHERS: 'fet_portal_vouchers_v1',
   DOCUMENTS: 'fet_portal_documents_v1',
+  DELETED_DOCUMENTS: 'fet_portal_deleted_documents_v1',
   NOTIFICATIONS: 'fet_portal_notifications_v1',
 };
 
+
+const getDeletedDocIdentifiers = (): Set<string> => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.DELETED_DOCUMENTS);
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) {
+        return new Set(arr.map((s: string) => String(s).trim().toLowerCase()));
+      }
+    }
+  } catch {}
+  return new Set();
+};
 
 const PortalContext = createContext<PortalContextType | undefined>(undefined);
 
@@ -1137,7 +1151,14 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           : [];
 
         const existingDbRefs = new Set(mappedDocs.map((d) => (d.referenceCode || '').toLowerCase()));
+        const deletedSet = getDeletedDocIdentifiers();
+
         for (const sDoc of signedCandidateDocs) {
+          const sRef = (sDoc.referenceCode || '').toLowerCase();
+          const sId = (sDoc.id || '').toLowerCase();
+          if (deletedSet.has(sRef) || deletedSet.has(sId)) {
+            continue; // Do not re-insert deleted agreements into database
+          }
           if (sDoc.referenceCode && !existingDbRefs.has(sDoc.referenceCode.toLowerCase())) {
             supabase.from('documents').insert({
               id: isUuid(sDoc.id) ? sDoc.id : crypto.randomUUID(),
@@ -1154,7 +1175,15 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         }
 
         setDocuments((prev) => {
-          const cleaned = dedupeDocumentsList([...signedCandidateDocs, ...mappedDocs, ...prev]);
+          const filteredSigned = signedCandidateDocs.filter(
+            (d) => !deletedSet.has((d.referenceCode || '').toLowerCase()) && !deletedSet.has((d.id || '').toLowerCase())
+          );
+          const filteredMapped = mappedDocs.filter(
+            (d) => !deletedSet.has((d.referenceCode || '').toLowerCase()) && !deletedSet.has((d.id || '').toLowerCase())
+          );
+          const cleaned = dedupeDocumentsList([...filteredSigned, ...filteredMapped, ...prev]).filter(
+            (d) => !deletedSet.has((d.referenceCode || '').toLowerCase()) && !deletedSet.has((d.id || '').toLowerCase())
+          );
           try {
             localStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify(cleaned));
           } catch {}
@@ -3780,23 +3809,52 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const deleteDocument = async (documentId: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      const targetDoc = documents.find((d) => d.id === documentId);
+      const targetDoc = documents.find((d) => d.id === documentId || d.referenceCode === documentId);
+      const matchedApp = applications.find(
+        (a) => a.id === documentId || a.referenceCode === documentId || (targetDoc?.referenceCode && a.referenceCode === targetDoc.referenceCode)
+      );
+
+      const refCode = targetDoc?.referenceCode || matchedApp?.referenceCode || (documentId.startsWith('FET-APP-') ? documentId : undefined);
+      const docUuid = (isUuid(documentId) ? documentId : undefined) || (targetDoc?.id && isUuid(targetDoc.id) ? targetDoc.id : undefined);
+
+      // 1. Record in persistent deleted identifiers set
+      const deletedSet = getDeletedDocIdentifiers();
+      if (documentId) deletedSet.add(documentId.toLowerCase());
+      if (docUuid) deletedSet.add(docUuid.toLowerCase());
+      if (refCode) deletedSet.add(refCode.toLowerCase());
+      if (targetDoc?.title) deletedSet.add(targetDoc.title.toLowerCase());
+      localStorage.setItem(STORAGE_KEYS.DELETED_DOCUMENTS, JSON.stringify(Array.from(deletedSet)));
+
+      // 2. Remove from local memory documents state
       setDocuments((prev) => {
-        const updated = prev.filter((d) => d.id !== documentId);
+        const updated = prev.filter(
+          (d) =>
+            d.id !== documentId &&
+            d.id !== docUuid &&
+            (!refCode || (d.referenceCode || '').toLowerCase() !== refCode.toLowerCase())
+        );
         localStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify(updated));
         return updated;
       });
+
+      // 3. Delete from Supabase Database if live
       if (isSupabaseLive) {
-        if (isUuid(documentId)) {
-          supabase.from('documents').delete().eq('id', documentId).then(({ error }) => {
-            if (error) console.warn('Supabase deleteDocument notice:', error.message);
-          });
-        }
-        if (targetDoc?.referenceCode) {
-          supabase.from('documents').delete().eq('reference_code', targetDoc.referenceCode).then(() => {});
+        try {
+          if (docUuid) {
+            await supabase.from('documents').delete().eq('id', docUuid);
+          }
+          if (refCode) {
+            await supabase.from('documents').delete().eq('reference_code', refCode);
+          }
+          if (targetDoc?.title) {
+            await supabase.from('documents').delete().eq('title', targetDoc.title);
+          }
+        } catch (dbErr: any) {
+          console.warn('Supabase deleteDocument notice:', dbErr?.message);
         }
       }
-      await addAuditLog('DOCUMENT_DELETED', 'Documents', `Deleted document ${documentId}`);
+
+      await addAuditLog('DOCUMENT_DELETED', 'Documents', `Deleted document ${targetDoc?.title || documentId}`);
       toast.success('Document removed from vault.');
       return { success: true };
     } catch (err: any) {
