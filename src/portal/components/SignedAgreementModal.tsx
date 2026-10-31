@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -54,13 +54,6 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
       commissionPerConversion: role === 'Telecaller' ? 150 : undefined,
     });
 
-  // Clean raw ASCII banners if present so letterhead is not duplicated
-  let cleanAgreementContent = rawAgreementContent.trim();
-  if (cleanAgreementContent.includes('================================================================================')) {
-    const parts = cleanAgreementContent.split('================================================================================');
-    cleanAgreementContent = parts[parts.length - 1].trim();
-  }
-
   const signDateFormatted = application.agreementSignedAt
     ? new Date(application.agreementSignedAt).toLocaleDateString('en-IN', {
         day: 'numeric',
@@ -81,7 +74,395 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
       })
     : '';
 
-  // Isolated multi-page printing engine via hidden iframe
+  // Parser: converts raw contract text into executive-grade structured HTML
+  const formatAgreementHtml = (rawText: string): string => {
+    let text = rawText.trim();
+    if (text.includes('================================================================================')) {
+      const parts = text.split('================================================================================');
+      text = parts[parts.length - 1].trim();
+    }
+
+    const lines = text.split('\n');
+    const htmlParts: string[] = [];
+    let inList = false;
+    let inKvTable = false;
+    let kvRows: { label: string; val: string }[] = [];
+
+    const flushKvTable = () => {
+      if (kvRows.length > 0) {
+        htmlParts.push('<table class="contract-spec-table"><tbody>');
+        for (const item of kvRows) {
+          htmlParts.push(
+            `<tr><td class="spec-label">${item.label}</td><td class="spec-value">${item.val}</td></tr>`
+          );
+        }
+        htmlParts.push('</tbody></table>');
+        kvRows = [];
+      }
+      inKvTable = false;
+    };
+
+    const flushList = () => {
+      if (inList) {
+        htmlParts.push('</ul>');
+        inList = false;
+      }
+    };
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+
+      if (!line) {
+        flushList();
+        flushKvTable();
+        continue;
+      }
+
+      // Clause header e.g. "1. COMPANY DETAILS", "4. ROLES AND RESPONSIBILITIES"
+      if (/^\d+\.\s+[A-Z\s,–&-]+$/.test(line)) {
+        flushList();
+        flushKvTable();
+        htmlParts.push(`<div class="clause-header">${line}</div>`);
+        continue;
+      }
+
+      // Sub-clause e.g. "A. Software Developer" or "B. Telecaller — ₹150..."
+      if (/^[A-Z]\.\s+.+$/.test(line) && !line.includes(':')) {
+        flushList();
+        flushKvTable();
+        htmlParts.push(`<div class="sub-clause-header">${line}</div>`);
+        continue;
+      }
+
+      // Key-Value rows in Company / Freelancer details e.g. "Company Name: Fusion Engine Technology"
+      if (
+        /^[A-Za-z\s]+:\s+.+$/.test(line) &&
+        !line.startsWith('http') &&
+        !line.toLowerCase().includes('agree to:') &&
+        !line.toLowerCase().includes('agrees to:') &&
+        !line.toLowerCase().includes('including:')
+      ) {
+        flushList();
+        inKvTable = true;
+        const colonIdx = line.indexOf(':');
+        const label = line.slice(0, colonIdx).trim();
+        const val = line.slice(colonIdx + 1).trim();
+        kvRows.push({ label, val });
+        continue;
+      } else {
+        flushKvTable();
+      }
+
+      // Bullet lists e.g. "• Develop, test..."
+      if (line.startsWith('•') || line.startsWith('*')) {
+        if (!inList) {
+          htmlParts.push('<ul class="clause-bullets">');
+          inList = true;
+        }
+        const bulletText = line.replace(/^[•*]\s*/, '');
+        htmlParts.push(`<li>${bulletText}</li>`);
+        continue;
+      }
+
+      flushList();
+
+      // Standard body paragraph
+      htmlParts.push(`<p class="clause-text">${line}</p>`);
+    }
+
+    flushList();
+    flushKvTable();
+
+    return htmlParts.join('\n');
+  };
+
+  const parsedHtml = formatAgreementHtml(rawAgreementContent);
+
+  // Common CSS for both iframe print engine and HTML download export
+  const documentPrintStyles = `
+    @page {
+      size: A4 portrait;
+      margin: 14mm 16mm 14mm 16mm;
+    }
+    @media print {
+      body {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Times New Roman', Times, Georgia, serif;
+      font-size: 10.5pt;
+      line-height: 1.55;
+      color: #0f172a;
+      background: #ffffff;
+      padding: 2mm 4mm;
+      margin: 0;
+    }
+    .letterhead {
+      text-align: center;
+      border-bottom: 2.5px solid #0f172a;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+    }
+    .letterhead h1 {
+      font-size: 18pt;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #0f172a;
+      margin: 0 0 3px 0;
+    }
+    .letterhead .subtitle {
+      font-size: 11.5pt;
+      font-weight: bold;
+      color: #0369a1;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin: 0 0 3px 0;
+    }
+    .letterhead .meta {
+      font-size: 8.5pt;
+      color: #475569;
+      margin-bottom: 3px;
+      font-family: Arial, sans-serif;
+    }
+    .letterhead .statute {
+      font-size: 8pt;
+      font-style: italic;
+      color: #64748b;
+    }
+
+    .stamp-box {
+      border: 2px solid #047857;
+      background: #f0fdf4 !important;
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .stamp-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1.5px solid #059669;
+      padding-bottom: 5px;
+      margin-bottom: 7px;
+      font-family: Arial, sans-serif;
+    }
+    .stamp-top .candidate-name {
+      font-size: 11pt;
+      font-weight: bold;
+      color: #064e3b;
+    }
+    .stamp-top .cert-badge {
+      font-size: 8.5pt;
+      font-weight: bold;
+      color: #047857;
+      border: 1px solid #047857;
+      padding: 2px 7px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stamp-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px 12px;
+      font-family: Arial, sans-serif;
+      font-size: 8pt;
+      color: #1e293b;
+    }
+    .stamp-grid strong {
+      color: #0f172a;
+    }
+
+    .clause-header {
+      font-size: 11pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #0f172a;
+      margin-top: 14px;
+      margin-bottom: 6px;
+      border-bottom: 1.5px solid #0f172a;
+      padding-bottom: 2px;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+    .sub-clause-header {
+      font-size: 10pt;
+      font-weight: bold;
+      color: #1e293b;
+      margin-top: 8px;
+      margin-bottom: 4px;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+    .clause-text {
+      font-size: 10pt;
+      line-height: 1.58;
+      text-align: justify;
+      text-justify: inter-word;
+      margin-bottom: 7px;
+      color: #0f172a;
+    }
+
+    /* Structured Key-Value Table for Company & Freelancer details */
+    .contract-spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 6px 0 12px 0;
+      font-size: 9.5pt;
+      font-family: Arial, sans-serif;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .contract-spec-table td {
+      border: 1px solid #94a3b8;
+      padding: 5px 10px;
+      vertical-align: middle;
+    }
+    .contract-spec-table .spec-label {
+      width: 30%;
+      font-weight: bold;
+      color: #334155;
+      background: #f8fafc;
+    }
+    .contract-spec-table .spec-value {
+      width: 70%;
+      color: #0f172a;
+    }
+
+    .clause-bullets {
+      margin: 4px 0 8px 24px;
+      padding-left: 6px;
+      list-style-type: disc;
+    }
+    .clause-bullets li {
+      font-size: 9.8pt;
+      line-height: 1.52;
+      margin-bottom: 3.5px;
+      text-align: justify;
+      text-justify: inter-word;
+      color: #0f172a;
+    }
+
+    .signatures-container {
+      margin-top: 22px;
+      padding-top: 14px;
+      border-top: 2.5px solid #0f172a;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    .signatures-title {
+      font-family: Arial, sans-serif;
+      font-size: 10pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #0f172a;
+      margin-bottom: 2px;
+    }
+    .signatures-subtitle {
+      font-size: 8pt;
+      font-style: italic;
+      color: #475569;
+      margin-bottom: 12px;
+    }
+    .signatures-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .sig-card {
+      border: 1.5px solid #0f172a;
+      background: #f8fafc;
+      padding: 10px 14px;
+      border-radius: 6px;
+    }
+    .sig-card.verified {
+      border: 2px solid #047857;
+      background: #f0fdf4 !important;
+    }
+    .sig-header {
+      font-family: Arial, sans-serif;
+      font-size: 8pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #475569;
+      margin-bottom: 3px;
+    }
+    .sig-card.verified .sig-header {
+      color: #047857;
+    }
+    .sig-company-name {
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      font-size: 10pt;
+      color: #0f172a;
+    }
+    .sig-line-box {
+      margin: 6px 0;
+    }
+    .sig-handwritten {
+      font-family: 'Georgia', cursive, serif;
+      font-style: italic;
+      font-size: 14pt;
+      font-weight: bold;
+      line-height: 1.2;
+    }
+    .sig-rule {
+      border-bottom: 1px solid #0f172a;
+      margin-top: 2px;
+    }
+    .sig-details {
+      font-family: Arial, sans-serif;
+      font-size: 8pt;
+      color: #334155;
+      line-height: 1.45;
+    }
+    .sig-seal-badge {
+      display: inline-block;
+      margin-top: 6px;
+      border: 1px solid #0f172a;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 7pt;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      color: #0f172a;
+    }
+    .sig-statute-badge {
+      display: inline-block;
+      margin-top: 6px;
+      border: 1px solid #047857;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 7pt;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      color: #047857;
+    }
+    .footer-note {
+      margin-top: 14px;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      font-size: 7.5pt;
+      color: #94a3b8;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+  `;
+
+  // Multi-page isolated A4 printing engine via hidden iframe
   const handlePrint = () => {
     const printFrame = document.createElement('iframe');
     printFrame.style.position = 'fixed';
@@ -105,222 +486,73 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
       <head>
         <meta charset="utf-8" />
         <title>Freelancer Service Agreement - ${application.fullName} (${application.referenceCode})</title>
-        <style>
-          @page {
-            size: A4 portrait;
-            margin: 18mm 16mm 18mm 16mm;
-          }
-          @media print {
-            body {
-              -webkit-print-color-adjust: exact !important;
-              print-color-adjust: exact !important;
-            }
-          }
-          * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-          }
-          body {
-            font-family: 'Times New Roman', Times, Georgia, serif;
-            font-size: 11.5pt;
-            line-height: 1.6;
-            color: #111;
-            background: #fff;
-            padding: 0;
-          }
-          .letterhead {
-            text-align: center;
-            border-bottom: 2px solid #111;
-            padding-bottom: 14px;
-            margin-bottom: 16px;
-          }
-          .letterhead h1 {
-            font-size: 19pt;
-            font-weight: bold;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: #0f172a;
-            margin-bottom: 3px;
-          }
-          .letterhead .subtitle {
-            font-size: 12pt;
-            font-weight: bold;
-            color: #0284c7;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 4px;
-          }
-          .letterhead .meta {
-            font-size: 9pt;
-            color: #475569;
-            margin-bottom: 4px;
-          }
-          .letterhead .statute {
-            font-size: 9pt;
-            font-style: italic;
-            color: #64748b;
-          }
-          .stamp-box {
-            border: 1.5px solid #059669;
-            background: #f0fdf4 !important;
-            border-radius: 6px;
-            padding: 10px 14px;
-            margin-bottom: 18px;
-            page-break-inside: avoid;
-            break-inside: avoid;
-          }
-          .stamp-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #bbf7d0;
-            padding-bottom: 6px;
-            margin-bottom: 8px;
-            font-family: Arial, sans-serif;
-          }
-          .stamp-top .candidate-name {
-            font-size: 11pt;
-            font-weight: bold;
-            color: #064e3b;
-          }
-          .stamp-top .cert-badge {
-            font-size: 8.5pt;
-            font-weight: bold;
-            color: #047857;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-          }
-          .stamp-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-            font-family: Arial, sans-serif;
-            font-size: 8.5pt;
-            color: #334155;
-          }
-          .stamp-grid strong {
-            color: #0f172a;
-          }
-          .legal-content {
-            font-size: 11pt;
-            line-height: 1.65;
-            text-align: justify;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            margin-bottom: 24px;
-          }
-          .signatures-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 24px;
-            padding-top: 16px;
-            border-top: 2px solid #111;
-            page-break-inside: avoid;
-            break-inside: avoid;
-          }
-          .sig-card {
-            border: 1px solid #cbd5e1;
-            background: #f8fafc;
-            padding: 12px 14px;
-            border-radius: 6px;
-          }
-          .sig-card.verified {
-            border-color: #10b981;
-            background: #f0fdf4 !important;
-          }
-          .sig-label {
-            font-family: Arial, sans-serif;
-            font-size: 8pt;
-            font-weight: bold;
-            text-transform: uppercase;
-            color: #64748b;
-            margin-bottom: 4px;
-          }
-          .sig-card.verified .sig-label {
-            color: #047857;
-          }
-          .sig-company-name {
-            font-weight: bold;
-            font-size: 11pt;
-            color: #0f172a;
-          }
-          .sig-handwritten {
-            font-family: 'Georgia', cursive, serif;
-            font-style: italic;
-            font-size: 14pt;
-            font-weight: bold;
-            color: #047857;
-            margin: 6px 0;
-          }
-          .sig-meta {
-            font-family: Arial, sans-serif;
-            font-size: 8pt;
-            color: #64748b;
-            line-height: 1.4;
-          }
-          .footer-note {
-            margin-top: 20px;
-            text-align: center;
-            font-family: Arial, sans-serif;
-            font-size: 8pt;
-            color: #94a3b8;
-            page-break-inside: avoid;
-            break-inside: avoid;
-          }
-        </style>
+        <style>${documentPrintStyles}</style>
       </head>
       <body>
         <div class="letterhead">
           <h1>FUSION ENGINE TECHNOLOGY</h1>
-          <div class="subtitle">Freelancer Onboarding & Service Agreement</div>
-          <div class="meta">Innovate • Integrate • Accelerate | https://fusionengine.in | fusionenginetechnology@gmail.com</div>
-          <div class="statute">Statutory Electronic Execution under Section 10A of the Indian Information Technology Act, 2000 & Indian Contract Act, 1872</div>
+          <div class="subtitle">Freelancer Onboarding &amp; Service Agreement</div>
+          <div class="meta">Innovate • Integrate • Accelerate &nbsp;|&nbsp; https://fusionengine.in &nbsp;|&nbsp; fusionenginetechnology@gmail.com</div>
+          <div class="statute">Statutory Electronic Execution under Section 10A of the Indian Information Technology Act, 2000 &amp; Indian Contract Act, 1872</div>
         </div>
 
         <div class="stamp-box">
           <div class="stamp-top">
             <div class="candidate-name">${application.fullName} (${application.referenceCode})</div>
-            <div class="cert-badge">✓ Certified Digital Execution</div>
+            <div class="cert-badge">&#10003; Certified Digital Execution</div>
           </div>
           <div class="stamp-grid">
             <div>Role: <strong>${application.roleTitle}</strong></div>
             <div>Department: <strong>${application.department === 'sales' ? 'Inside Sales & CRM' : 'Engineering'}</strong></div>
             <div>Signed Date: <strong>${signDateFormatted} ${signTimeFormatted}</strong></div>
             <div>Legal Signature: <strong>${application.agreementSignature || application.fullName}</strong></div>
-            <div>Affirmation: <strong>"${application.agreementAffirmationWord || 'I AGREE AND ACCEPT'}"</strong></div>
+            <div>Affirmation: <strong>&ldquo;${application.agreementAffirmationWord || 'I AGREE AND ACCEPT'}&rdquo;</strong></div>
             <div>Signer IP: <strong>${application.agreementSignerIp || 'Verified Web Session'}</strong></div>
           </div>
         </div>
 
-        <div class="legal-content">${cleanAgreementContent}</div>
+        <div class="legal-content">
+          ${parsedHtml}
+        </div>
 
-        <div class="signatures-grid">
-          <div class="sig-card">
-            <div class="sig-label">For Company:</div>
-            <div class="sig-company-name">Fusion Engine Technology</div>
-            <div class="sig-handwritten" style="color: #0f172a;">Prakash Ramakrishnan</div>
-            <div class="sig-meta">
-              Founder & Super Admin<br />
-              Executive Leadership Signatory
+        <div class="signatures-container">
+          <div class="signatures-title">Execution and Digital Attestation</div>
+          <div class="signatures-subtitle">IN WITNESS WHEREOF, the Parties have executed this Freelancer Onboarding &amp; Service Agreement electronically as of the Effective Date.</div>
+          <div class="signatures-grid">
+            <div class="sig-card">
+              <div class="sig-header">For Company:</div>
+              <div class="sig-company-name">Fusion Engine Technology</div>
+              <div class="sig-line-box">
+                <div class="sig-handwritten" style="color: #0f172a;">Prakash Ramakrishnan</div>
+                <div class="sig-rule"></div>
+              </div>
+              <div class="sig-details">
+                <div><strong>Prakash Ramakrishnan</strong></div>
+                <div>Founder &amp; Super Admin</div>
+                <div>Executive Leadership Signatory</div>
+                <div class="sig-seal-badge">OFFICIAL CORPORATE SEAL • VERIFIED</div>
+              </div>
             </div>
-          </div>
 
-          <div class="sig-card verified">
-            <div class="sig-label">Digitally Accepted by Freelancer:</div>
-            <div class="sig-company-name">${application.fullName}</div>
-            <div class="sig-handwritten">${application.agreementSignature || application.fullName}</div>
-            <div class="sig-meta">
-              Certified on: ${signDateFormatted} ${signTimeFormatted}<br />
-              Signer IP: ${application.agreementSignerIp || 'Verified Web Session'}<br />
-              Status: Formally Executed & Legally Enforceable
+            <div class="sig-card verified">
+              <div class="sig-header">Digitally Accepted by Freelancer:</div>
+              <div class="sig-company-name">${application.fullName}</div>
+              <div class="sig-line-box">
+                <div class="sig-handwritten" style="color: #047857;">${application.agreementSignature || application.fullName}</div>
+                <div class="sig-rule" style="border-color: #047857;"></div>
+              </div>
+              <div class="sig-details">
+                <div>Legal Signature: <strong>${application.agreementSignature || application.fullName}</strong></div>
+                <div>Certified on: <strong>${signDateFormatted} ${signTimeFormatted}</strong></div>
+                <div>Signer IP: <strong>${application.agreementSignerIp || 'Verified Web Session'}</strong></div>
+                <div class="sig-statute-badge">&#10003; SEC 10A IT ACT 2000 • ENFORCEABLE</div>
+              </div>
             </div>
           </div>
         </div>
 
         <div class="footer-note">
-          Reference: ${application.referenceCode} • Permanent Record Stored in Fusion Engine Technology Document Vault (/portal/documents)
+          Reference: ${application.referenceCode} • Permanent Statutory Record Stored in Fusion Engine Technology Document Vault (/portal/documents)
         </div>
       </body>
       </html>
@@ -338,50 +570,97 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
     }, 300);
   };
 
+  // Intercept Ctrl+P / Cmd+P while modal is open so the user gets clean multi-page A4 print
+  useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        handlePrint();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [open, application]);
+
   const handleDownloadHtml = () => {
     const htmlBlob = new Blob(
       [
         `<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Freelancer Service Agreement - ${application.fullName}</title>
+  <title>Freelancer Service Agreement - ${application.fullName} (${application.referenceCode})</title>
   <style>
-    body { font-family: "Times New Roman", Times, Georgia, serif; padding: 40px; max-width: 800px; margin: auto; line-height: 1.6; color: #111; }
-    h1 { text-align: center; font-size: 24px; text-transform: uppercase; margin-bottom: 5px; }
-    h2 { text-align: center; font-size: 16px; color: #0284c7; text-transform: uppercase; margin-bottom: 10px; }
-    .meta { text-align: center; font-size: 12px; color: #555; margin-bottom: 25px; border-bottom: 2px solid #222; padding-bottom: 15px; }
-    .cert { border: 1.5px solid #059669; background: #f0fdf4; padding: 12px 16px; border-radius: 6px; margin-bottom: 25px; font-family: Arial, sans-serif; font-size: 13px; }
-    .content { white-space: pre-wrap; line-height: 1.65; text-align: justify; margin-bottom: 30px; }
-    .signatures { display: flex; justify-content: space-between; border-top: 2px solid #222; padding-top: 20px; font-family: Arial, sans-serif; font-size: 13px; }
-    .sig-box { width: 45%; border: 1px solid #ccc; padding: 12px; border-radius: 6px; }
-    .handwriting { font-family: Georgia, serif; font-style: italic; font-weight: bold; font-size: 18px; color: #047857; margin: 6px 0; }
+    ${documentPrintStyles}
+    body { padding: 40px; max-width: 840px; margin: auto; }
   </style>
 </head>
 <body>
-  <h1>FUSION ENGINE TECHNOLOGY</h1>
-  <h2>Freelancer Onboarding & Service Agreement</h2>
-  <div class="meta">Innovate • Integrate • Accelerate | https://fusionengine.in | fusionenginetechnology@gmail.com<br>Statutory Electronic Execution under Section 10A of the Indian Information Technology Act, 2000</div>
-  <div class="cert">
-    <strong>Certified Digital Signature Record</strong><br>
-    Candidate: ${application.fullName} (${application.referenceCode})<br>
-    Role: ${application.roleTitle} | Signed: ${signDateFormatted} ${signTimeFormatted}<br>
-    Legal Signature: "${application.agreementSignature || application.fullName}" | Signer IP: ${application.agreementSignerIp || 'Verified Web Session'}
+  <div class="letterhead">
+    <h1>FUSION ENGINE TECHNOLOGY</h1>
+    <div class="subtitle">Freelancer Onboarding &amp; Service Agreement</div>
+    <div class="meta">Innovate • Integrate • Accelerate &nbsp;|&nbsp; https://fusionengine.in &nbsp;|&nbsp; fusionenginetechnology@gmail.com</div>
+    <div class="statute">Statutory Electronic Execution under Section 10A of the Indian Information Technology Act, 2000 &amp; Indian Contract Act, 1872</div>
   </div>
-  <div class="content">${cleanAgreementContent}</div>
-  <div class="signatures">
-    <div class="sig-box">
-      <strong>For Company:</strong><br>
-      Fusion Engine Technology<br>
-      <div class="handwriting" style="color: #111;">Prakash Ramakrishnan</div>
-      Founder & Super Admin
+
+  <div class="stamp-box">
+    <div class="stamp-top">
+      <div class="candidate-name">${application.fullName} (${application.referenceCode})</div>
+      <div class="cert-badge">&#10003; Certified Digital Execution</div>
     </div>
-    <div class="sig-box" style="border-color: #059669; background: #f0fdf4;">
-      <strong style="color: #047857;">Digitally Accepted by Freelancer:</strong><br>
-      ${application.fullName}<br>
-      <div class="handwriting">${application.agreementSignature || application.fullName}</div>
-      Signed: ${signDateFormatted} ${signTimeFormatted}
+    <div class="stamp-grid">
+      <div>Role: <strong>${application.roleTitle}</strong></div>
+      <div>Department: <strong>${application.department === 'sales' ? 'Inside Sales & CRM' : 'Engineering'}</strong></div>
+      <div>Signed Date: <strong>${signDateFormatted} ${signTimeFormatted}</strong></div>
+      <div>Legal Signature: <strong>${application.agreementSignature || application.fullName}</strong></div>
+      <div>Affirmation: <strong>&ldquo;${application.agreementAffirmationWord || 'I AGREE AND ACCEPT'}&rdquo;</strong></div>
+      <div>Signer IP: <strong>${application.agreementSignerIp || 'Verified Web Session'}</strong></div>
     </div>
+  </div>
+
+  <div class="legal-content">
+    ${parsedHtml}
+  </div>
+
+  <div class="signatures-container">
+    <div class="signatures-title">Execution and Digital Attestation</div>
+    <div class="signatures-subtitle">IN WITNESS WHEREOF, the Parties have executed this Freelancer Onboarding &amp; Service Agreement electronically as of the Effective Date.</div>
+    <div class="signatures-grid">
+      <div class="sig-card">
+        <div class="sig-header">For Company:</div>
+        <div class="sig-company-name">Fusion Engine Technology</div>
+        <div class="sig-line-box">
+          <div class="sig-handwritten" style="color: #0f172a;">Prakash Ramakrishnan</div>
+          <div class="sig-rule"></div>
+        </div>
+        <div class="sig-details">
+          <div><strong>Prakash Ramakrishnan</strong></div>
+          <div>Founder &amp; Super Admin</div>
+          <div>Executive Leadership Signatory</div>
+          <div class="sig-seal-badge">OFFICIAL CORPORATE SEAL • VERIFIED</div>
+        </div>
+      </div>
+
+      <div class="sig-card verified">
+        <div class="sig-header">Digitally Accepted by Freelancer:</div>
+        <div class="sig-company-name">${application.fullName}</div>
+        <div class="sig-line-box">
+          <div class="sig-handwritten" style="color: #047857;">${application.agreementSignature || application.fullName}</div>
+          <div class="sig-rule" style="border-color: #047857;"></div>
+        </div>
+        <div class="sig-details">
+          <div>Legal Signature: <strong>${application.agreementSignature || application.fullName}</strong></div>
+          <div>Certified on: <strong>${signDateFormatted} ${signTimeFormatted}</strong></div>
+          <div>Signer IP: <strong>${application.agreementSignerIp || 'Verified Web Session'}</strong></div>
+          <div class="sig-statute-badge">&#10003; SEC 10A IT ACT 2000 • ENFORCEABLE</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Reference: ${application.referenceCode} • Permanent Statutory Record Stored in Fusion Engine Technology Document Vault (/portal/documents)
   </div>
 </body>
 </html>`
@@ -412,7 +691,7 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
                 <DialogTitle className="text-base sm:text-lg font-bold flex items-center gap-2">
                   <span>Certified Freelancer Service Agreement</span>
                   <Badge className="bg-emerald-600 text-white text-[10px] gap-1">
-                    <CheckCircle2 className="w-3 h-3" /> Signed & Enforceable
+                    <CheckCircle2 className="w-3 h-3" /> Signed &amp; Enforceable
                   </Badge>
                 </DialogTitle>
                 <DialogDescription className="text-xs text-muted-foreground mt-0.5">
@@ -484,49 +763,130 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
           </div>
         </div>
 
-        {/* Agreement Legal Text Viewer in Times New Roman */}
+        {/* Agreement Legal Text Viewer with matching typography and structured tables */}
         <div
           ref={printRef}
           style={{ fontFamily: '"Times New Roman", Times, Georgia, serif' }}
-          className="p-6 sm:p-10 rounded-xl border border-border/60 bg-card text-foreground text-[15px] sm:text-base leading-relaxed select-text shadow-inner overflow-y-auto max-h-[500px] whitespace-pre-wrap space-y-4"
+          className="agreement-preview-scroll p-6 sm:p-10 rounded-xl border border-border/60 bg-white text-slate-900 select-text shadow-inner overflow-y-auto max-h-[500px] space-y-4 leading-relaxed"
         >
+          {/* Inject matching styles for in-dialog preview */}
+          <style>{`
+            .agreement-preview-scroll .clause-header {
+              font-size: 11pt;
+              font-weight: bold;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              color: #0f172a;
+              margin-top: 16px;
+              margin-bottom: 6px;
+              border-bottom: 1.5px solid #0f172a;
+              padding-bottom: 2px;
+            }
+            .agreement-preview-scroll .sub-clause-header {
+              font-size: 10pt;
+              font-weight: bold;
+              color: #1e293b;
+              margin-top: 8px;
+              margin-bottom: 4px;
+            }
+            .agreement-preview-scroll .clause-text {
+              font-size: 10pt;
+              line-height: 1.6;
+              text-align: justify;
+              text-justify: inter-word;
+              margin-bottom: 8px;
+              color: #0f172a;
+            }
+            .agreement-preview-scroll .contract-spec-table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 8px 0 14px 0;
+              font-size: 9.5pt;
+              font-family: Arial, sans-serif;
+            }
+            .agreement-preview-scroll .contract-spec-table td {
+              border: 1px solid #cbd5e1;
+              padding: 6px 10px;
+              vertical-align: middle;
+            }
+            .agreement-preview-scroll .contract-spec-table .spec-label {
+              width: 30%;
+              font-weight: bold;
+              color: #334155;
+              background: #f8fafc;
+            }
+            .agreement-preview-scroll .contract-spec-table .spec-value {
+              width: 70%;
+              color: #0f172a;
+            }
+            .agreement-preview-scroll .clause-bullets {
+              margin: 6px 0 10px 24px;
+              padding-left: 6px;
+              list-style-type: disc;
+            }
+            .agreement-preview-scroll .clause-bullets li {
+              font-size: 9.8pt;
+              line-height: 1.55;
+              margin-bottom: 4px;
+              text-align: justify;
+              color: #0f172a;
+            }
+          `}</style>
+
           {/* Formal Letterhead */}
-          <div className="text-center pb-6 border-b-2 border-border/60 space-y-1">
-            <h2 className="text-xl sm:text-2xl font-bold tracking-wider uppercase text-foreground">
+          <div className="text-center pb-6 border-b-2 border-slate-900 space-y-1">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-wider uppercase text-slate-900">
               FUSION ENGINE TECHNOLOGY
             </h2>
-            <p className="text-sm font-bold text-primary uppercase tracking-widest mt-0.5">
-              Freelancer Onboarding & Service Agreement
+            <p className="text-sm font-bold text-sky-700 uppercase tracking-widest mt-0.5">
+              Freelancer Onboarding &amp; Service Agreement
             </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Innovate • Integrate • Accelerate | https://fusionengine.in | fusionenginetechnology@gmail.com
+            <p className="text-xs text-slate-600 mt-1 font-sans">
+              Innovate • Integrate • Accelerate &nbsp;|&nbsp; https://fusionengine.in &nbsp;|&nbsp; fusionenginetechnology@gmail.com
             </p>
-            <p className="text-xs italic text-muted-foreground pt-1">
-              Statutory Electronic Execution under Section 10A Indian Information Technology Act, 2000 & Indian Contract Act, 1872
+            <p className="text-xs italic text-slate-500 pt-1">
+              Statutory Electronic Execution under Section 10A Indian Information Technology Act, 2000 &amp; Indian Contract Act, 1872
             </p>
           </div>
 
-          {/* Legal Text */}
-          <div className="text-left leading-relaxed text-foreground/95">
-            {cleanAgreementContent}
-          </div>
+          {/* Structured Legal Content */}
+          <div
+            className="text-left leading-relaxed text-slate-900"
+            dangerouslySetInnerHTML={{ __html: parsedHtml }}
+          />
 
           {/* Electronic Countersignature Certificate Stamp */}
-          <div className="mt-8 pt-6 border-t-2 border-border/60 grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs">
-            <div className="p-4 rounded-lg border border-border bg-muted/20 space-y-1.5">
-              <span className="text-muted-foreground font-sans font-semibold uppercase text-[10px]">For Company:</span>
-              <p className="font-bold text-sm">Fusion Engine Technology</p>
-              <p className="font-serif italic font-bold text-sm">Prakash Ramakrishnan</p>
-              <p className="text-[11px] text-muted-foreground font-sans">Authorized Executive Signatory</p>
+          <div className="mt-8 pt-6 border-t-2 border-slate-900 grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs font-sans">
+            <div className="p-4 rounded-lg border-2 border-slate-900 bg-slate-50 space-y-1.5">
+              <span className="text-slate-600 font-bold uppercase text-[10px]">For Company:</span>
+              <p className="font-bold text-sm text-slate-900">Fusion Engine Technology</p>
+              <div className="border-b border-slate-900 pb-1 my-1">
+                <p className="font-serif italic font-bold text-base text-slate-900">Prakash Ramakrishnan</p>
+              </div>
+              <div className="text-[11px] text-slate-700 leading-tight">
+                <div><strong>Prakash Ramakrishnan</strong></div>
+                <div>Founder &amp; Super Admin</div>
+                <div>Executive Leadership Signatory</div>
+                <div className="mt-2 inline-block border border-slate-900 px-2 py-0.5 rounded text-[9px] font-bold">
+                  OFFICIAL CORPORATE SEAL • VERIFIED
+                </div>
+              </div>
             </div>
 
-            <div className="p-4 rounded-lg border border-emerald-500/30 bg-emerald-500/5 space-y-1.5">
-              <span className="text-emerald-600 dark:text-emerald-400 font-sans font-semibold uppercase text-[10px]">Digitally Accepted By Freelancer:</span>
-              <p className="font-bold text-sm">{application.fullName}</p>
-              <p className="font-serif italic font-bold text-emerald-600 text-sm">{application.agreementSignature || application.fullName}</p>
-              <p className="text-[10px] text-muted-foreground font-mono">
-                Date: {signDateFormatted} {signTimeFormatted}
-              </p>
+            <div className="p-4 rounded-lg border-2 border-emerald-700 bg-emerald-50/50 space-y-1.5">
+              <span className="text-emerald-700 font-bold uppercase text-[10px]">Digitally Accepted By Freelancer:</span>
+              <p className="font-bold text-sm text-slate-900">{application.fullName}</p>
+              <div className="border-b border-emerald-700 pb-1 my-1">
+                <p className="font-serif italic font-bold text-emerald-800 text-base">{application.agreementSignature || application.fullName}</p>
+              </div>
+              <div className="text-[11px] text-slate-700 leading-tight space-y-0.5">
+                <div>Legal Signature: <strong>{application.agreementSignature || application.fullName}</strong></div>
+                <div>Certified on: <strong>{signDateFormatted} {signTimeFormatted}</strong></div>
+                <div>Signer IP: <strong>{application.agreementSignerIp || 'Verified Web Session'}</strong></div>
+                <div className="mt-2 inline-block border border-emerald-700 text-emerald-800 px-2 py-0.5 rounded text-[9px] font-bold">
+                  ✓ SEC 10A IT ACT 2000 • ENFORCEABLE
+                </div>
+              </div>
             </div>
           </div>
         </div>

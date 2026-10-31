@@ -3037,11 +3037,13 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setLeads([]);
     setVouchers([]);
     setAuditLogs([]);
+    setDocuments((prev) => prev.filter(isNotDemoDoc));
     setDailyStandups(INITIAL_DAILY_STANDUPS);
     localStorage.removeItem(STORAGE_KEYS.PROJECTS);
     localStorage.removeItem(STORAGE_KEYS.TASKS);
     localStorage.removeItem(STORAGE_KEYS.LEADS);
     localStorage.removeItem(STORAGE_KEYS.VOUCHERS);
+    localStorage.removeItem(STORAGE_KEYS.DOCUMENTS);
     localStorage.removeItem(STORAGE_KEYS.DAILY_STANDUPS);
     localStorage.removeItem(STORAGE_KEYS.LOCAL_DATA);
     toast.success('Dashboard reset to a pristine fresh state! Ready for real client onboarding.');
