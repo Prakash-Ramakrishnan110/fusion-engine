@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { usePortal } from '../context/PortalContext';
 import {
   LayoutDashboard,
@@ -14,8 +14,10 @@ import {
   BookOpen,
   Clock,
   Briefcase,
+  LogOut,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface NavItem {
   name: string;
@@ -233,6 +235,17 @@ export const PortalSidebar: React.FC<PortalSidebarProps> = ({ className, onNavig
   ];
 
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = usePortal();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } finally {
+      onNavigate?.();
+      navigate('/portal/login', { replace: true });
+    }
+  };
 
   // Select sections based on current active role
   const sections =
@@ -347,8 +360,8 @@ export const PortalSidebar: React.FC<PortalSidebarProps> = ({ className, onNavig
       </div>
 
 
-      {/* Footer System Status */}
-      <div className="p-3 border-t border-border/30 bg-muted/10 text-[11px] text-muted-foreground space-y-1">
+      {/* Footer System Status & Sign Out */}
+      <div className="p-3 border-t border-border/30 bg-muted/10 text-[11px] text-muted-foreground space-y-2">
         <div className="flex items-center justify-between text-[10px]">
           <span>Security Protocol</span>
           <span className="font-mono text-emerald-500 font-semibold flex items-center gap-1">
@@ -358,6 +371,16 @@ export const PortalSidebar: React.FC<PortalSidebarProps> = ({ className, onNavig
         <div className="text-[10px] text-muted-foreground truncate">
           Logged in: <span className="font-mono text-foreground font-medium">{user.userId}</span>
         </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={handleLogout}
+          className="w-full text-xs h-7 text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 border-rose-500/20 gap-1.5 cursor-pointer justify-center"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+          <span>Sign Out</span>
+        </Button>
       </div>
     </aside>
   );

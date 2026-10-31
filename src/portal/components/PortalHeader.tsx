@@ -91,9 +91,12 @@ export const PortalHeader: React.FC = () => {
   };
 
   const handleLogout = async () => {
-    await logout();
-    toast.success('Signed out from portal.');
-    navigate('/portal/login', { replace: true });
+    try {
+      await logout();
+      toast.success('Signed out from portal.');
+    } finally {
+      navigate('/portal/login', { replace: true });
+    }
   };
 
   return (
@@ -261,6 +264,7 @@ export const PortalHeader: React.FC = () => {
 
               {/* Sign Out */}
               <DropdownMenuItem
+                onSelect={handleLogout}
                 onClick={handleLogout}
                 className="text-xs flex items-center gap-2 text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 cursor-pointer py-2 font-medium"
               >

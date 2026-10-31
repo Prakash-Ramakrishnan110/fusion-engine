@@ -236,9 +236,10 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
       margin: 14mm 16mm 14mm 16mm;
     }
     @media print {
-      body {
+      *, *::before, *::after {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
+        color-adjust: exact !important;
       }
     }
     * {

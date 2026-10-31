@@ -105,7 +105,7 @@ interface PortalContextType {
   // Authentication & Users
   currentUser: UserPersona | null;
   isAuthenticated: boolean;
-  login: (userIdOrEmail: string, password: string) => Promise<{ success: boolean; error?: string; mustChangePassword?: boolean }>;
+  login: (userIdOrEmail: string, password: string) => Promise<{ success: boolean; error?: string; mustChangePassword?: boolean; redirectPath?: string }>;
   logout: () => Promise<void>;
   changePassword: (newPassword: string) => Promise<{ success: boolean; error?: string }>;
   users: UserPersona[];
@@ -674,25 +674,36 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         .select('*, developer_details(*)');
 
       if (profilesData && profilesData.length > 0) {
-        const mappedUsers: UserPersona[] = profilesData.map((p: any) => ({
-          id: p.id,
-          userId: p.user_id,
-          name: p.full_name,
-          email: `${p.user_id}@portal.internal`,
-          role: p.role,
-          title: p.role === 'admin' ? 'Super Admin / Founder' : p.role === 'developer' ? 'Software Engineer' : 'Inside Sales Executive',
-          avatar: p.avatar_url || defaultAvatar,
-          department: p.department || 'Operations',
-          phone: p.phone || undefined,
-          isActive: p.is_active,
-          mustChangePassword: p.must_change_password,
-          skills: (p as any).developer_details?.[0]?.skills || [],
-          pan: (p as any).developer_details?.[0]?.pan || undefined,
-          bankAccountName: (p as any).developer_details?.[0]?.bank_account_name || undefined,
-          bankAccountNo: (p as any).developer_details?.[0]?.bank_account_no || undefined,
-          ifsc: (p as any).developer_details?.[0]?.ifsc || undefined,
-          upiId: (p as any).developer_details?.[0]?.upi_id || undefined,
-        }));
+        const mappedUsers: UserPersona[] = profilesData.map((p: any) => {
+          const isSuperAdminRecord =
+            p.id === '00000000-0000-0000-0000-000000000001' ||
+            p.role === 'admin' ||
+            p.role === 'super_admin' ||
+            (p.user_id || '').includes('admin');
+          return {
+            id: p.id,
+            userId: isSuperAdminRecord ? 'admin.prakash' : p.user_id,
+            name: isSuperAdminRecord ? 'Prakash Ramakrishnan' : p.full_name,
+            email: isSuperAdminRecord ? 'admin.prakash@fusionengine.in' : `${p.user_id}@portal.internal`,
+            role: isSuperAdminRecord ? 'super_admin' : p.role,
+            title: isSuperAdminRecord
+              ? 'Super Admin / Founder'
+              : p.role === 'developer'
+              ? 'Software Engineer'
+              : 'Inside Sales Executive',
+            avatar: p.avatar_url || defaultAvatar,
+            department: isSuperAdminRecord ? 'Executive Leadership' : (p.department || 'Operations'),
+            phone: p.phone || undefined,
+            isActive: p.is_active,
+            mustChangePassword: p.must_change_password,
+            skills: (p as any).developer_details?.[0]?.skills || [],
+            pan: (p as any).developer_details?.[0]?.pan || undefined,
+            bankAccountName: (p as any).developer_details?.[0]?.bank_account_name || undefined,
+            bankAccountNo: (p as any).developer_details?.[0]?.bank_account_no || undefined,
+            ifsc: (p as any).developer_details?.[0]?.ifsc || undefined,
+            upiId: (p as any).developer_details?.[0]?.upi_id || undefined,
+          };
+        });
 
         setUsers((prev) => {
           const dbIds = new Set(mappedUsers.map((m) => m.id));
@@ -700,9 +711,9 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           return [...mappedUsers, ...localOnly];
         });
 
-        // Update currentUser if matched
+        // Update currentUser only if matched in mappedUsers (prevents clobbering developer session)
         if (currentUser) {
-          const updated = mappedUsers.find(u => u.id === currentUser.id);
+          const updated = mappedUsers.find((u) => u.id === currentUser.id);
           if (updated) setCurrentUser(updated);
         }
       }
@@ -1281,68 +1292,116 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   // AUTHENTICATION METHODS
   // ==========================================
 
-  const login = async (userIdOrEmail: string, password: string) => {
+  const login = async (userIdOrEmail: string, password: string): Promise<{
+    success: boolean;
+    error?: string;
+    mustChangePassword?: boolean;
+    redirectPath?: string;
+  }> => {
     const rawInput = userIdOrEmail.trim();
     const cleanId = extractUserIdFromEmail(rawInput).toLowerCase();
     const email = formatPortalEmail(rawInput);
 
-    // 0. Quick Super Admin local demo bypass (instant login with zero network error)
+    // 1. Super Admin Authentication (admin.prakash@fusionengine.in / Prakash@2004)
     const isAdminIdentifier =
-      cleanId === 'prakash.r' ||
-      cleanId === 'prakash' ||
-      cleanId === 'admin' ||
-      cleanId === 'superadmin' ||
       cleanId === 'admin.prakash' ||
+      cleanId === 'admin' ||
+      cleanId === 'fusion.admin' ||
+      cleanId === 'superadmin' ||
       rawInput.toLowerCase() === 'admin.prakash@fusionengine.in' ||
       email.toLowerCase() === 'admin.prakash@fusionengine.in' ||
-      rawInput.toLowerCase() === 'prakash.r' ||
-      rawInput.toLowerCase() === 'admin' ||
-      email.toLowerCase().includes('prakash') ||
-      email.toLowerCase() === 'prakash.ramakrishnan@fusionengine.in' ||
-      email.toLowerCase() === 'fusion.admin@fusionengine.in';
+      rawInput.toLowerCase() === 'fusion.admin@fusionengine.in' ||
+      rawInput.toLowerCase() === 'prakash.ramakrishnan@fusionengine.in';
 
     const isAdminPassword =
       password === 'Prakash@2004' ||
       password === 'admin' ||
-      password === 'admin123' ||
-      password === 'Welcome@2026!';
+      password === 'admin123';
 
     if (isAdminIdentifier && isAdminPassword) {
-      const matchedAdmin = users.find(
-        (u) =>
-          u.userId === 'prakash.r' ||
-          u.userId === 'admin' ||
-          u.role === 'admin' ||
-          u.role === 'super_admin'
-      );
-      const adminUser: UserPersona = matchedAdmin
-        ? {
-            ...matchedAdmin,
-            userId: 'prakash.r',
-            name: 'Prakash Ramakrishnan',
-            email: 'prakash.ramakrishnan@fusionengine.in',
-            role: 'super_admin',
-            title: 'Founder & Super Admin',
-            avatar: defaultAvatar,
-          }
-        : {
-            id: '00000000-0000-0000-0000-000000000001',
-            userId: 'prakash.r',
-            name: 'Prakash Ramakrishnan',
-            email: 'prakash.ramakrishnan@fusionengine.in',
-            role: 'super_admin',
-            title: 'Founder & Super Admin',
-            avatar: defaultAvatar,
-            department: 'Executive Leadership',
-            isActive: true,
-            mustChangePassword: false,
-          };
+      const adminUser: UserPersona = {
+        id: '00000000-0000-0000-0000-000000000001',
+        userId: 'admin.prakash',
+        name: 'Prakash Ramakrishnan',
+        email: 'admin.prakash@fusionengine.in',
+        role: 'super_admin',
+        title: 'Founder & Super Admin',
+        avatar: defaultAvatar,
+        department: 'Executive Leadership',
+        isActive: true,
+        mustChangePassword: false,
+      };
       setCurrentUser(adminUser);
       localStorage.setItem(STORAGE_KEYS.AUTH_USER, JSON.stringify(adminUser));
-      return { success: true, mustChangePassword: false };
+      return { success: true, mustChangePassword: false, redirectPath: '/portal' };
     }
 
-    // 0b. Check provisioned/seed directory users (e.g. rahul.dev, priya.caller)
+    // 2. Hired Developer Prakash R (prakash.r / Welcome@2026!)
+    const isDevPrakash =
+      (cleanId === 'prakash.r' ||
+        cleanId === 'prakash' ||
+        rawInput.toLowerCase() === 'prakash2954r@gmail.com' ||
+        rawInput.toLowerCase() === 'prakash2004r@gmail.com' ||
+        cleanId === 'fet-app-898381') &&
+      password === 'Welcome@2026!';
+
+    if (isDevPrakash) {
+      const devUser: UserPersona = {
+        id: '793508c1-954b-40ab-8b45-0cee5da44530',
+        userId: 'prakash.r',
+        name: 'Prakash R',
+        email: 'prakash2954r@gmail.com',
+        role: 'developer',
+        title: 'Software Developer',
+        avatar: defaultAvatar,
+        department: 'Engineering',
+        phone: '+917418132954',
+        isActive: true,
+        mustChangePassword: false,
+        skills: ['React', 'TypeScript', 'Node.js', 'Frontend Architecture'],
+      };
+      setCurrentUser(devUser);
+      localStorage.setItem(STORAGE_KEYS.AUTH_USER, JSON.stringify(devUser));
+      return { success: true, mustChangePassword: false, redirectPath: '/portal/tasks' };
+    }
+
+    // 3. Any other hired/signed candidate logging in (engineering -> developer, sales -> telecaller)
+    const matchedCandidate = applications.find(
+      (app) =>
+        (app.status === 'Hired' || app.agreementStatus === 'signed' || Boolean(app.agreementTermsAccepted)) &&
+        (
+          app.email.toLowerCase() === rawInput.toLowerCase() ||
+          app.referenceCode.toLowerCase() === cleanId ||
+          app.fullName.toLowerCase().replace(/[^a-z0-9]/g, '.').includes(cleanId) ||
+          app.fullName.toLowerCase() === rawInput.toLowerCase()
+        )
+    );
+
+    if (matchedCandidate && (password === 'Welcome@2026!' || password.startsWith('TempPass') || password === 'admin123')) {
+      const isSales = matchedCandidate.department === 'sales' || matchedCandidate.roleTitle.toLowerCase().includes('telecaller');
+      const candidateUser: UserPersona = {
+        id: matchedCandidate.id,
+        userId: cleanId || matchedCandidate.referenceCode.toLowerCase(),
+        name: matchedCandidate.fullName,
+        email: matchedCandidate.email,
+        role: isSales ? 'telecaller' : 'developer',
+        title: matchedCandidate.roleTitle || (isSales ? 'Inside Sales Executive' : 'Software Developer'),
+        avatar: defaultAvatar,
+        department: isSales ? 'Inside Sales & CRM' : 'Engineering',
+        phone: matchedCandidate.phone,
+        isActive: true,
+        mustChangePassword: false,
+      };
+      setCurrentUser(candidateUser);
+      localStorage.setItem(STORAGE_KEYS.AUTH_USER, JSON.stringify(candidateUser));
+      return {
+        success: true,
+        mustChangePassword: false,
+        redirectPath: isSales ? '/portal/telecaller' : '/portal/tasks',
+      };
+    }
+
+    // 4. Check active provisioned directory users (e.g. users array)
     const matchedDirectoryUser = users.find(
       (u) =>
         u.userId.toLowerCase() === cleanId ||
@@ -1350,12 +1409,22 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         u.name.toLowerCase() === rawInput.toLowerCase()
     );
 
-    if (matchedDirectoryUser) {
+    if (matchedDirectoryUser && (password === 'Welcome@2026!' || password === 'Prakash@2004' || password.length >= 4)) {
       if (matchedDirectoryUser.isActive === false) {
         return { success: false, error: 'This account has been deactivated by Super Admin.' };
       }
       setCurrentUser(matchedDirectoryUser);
-      return { success: true, mustChangePassword: Boolean(matchedDirectoryUser.mustChangePassword) };
+      localStorage.setItem(STORAGE_KEYS.AUTH_USER, JSON.stringify(matchedDirectoryUser));
+      return {
+        success: true,
+        mustChangePassword: Boolean(matchedDirectoryUser.mustChangePassword),
+        redirectPath:
+          matchedDirectoryUser.role === 'developer'
+            ? '/portal/tasks'
+            : matchedDirectoryUser.role === 'telecaller'
+            ? '/portal/telecaller'
+            : '/portal',
+      };
     }
 
     // 1. If Supabase is live, attempt Supabase Auth for cloud accounts
@@ -1524,11 +1593,17 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const logout = async () => {
-    if (isSupabaseLive) {
-      await supabase.auth.signOut();
+    try {
+      if (isSupabaseLive) {
+        await supabase.auth.signOut().catch((e) => console.warn('Supabase signOut note:', e));
+      }
+    } catch (e) {
+      console.warn('SignOut error:', e);
+    } finally {
+      setCurrentUser(null);
+      localStorage.removeItem(STORAGE_KEYS.AUTH_USER);
+      localStorage.removeItem('sb-wpmfpyjwyzawwwtvwlot-auth-token');
     }
-    setCurrentUser(null);
-    localStorage.removeItem(STORAGE_KEYS.AUTH_USER);
   };
 
   const changePassword = async (newPassword: string) => {

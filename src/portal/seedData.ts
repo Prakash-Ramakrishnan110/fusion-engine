@@ -5,9 +5,9 @@ import defaultAvatar from '../assets/default-avatar.svg';
 export const INITIAL_PERSONAS: UserPersona[] = [
   {
     id: '00000000-0000-0000-0000-000000000001',
-    userId: 'prakash.r',
+    userId: 'admin.prakash',
     name: 'Prakash Ramakrishnan',
-    email: 'prakash.ramakrishnan@fusionengine.in',
+    email: 'admin.prakash@fusionengine.in',
     role: 'super_admin',
     title: 'Founder & Super Admin',
     avatar: defaultAvatar,

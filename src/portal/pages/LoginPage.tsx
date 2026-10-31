@@ -31,11 +31,13 @@ export const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // If already authenticated and visiting /portal/login, redirect to dashboard or intended route
+  // If already authenticated and visiting /portal/login from a protected redirect, navigate to intended path
   React.useEffect(() => {
     if (isAuthenticated) {
-      const from = (location.state as any)?.from?.pathname || '/portal';
-      navigate(from, { replace: true });
+      const from = (location.state as any)?.from?.pathname;
+      if (from && from !== '/portal/login') {
+        navigate(from, { replace: true });
+      }
     }
   }, [isAuthenticated, navigate, location]);
 
@@ -51,11 +53,11 @@ export const LoginPage: React.FC = () => {
       const res = await login(userIdOrEmail, password);
       setIsLoading(false);
       if (res.success) {
-        toast.success(`Authenticated successfully as ${userIdOrEmail.trim()}!`);
+        toast.success(`Authenticated successfully!`);
         if (res.mustChangePassword) {
           toast.warning('First-time login detected: Please update your temporary password.');
         }
-        navigate('/portal', { replace: true });
+        navigate(res.redirectPath || '/portal', { replace: true });
       } else {
         toast.error(res.error || 'Authentication failed. Please check credentials.');
       }
