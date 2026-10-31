@@ -25,8 +25,57 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
   onOpenChange,
   application,
 }) => {
+  // All hooks declared unconditionally at the top of the component (React Rules of Hooks)
   const printRef = useRef<HTMLDivElement>(null);
 
+  // Print engine function
+  const handlePrint = () => {
+    if (!application) return;
+
+    const printFrame = document.createElement('iframe');
+    printFrame.style.position = 'fixed';
+    printFrame.style.right = '0';
+    printFrame.style.bottom = '0';
+    printFrame.style.width = '0';
+    printFrame.style.height = '0';
+    printFrame.style.border = '0';
+    document.body.appendChild(printFrame);
+
+    const frameDoc = printFrame.contentWindow?.document;
+    if (!frameDoc) {
+      window.print();
+      return;
+    }
+
+    frameDoc.open();
+    frameDoc.write(generateFullDocumentHtml());
+    frameDoc.close();
+
+    setTimeout(() => {
+      printFrame.contentWindow?.focus();
+      printFrame.contentWindow?.print();
+      setTimeout(() => {
+        if (document.body.contains(printFrame)) {
+          document.body.removeChild(printFrame);
+        }
+      }, 3000);
+    }, 300);
+  };
+
+  // Keyboard shortcut: Ctrl+P / Cmd+P while modal is active triggers clean multi-page A4 print
+  useEffect(() => {
+    if (!open) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        handlePrint();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [open, application]);
+
+  // Conditional early return AFTER all React hooks are registered
   if (!application) return null;
 
   const role: 'Software Developer' | 'Telecaller' =
@@ -34,7 +83,7 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
       ? 'Telecaller'
       : 'Software Developer';
 
-  // Use stored agreement text or regenerate from candidate profile
+  // Use stored agreement text or generate default corporate contract text
   const rawAgreementContent =
     application.agreementDocumentText ||
     generateFreelancerAgreementText({
@@ -74,7 +123,7 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
       })
     : '';
 
-  // Parser: converts raw contract text into executive-grade structured HTML
+  // Parser: converts raw contract text into structured executive-grade corporate HTML
   const formatAgreementHtml = (rawText: string): string => {
     let text = rawText.trim();
     if (text.includes('================================================================================')) {
@@ -135,16 +184,18 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
       }
 
       // Key-Value rows in Company / Freelancer details e.g. "Company Name: Fusion Engine Technology"
+      const colonIdx = line.indexOf(':');
       if (
-        /^[A-Za-z\s]+:\s+.+$/.test(line) &&
+        colonIdx > 0 &&
+        colonIdx < 35 &&
         !line.startsWith('http') &&
-        !line.toLowerCase().includes('agree to:') &&
         !line.toLowerCase().includes('agrees to:') &&
-        !line.toLowerCase().includes('including:')
+        !line.toLowerCase().includes('agree to:') &&
+        !line.toLowerCase().includes('including:') &&
+        !line.toLowerCase().includes('not limited to:')
       ) {
         flushList();
         inKvTable = true;
-        const colonIdx = line.indexOf(':');
         const label = line.slice(0, colonIdx).trim();
         const val = line.slice(colonIdx + 1).trim();
         kvRows.push({ label, val });
@@ -178,8 +229,8 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
 
   const parsedHtml = formatAgreementHtml(rawAgreementContent);
 
-  // Common CSS for both iframe print engine and HTML download export
-  const documentPrintStyles = `
+  // Corporate styling applied uniformly to Print Engine, Download HTML, and Modal Preview
+  const corporatePrintStyles = `
     @page {
       size: A4 portrait;
       margin: 14mm 16mm 14mm 16mm;
@@ -198,7 +249,7 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
     body {
       font-family: 'Times New Roman', Times, Georgia, serif;
       font-size: 10.5pt;
-      line-height: 1.55;
+      line-height: 1.58;
       color: #0f172a;
       background: #ffffff;
       padding: 2mm 4mm;
@@ -212,15 +263,15 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
     }
     .letterhead h1 {
       font-size: 18pt;
-      font-weight: bold;
+      font-weight: 800;
       letter-spacing: 2px;
       text-transform: uppercase;
       color: #0f172a;
       margin: 0 0 3px 0;
     }
     .letterhead .subtitle {
-      font-size: 11.5pt;
-      font-weight: bold;
+      font-size: 11pt;
+      font-weight: 700;
       color: #0369a1;
       text-transform: uppercase;
       letter-spacing: 1.5px;
@@ -230,7 +281,7 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
       font-size: 8.5pt;
       color: #475569;
       margin-bottom: 3px;
-      font-family: Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
     }
     .letterhead .statute {
       font-size: 8pt;
@@ -254,16 +305,16 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
       border-bottom: 1.5px solid #059669;
       padding-bottom: 5px;
       margin-bottom: 7px;
-      font-family: Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
     }
     .stamp-top .candidate-name {
       font-size: 11pt;
-      font-weight: bold;
+      font-weight: 800;
       color: #064e3b;
     }
     .stamp-top .cert-badge {
       font-size: 8.5pt;
-      font-weight: bold;
+      font-weight: 700;
       color: #047857;
       border: 1px solid #047857;
       padding: 2px 7px;
@@ -275,7 +326,7 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 6px 12px;
-      font-family: Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       font-size: 8pt;
       color: #1e293b;
     }
@@ -284,97 +335,110 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
     }
 
     .clause-header {
-      font-size: 11pt;
-      font-weight: bold;
+      font-family: 'Times New Roman', Georgia, serif;
+      font-size: 11.5pt;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.75px;
       color: #0f172a;
-      margin-top: 14px;
-      margin-bottom: 6px;
-      border-bottom: 1.5px solid #0f172a;
-      padding-bottom: 2px;
+      border-bottom: 2px solid #0f172a;
+      padding-bottom: 3px;
+      margin-top: 18px;
+      margin-bottom: 8px;
       page-break-after: avoid;
       break-after: avoid;
     }
     .sub-clause-header {
+      font-family: Arial, Helvetica, sans-serif;
       font-size: 10pt;
-      font-weight: bold;
-      color: #1e293b;
-      margin-top: 8px;
-      margin-bottom: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #0f172a;
+      background: #f8fafc;
+      border-left: 3px solid #0284c7;
+      padding: 3px 8px;
+      margin-top: 10px;
+      margin-bottom: 6px;
       page-break-after: avoid;
       break-after: avoid;
     }
     .clause-text {
       font-size: 10pt;
-      line-height: 1.58;
+      line-height: 1.62;
       text-align: justify;
       text-justify: inter-word;
-      margin-bottom: 7px;
+      margin-bottom: 8px;
       color: #0f172a;
     }
 
-    /* Structured Key-Value Table for Company & Freelancer details */
+    /* Structured Corporate Specification Schedule Table */
     .contract-spec-table {
       width: 100%;
       border-collapse: collapse;
-      margin: 6px 0 12px 0;
+      margin: 8px 0 14px 0;
+      font-family: Arial, Helvetica, sans-serif;
       font-size: 9.5pt;
-      font-family: Arial, sans-serif;
       page-break-inside: avoid;
       break-inside: avoid;
     }
     .contract-spec-table td {
-      border: 1px solid #94a3b8;
-      padding: 5px 10px;
+      border: 1.5px solid #0f172a;
+      padding: 6px 12px;
       vertical-align: middle;
     }
     .contract-spec-table .spec-label {
-      width: 30%;
-      font-weight: bold;
-      color: #334155;
-      background: #f8fafc;
+      width: 32%;
+      font-weight: 700;
+      color: #0f172a;
+      background-color: #f1f5f9;
+      text-transform: uppercase;
+      font-size: 8.5pt;
+      letter-spacing: 0.5px;
     }
     .contract-spec-table .spec-value {
-      width: 70%;
+      width: 68%;
       color: #0f172a;
+      font-weight: 500;
     }
 
     .clause-bullets {
-      margin: 4px 0 8px 24px;
-      padding-left: 6px;
-      list-style-type: disc;
+      margin: 6px 0 12px 24px;
+      padding-left: 8px;
+      list-style-type: square;
     }
     .clause-bullets li {
       font-size: 9.8pt;
-      line-height: 1.52;
-      margin-bottom: 3.5px;
+      line-height: 1.6;
+      margin-bottom: 5px;
       text-align: justify;
       text-justify: inter-word;
       color: #0f172a;
     }
 
     .signatures-container {
-      margin-top: 22px;
+      margin-top: 24px;
       padding-top: 14px;
       border-top: 2.5px solid #0f172a;
       page-break-inside: avoid;
       break-inside: avoid;
     }
     .signatures-title {
-      font-family: Arial, sans-serif;
-      font-size: 10pt;
-      font-weight: bold;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 10.5pt;
+      font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 1px;
       color: #0f172a;
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
     .signatures-subtitle {
-      font-size: 8pt;
+      font-size: 8.5pt;
       font-style: italic;
-      color: #475569;
+      color: #334155;
       margin-bottom: 12px;
+      text-align: justify;
+      line-height: 1.45;
     }
     .signatures-grid {
       display: grid;
@@ -383,78 +447,78 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
     }
     .sig-card {
       border: 1.5px solid #0f172a;
-      background: #f8fafc;
-      padding: 10px 14px;
+      background: #ffffff;
+      padding: 12px 14px;
       border-radius: 6px;
     }
-    .sig-card.verified {
+    .sig-card.freelancer-card {
       border: 2px solid #047857;
       background: #f0fdf4 !important;
     }
     .sig-header {
-      font-family: Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       font-size: 8pt;
-      font-weight: bold;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: #475569;
-      margin-bottom: 3px;
+      margin-bottom: 4px;
     }
-    .sig-card.verified .sig-header {
+    .sig-card.freelancer-card .sig-header {
       color: #047857;
     }
     .sig-company-name {
-      font-family: Arial, sans-serif;
-      font-weight: bold;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 800;
       font-size: 10pt;
       color: #0f172a;
     }
     .sig-line-box {
-      margin: 6px 0;
+      margin: 8px 0;
     }
     .sig-handwritten {
       font-family: 'Georgia', cursive, serif;
       font-style: italic;
-      font-size: 14pt;
-      font-weight: bold;
+      font-size: 15pt;
+      font-weight: 700;
       line-height: 1.2;
     }
     .sig-rule {
-      border-bottom: 1px solid #0f172a;
-      margin-top: 2px;
+      border-bottom: 1.5px solid #0f172a;
+      margin-top: 3px;
     }
     .sig-details {
-      font-family: Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       font-size: 8pt;
-      color: #334155;
-      line-height: 1.45;
+      color: #1e293b;
+      line-height: 1.5;
     }
     .sig-seal-badge {
       display: inline-block;
-      margin-top: 6px;
+      margin-top: 8px;
       border: 1px solid #0f172a;
-      padding: 2px 6px;
+      padding: 2px 7px;
       border-radius: 3px;
-      font-size: 7pt;
-      font-weight: bold;
+      font-size: 7.5pt;
+      font-weight: 800;
       letter-spacing: 0.5px;
       color: #0f172a;
     }
     .sig-statute-badge {
       display: inline-block;
-      margin-top: 6px;
+      margin-top: 8px;
       border: 1px solid #047857;
-      padding: 2px 6px;
+      padding: 2px 7px;
       border-radius: 3px;
-      font-size: 7pt;
-      font-weight: bold;
+      font-size: 7.5pt;
+      font-weight: 800;
       letter-spacing: 0.5px;
       color: #047857;
     }
     .footer-note {
       margin-top: 14px;
       text-align: center;
-      font-family: Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       font-size: 7.5pt;
       color: #94a3b8;
       page-break-inside: avoid;
@@ -462,211 +526,88 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
     }
   `;
 
-  // Multi-page isolated A4 printing engine via hidden iframe
-  const handlePrint = () => {
-    const printFrame = document.createElement('iframe');
-    printFrame.style.position = 'fixed';
-    printFrame.style.right = '0';
-    printFrame.style.bottom = '0';
-    printFrame.style.width = '0';
-    printFrame.style.height = '0';
-    printFrame.style.border = '0';
-    document.body.appendChild(printFrame);
+  const generateFullDocumentHtml = () => `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8" />
+      <title>Freelancer Service Agreement - ${application.fullName} (${application.referenceCode})</title>
+      <style>${corporatePrintStyles}</style>
+    </head>
+    <body>
+      <div class="letterhead">
+        <h1>FUSION ENGINE TECHNOLOGY</h1>
+        <div class="subtitle">Freelancer Onboarding &amp; Service Agreement</div>
+        <div class="meta">Innovate • Integrate • Accelerate &nbsp;|&nbsp; https://fusionengine.in &nbsp;|&nbsp; fusionenginetechnology@gmail.com</div>
+        <div class="statute">Statutory Electronic Execution under Section 10A of the Indian Information Technology Act, 2000 &amp; Indian Contract Act, 1872</div>
+      </div>
 
-    const frameDoc = printFrame.contentWindow?.document;
-    if (!frameDoc) {
-      window.print();
-      return;
-    }
-
-    frameDoc.open();
-    frameDoc.write(`
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="utf-8" />
-        <title>Freelancer Service Agreement - ${application.fullName} (${application.referenceCode})</title>
-        <style>${documentPrintStyles}</style>
-      </head>
-      <body>
-        <div class="letterhead">
-          <h1>FUSION ENGINE TECHNOLOGY</h1>
-          <div class="subtitle">Freelancer Onboarding &amp; Service Agreement</div>
-          <div class="meta">Innovate • Integrate • Accelerate &nbsp;|&nbsp; https://fusionengine.in &nbsp;|&nbsp; fusionenginetechnology@gmail.com</div>
-          <div class="statute">Statutory Electronic Execution under Section 10A of the Indian Information Technology Act, 2000 &amp; Indian Contract Act, 1872</div>
+      <div class="stamp-box">
+        <div class="stamp-top">
+          <div class="candidate-name">${application.fullName} (${application.referenceCode})</div>
+          <div class="cert-badge">&#10003; Certified Digital Execution</div>
         </div>
-
-        <div class="stamp-box">
-          <div class="stamp-top">
-            <div class="candidate-name">${application.fullName} (${application.referenceCode})</div>
-            <div class="cert-badge">&#10003; Certified Digital Execution</div>
-          </div>
-          <div class="stamp-grid">
-            <div>Role: <strong>${application.roleTitle}</strong></div>
-            <div>Department: <strong>${application.department === 'sales' ? 'Inside Sales & CRM' : 'Engineering'}</strong></div>
-            <div>Signed Date: <strong>${signDateFormatted} ${signTimeFormatted}</strong></div>
-            <div>Legal Signature: <strong>${application.agreementSignature || application.fullName}</strong></div>
-            <div>Affirmation: <strong>&ldquo;${application.agreementAffirmationWord || 'I AGREE AND ACCEPT'}&rdquo;</strong></div>
-            <div>Signer IP: <strong>${application.agreementSignerIp || 'Verified Web Session'}</strong></div>
-          </div>
+        <div class="stamp-grid">
+          <div>Role: <strong>${application.roleTitle}</strong></div>
+          <div>Department: <strong>${application.department === 'sales' ? 'Inside Sales & CRM' : 'Engineering'}</strong></div>
+          <div>Signed Date: <strong>${signDateFormatted} ${signTimeFormatted}</strong></div>
+          <div>Legal Signature: <strong>${application.agreementSignature || application.fullName}</strong></div>
+          <div>Affirmation: <strong>&ldquo;${application.agreementAffirmationWord || 'I AGREE AND ACCEPT'}&rdquo;</strong></div>
+          <div>Signer IP: <strong>${application.agreementSignerIp || 'Verified Web Session'}</strong></div>
         </div>
+      </div>
 
-        <div class="legal-content">
-          ${parsedHtml}
-        </div>
+      <div class="legal-content">
+        ${parsedHtml}
+      </div>
 
-        <div class="signatures-container">
-          <div class="signatures-title">Execution and Digital Attestation</div>
-          <div class="signatures-subtitle">IN WITNESS WHEREOF, the Parties have executed this Freelancer Onboarding &amp; Service Agreement electronically as of the Effective Date.</div>
-          <div class="signatures-grid">
-            <div class="sig-card">
-              <div class="sig-header">For Company:</div>
-              <div class="sig-company-name">Fusion Engine Technology</div>
-              <div class="sig-line-box">
-                <div class="sig-handwritten" style="color: #0f172a;">Prakash Ramakrishnan</div>
-                <div class="sig-rule"></div>
-              </div>
-              <div class="sig-details">
-                <div><strong>Prakash Ramakrishnan</strong></div>
-                <div>Founder &amp; Super Admin</div>
-                <div>Executive Leadership Signatory</div>
-                <div class="sig-seal-badge">OFFICIAL CORPORATE SEAL • VERIFIED</div>
-              </div>
+      <div class="signatures-container">
+        <div class="signatures-title">EXECUTION AND DIGITAL ATTESTATION</div>
+        <div class="signatures-subtitle">IN WITNESS WHEREOF, the Parties hereto have caused this Freelancer Onboarding &amp; Service Agreement to be executed and delivered electronically by their duly authorized representatives pursuant to Section 10A of the Indian Information Technology Act, 2000 and the Indian Contract Act, 1872, as of the Effective Date.</div>
+        <div class="signatures-grid">
+          <div class="sig-card">
+            <div class="sig-header">For and on behalf of the Company:</div>
+            <div class="sig-company-name">FUSION ENGINE TECHNOLOGY</div>
+            <div class="sig-line-box">
+              <div class="sig-handwritten" style="color: #0f172a;">Prakash Ramakrishnan</div>
+              <div class="sig-rule"></div>
             </div>
+            <div class="sig-details">
+              <div>Name: <strong>Prakash Ramakrishnan</strong></div>
+              <div>Title: <strong>Founder &amp; Super Admin</strong></div>
+              <div>Designation: <strong>Executive Leadership Signatory</strong></div>
+              <div>Jurisdiction: <strong>Tamil Nadu, India</strong></div>
+              <div class="sig-seal-badge">OFFICIAL CORPORATE SEAL • VERIFIED</div>
+            </div>
+          </div>
 
-            <div class="sig-card verified">
-              <div class="sig-header">Digitally Accepted by Freelancer:</div>
-              <div class="sig-company-name">${application.fullName}</div>
-              <div class="sig-line-box">
-                <div class="sig-handwritten" style="color: #047857;">${application.agreementSignature || application.fullName}</div>
-                <div class="sig-rule" style="border-color: #047857;"></div>
-              </div>
-              <div class="sig-details">
-                <div>Legal Signature: <strong>${application.agreementSignature || application.fullName}</strong></div>
-                <div>Certified on: <strong>${signDateFormatted} ${signTimeFormatted}</strong></div>
-                <div>Signer IP: <strong>${application.agreementSignerIp || 'Verified Web Session'}</strong></div>
-                <div class="sig-statute-badge">&#10003; SEC 10A IT ACT 2000 • ENFORCEABLE</div>
-              </div>
+          <div class="sig-card freelancer-card">
+            <div class="sig-header">Digitally Accepted &amp; Executed by Freelancer:</div>
+            <div class="sig-company-name">${application.fullName}</div>
+            <div class="sig-line-box">
+              <div class="sig-handwritten" style="color: #047857;">${application.agreementSignature || application.fullName}</div>
+              <div class="sig-rule" style="border-color: #047857;"></div>
+            </div>
+            <div class="sig-details">
+              <div>Legal Signature: <strong>${application.agreementSignature || application.fullName}</strong></div>
+              <div>Affirmation: <strong>&ldquo;${application.agreementAffirmationWord || 'I AGREE AND ACCEPT'}&rdquo;</strong></div>
+              <div>Timestamp: <strong>${signDateFormatted} ${signTimeFormatted}</strong></div>
+              <div>Signer IP / Session: <strong>${application.agreementSignerIp || 'Verified Web Session'}</strong></div>
+              <div class="sig-statute-badge">&#10003; SEC 10A IT ACT 2000 • STATUTORILY VALID</div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="footer-note">
-          Reference: ${application.referenceCode} • Permanent Statutory Record Stored in Fusion Engine Technology Document Vault (/portal/documents)
-        </div>
-      </body>
-      </html>
-    `);
-    frameDoc.close();
-
-    setTimeout(() => {
-      printFrame.contentWindow?.focus();
-      printFrame.contentWindow?.print();
-      setTimeout(() => {
-        if (document.body.contains(printFrame)) {
-          document.body.removeChild(printFrame);
-        }
-      }, 3000);
-    }, 300);
-  };
-
-  // Intercept Ctrl+P / Cmd+P while modal is open so the user gets clean multi-page A4 print
-  useEffect(() => {
-    if (!open) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
-        e.preventDefault();
-        handlePrint();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, application]);
+      <div class="footer-note">
+        Reference: ${application.referenceCode} • Permanent Statutory Record Stored in Fusion Engine Technology Document Vault (/portal/documents)
+      </div>
+    </body>
+    </html>
+  `;
 
   const handleDownloadHtml = () => {
-    const htmlBlob = new Blob(
-      [
-        `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Freelancer Service Agreement - ${application.fullName} (${application.referenceCode})</title>
-  <style>
-    ${documentPrintStyles}
-    body { padding: 40px; max-width: 840px; margin: auto; }
-  </style>
-</head>
-<body>
-  <div class="letterhead">
-    <h1>FUSION ENGINE TECHNOLOGY</h1>
-    <div class="subtitle">Freelancer Onboarding &amp; Service Agreement</div>
-    <div class="meta">Innovate • Integrate • Accelerate &nbsp;|&nbsp; https://fusionengine.in &nbsp;|&nbsp; fusionenginetechnology@gmail.com</div>
-    <div class="statute">Statutory Electronic Execution under Section 10A of the Indian Information Technology Act, 2000 &amp; Indian Contract Act, 1872</div>
-  </div>
-
-  <div class="stamp-box">
-    <div class="stamp-top">
-      <div class="candidate-name">${application.fullName} (${application.referenceCode})</div>
-      <div class="cert-badge">&#10003; Certified Digital Execution</div>
-    </div>
-    <div class="stamp-grid">
-      <div>Role: <strong>${application.roleTitle}</strong></div>
-      <div>Department: <strong>${application.department === 'sales' ? 'Inside Sales & CRM' : 'Engineering'}</strong></div>
-      <div>Signed Date: <strong>${signDateFormatted} ${signTimeFormatted}</strong></div>
-      <div>Legal Signature: <strong>${application.agreementSignature || application.fullName}</strong></div>
-      <div>Affirmation: <strong>&ldquo;${application.agreementAffirmationWord || 'I AGREE AND ACCEPT'}&rdquo;</strong></div>
-      <div>Signer IP: <strong>${application.agreementSignerIp || 'Verified Web Session'}</strong></div>
-    </div>
-  </div>
-
-  <div class="legal-content">
-    ${parsedHtml}
-  </div>
-
-  <div class="signatures-container">
-    <div class="signatures-title">Execution and Digital Attestation</div>
-    <div class="signatures-subtitle">IN WITNESS WHEREOF, the Parties have executed this Freelancer Onboarding &amp; Service Agreement electronically as of the Effective Date.</div>
-    <div class="signatures-grid">
-      <div class="sig-card">
-        <div class="sig-header">For Company:</div>
-        <div class="sig-company-name">Fusion Engine Technology</div>
-        <div class="sig-line-box">
-          <div class="sig-handwritten" style="color: #0f172a;">Prakash Ramakrishnan</div>
-          <div class="sig-rule"></div>
-        </div>
-        <div class="sig-details">
-          <div><strong>Prakash Ramakrishnan</strong></div>
-          <div>Founder &amp; Super Admin</div>
-          <div>Executive Leadership Signatory</div>
-          <div class="sig-seal-badge">OFFICIAL CORPORATE SEAL • VERIFIED</div>
-        </div>
-      </div>
-
-      <div class="sig-card verified">
-        <div class="sig-header">Digitally Accepted by Freelancer:</div>
-        <div class="sig-company-name">${application.fullName}</div>
-        <div class="sig-line-box">
-          <div class="sig-handwritten" style="color: #047857;">${application.agreementSignature || application.fullName}</div>
-          <div class="sig-rule" style="border-color: #047857;"></div>
-        </div>
-        <div class="sig-details">
-          <div>Legal Signature: <strong>${application.agreementSignature || application.fullName}</strong></div>
-          <div>Certified on: <strong>${signDateFormatted} ${signTimeFormatted}</strong></div>
-          <div>Signer IP: <strong>${application.agreementSignerIp || 'Verified Web Session'}</strong></div>
-          <div class="sig-statute-badge">&#10003; SEC 10A IT ACT 2000 • ENFORCEABLE</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="footer-note">
-    Reference: ${application.referenceCode} • Permanent Statutory Record Stored in Fusion Engine Technology Document Vault (/portal/documents)
-  </div>
-</body>
-</html>`
-      ],
-      { type: 'text/html;charset=utf-8' }
-    );
+    const htmlBlob = new Blob([generateFullDocumentHtml()], { type: 'text/html;charset=utf-8' });
     const downloadUrl = URL.createObjectURL(htmlBlob);
     const link = document.createElement('a');
     link.href = downloadUrl;
@@ -772,26 +713,33 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
           {/* Inject matching styles for in-dialog preview */}
           <style>{`
             .agreement-preview-scroll .clause-header {
-              font-size: 11pt;
-              font-weight: bold;
+              font-family: 'Times New Roman', Georgia, serif;
+              font-size: 11.5pt;
+              font-weight: 800;
+              text-transform: uppercase;
+              letter-spacing: 0.75px;
+              color: #0f172a;
+              margin-top: 18px;
+              margin-bottom: 8px;
+              border-bottom: 2px solid #0f172a;
+              padding-bottom: 3px;
+            }
+            .agreement-preview-scroll .sub-clause-header {
+              font-family: Arial, Helvetica, sans-serif;
+              font-size: 10pt;
+              font-weight: 700;
               text-transform: uppercase;
               letter-spacing: 0.5px;
               color: #0f172a;
-              margin-top: 16px;
+              background: #f8fafc;
+              border-left: 3px solid #0284c7;
+              padding: 3px 8px;
+              margin-top: 10px;
               margin-bottom: 6px;
-              border-bottom: 1.5px solid #0f172a;
-              padding-bottom: 2px;
-            }
-            .agreement-preview-scroll .sub-clause-header {
-              font-size: 10pt;
-              font-weight: bold;
-              color: #1e293b;
-              margin-top: 8px;
-              margin-bottom: 4px;
             }
             .agreement-preview-scroll .clause-text {
               font-size: 10pt;
-              line-height: 1.6;
+              line-height: 1.62;
               text-align: justify;
               text-justify: inter-word;
               margin-bottom: 8px;
@@ -801,33 +749,37 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
               width: 100%;
               border-collapse: collapse;
               margin: 8px 0 14px 0;
+              font-family: Arial, Helvetica, sans-serif;
               font-size: 9.5pt;
-              font-family: Arial, sans-serif;
             }
             .agreement-preview-scroll .contract-spec-table td {
-              border: 1px solid #cbd5e1;
-              padding: 6px 10px;
+              border: 1.5px solid #0f172a;
+              padding: 6px 12px;
               vertical-align: middle;
             }
             .agreement-preview-scroll .contract-spec-table .spec-label {
-              width: 30%;
-              font-weight: bold;
-              color: #334155;
-              background: #f8fafc;
+              width: 32%;
+              font-weight: 700;
+              color: #0f172a;
+              background-color: #f1f5f9;
+              text-transform: uppercase;
+              font-size: 8.5pt;
+              letter-spacing: 0.5px;
             }
             .agreement-preview-scroll .contract-spec-table .spec-value {
-              width: 70%;
+              width: 68%;
               color: #0f172a;
+              font-weight: 500;
             }
             .agreement-preview-scroll .clause-bullets {
-              margin: 6px 0 10px 24px;
-              padding-left: 6px;
-              list-style-type: disc;
+              margin: 6px 0 12px 24px;
+              padding-left: 8px;
+              list-style-type: square;
             }
             .agreement-preview-scroll .clause-bullets li {
               font-size: 9.8pt;
-              line-height: 1.55;
-              margin-bottom: 4px;
+              line-height: 1.6;
+              margin-bottom: 5px;
               text-align: justify;
               color: #0f172a;
             }
@@ -881,10 +833,11 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
               </div>
               <div className="text-[11px] text-slate-700 leading-tight space-y-0.5">
                 <div>Legal Signature: <strong>{application.agreementSignature || application.fullName}</strong></div>
+                <div>Affirmation: <strong>&ldquo;{application.agreementAffirmationWord || 'I AGREE AND ACCEPT'}&rdquo;</strong></div>
                 <div>Certified on: <strong>{signDateFormatted} {signTimeFormatted}</strong></div>
                 <div>Signer IP: <strong>{application.agreementSignerIp || 'Verified Web Session'}</strong></div>
                 <div className="mt-2 inline-block border border-emerald-700 text-emerald-800 px-2 py-0.5 rounded text-[9px] font-bold">
-                  ✓ SEC 10A IT ACT 2000 • ENFORCEABLE
+                  ✓ SEC 10A IT ACT 2000 • STATUTORILY VALID
                 </div>
               </div>
             </div>
