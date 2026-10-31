@@ -3657,6 +3657,33 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       ) {
         return { success: false, error: 'You cannot delete your own active administrator account.' };
       }
+
+      // 1. Permanently delete from Supabase Database if live
+      if (isSupabaseLive) {
+        try {
+          // Unlink tasks assigned to or reviewed by this user
+          await supabase.from('tasks').update({ assignee_id: null }).eq('assignee_id', targetUserId);
+          await supabase.from('tasks').update({ reviewer_id: null }).eq('reviewer_id', targetUserId);
+
+          // Delete dependent rows in developer_details and project_members
+          await supabase.from('developer_details').delete().eq('profile_id', targetUserId);
+          await supabase.from('project_members').delete().eq('profile_id', targetUserId);
+
+          // Delete from profiles table by UUID or user_id
+          const { error: profileDelErr } = await supabase
+            .from('profiles')
+            .delete()
+            .or(`id.eq.${targetUserId},user_id.eq.${targetUserId}`);
+
+          if (profileDelErr) {
+            console.warn('Supabase delete profile notice:', profileDelErr.message);
+          }
+        } catch (dbErr: any) {
+          console.warn('Supabase profile deletion warning:', dbErr?.message);
+        }
+      }
+
+      // 2. Remove from local memory state and cache
       setUsers((prev) => {
         const updated = prev.filter(
           (u) => u.id !== targetUserId && u.userId !== targetUserId
@@ -3664,8 +3691,19 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(updated));
         return updated;
       });
+
+      // 3. Unassign from local tasks
+      setTasks((prev) => {
+        const updated = prev.map((t) => {
+          if (t.assignedToId === targetUserId) return { ...t, assignedToId: undefined };
+          return t;
+        });
+        localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(updated));
+        return updated;
+      });
+
       await addAuditLog('USER_DELETED', 'Users', `Deleted user account ${targetUserId}`);
-      toast.success('User account removed successfully.');
+      toast.success('User account removed permanently.');
       return { success: true };
     } catch (err: any) {
       return { success: false, error: err?.message || 'Failed to delete user.' };

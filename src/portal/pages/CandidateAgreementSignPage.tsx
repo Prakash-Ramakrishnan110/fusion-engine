@@ -216,6 +216,14 @@ export const CandidateAgreementSignPage: React.FC = () => {
             from_name: 'Fusion Engine Technology',
             reply_to: 'fusionenginetechnology@gmail.com',
             subject: candidateTemplate.subject,
+            title: candidateTemplate.subject,
+            email_subject: candidateTemplate.subject,
+            Subject: candidateTemplate.subject,
+            header: candidateTemplate.subject,
+            email_header: candidateTemplate.subject,
+            subject_line: candidateTemplate.subject,
+            heading: candidateTemplate.subject,
+            topic: candidateTemplate.subject,
             message: candidateTemplate.body,
             content: candidateTemplate.body,
             time: new Date().toLocaleString(),
@@ -327,9 +335,7 @@ export const CandidateAgreementSignPage: React.FC = () => {
                 <h1 className="text-sm font-bold tracking-tight text-foreground uppercase">
                   Freelancer Onboarding Agreement
                 </h1>
-                <Badge variant="outline" className="text-[9px] bg-primary/10 text-primary border-primary/20 uppercase font-mono">
-                  IT Act 2000
-                </Badge>
+                
               </div>
               <p className="text-[11px] text-muted-foreground">
                 Independent Contractor Service Agreement & Code of Conduct
@@ -544,6 +550,9 @@ export const CandidateAgreementSignPage: React.FC = () => {
                 <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
                   Innovate • Integrate • Accelerate | https://fusionengine.in | fusionenginetechnology@gmail.com
                 </p>
+                <div className="statute text-[10px] sm:text-[11px] italic text-muted-foreground font-sans mt-1">
+                  Statutory Electronic Execution under Section 10A of the Indian Information Technology Act, 2000 & Indian Contract Act, 1872
+                </div>
               </div>
 
               {/* Legal Agreement Clauses with Mobile-Friendly Left Alignment */}

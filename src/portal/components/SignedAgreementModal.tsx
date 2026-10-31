@@ -539,6 +539,7 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
         <h1>FUSION ENGINE TECHNOLOGY</h1>
         <div class="subtitle">Freelancer Onboarding &amp; Service Agreement</div>
         <div class="meta">Innovate • Integrate • Accelerate &nbsp;|&nbsp; https://fusionengine.in &nbsp;|&nbsp; fusionenginetechnology@gmail.com</div>
+        <div class="statute">Statutory Electronic Execution under Section 10A of the Indian Information Technology Act, 2000 &amp; Indian Contract Act, 1872</div>
       </div>
 
       <div class="stamp-box">
@@ -794,6 +795,9 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
             <p className="text-xs text-slate-600 mt-1 font-sans">
               Innovate • Integrate • Accelerate &nbsp;|&nbsp; https://fusionengine.in &nbsp;|&nbsp; fusionenginetechnology@gmail.com
             </p>
+            <div className="statute text-[11px] italic text-slate-500 font-sans mt-1">
+              Statutory Electronic Execution under Section 10A of the Indian Information Technology Act, 2000 &amp; Indian Contract Act, 1872
+            </div>
           </div>
 
           {/* Structured Legal Content */}

@@ -45,9 +45,13 @@ export function getCandidateEmailTemplate(
 
   switch (status) {
     case 'Applied': {
+      const emailSubject = `Application Confirmed: ${role} — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`;
       return {
-        subject: `Application Confirmed: ${role} — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`,
-        body: `Dear ${name},
+        subject: emailSubject,
+        body: `FUSION ENGINE TECHNOLOGY
+SUBJECT: ${emailSubject}
+
+Dear ${name},
 
 Thank you for applying for the ${role} position at ${EMAIL_CONFIG.COMPANY_NAME}!
 
@@ -79,9 +83,13 @@ ${EMAIL_CONFIG.COMPANY_NAME}
 
     case 'Shortlisted': {
       const agreementLink = `${EMAIL_CONFIG.PORTAL_URL}/agreement?ref=${ref}&name=${encodeURIComponent(name)}&role=${encodeURIComponent(role)}&email=${encodeURIComponent(candidate.email || '')}`;
+      const emailSubject = `Congratulations! Shortlisted for ${role} — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`;
       return {
-        subject: `Congratulations! Shortlisted for ${role} — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`,
-        body: `Dear ${name},
+        subject: emailSubject,
+        body: `FUSION ENGINE TECHNOLOGY
+SUBJECT: ${emailSubject}
+
+Dear ${name},
 
 We are pleased to inform you that your application (Ref: ${ref}) for ${role} has been SHORTLISTED by our technical review team at ${EMAIL_CONFIG.COMPANY_NAME}!
 
@@ -115,9 +123,13 @@ ${EMAIL_CONFIG.COMPANY_NAME}
     }
 
     case 'Signed': {
+      const emailSubject = `Agreement Certified & Recorded — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`;
       return {
-        subject: `Agreement Certified & Recorded — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`,
-        body: `Dear ${name},
+        subject: emailSubject,
+        body: `FUSION ENGINE TECHNOLOGY
+SUBJECT: ${emailSubject}
+
+Dear ${name},
 
 This email certifies that your Freelancer Onboarding & Service Agreement has been DIGITALLY SIGNED AND RECORDED under Application Reference ${ref}.
 
@@ -159,9 +171,13 @@ ${EMAIL_CONFIG.COMPANY_NAME}
           ? '• Executive ERP: Access full oversight, workforce records, client billing, and review gates.'
           : '• Engineering Workspace: Access your project sprint board, tasks queue, code submission review gates, and deliverable specs.';
 
+      const emailSubject = `Welcome to the Team! Workspace Login Credentials — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`;
       return {
-        subject: `Welcome to the Team! Workspace Login Credentials — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`,
-        body: `Dear ${name},
+        subject: emailSubject,
+        body: `FUSION ENGINE TECHNOLOGY
+SUBJECT: ${emailSubject}
+
+Dear ${name},
 
 Congratulations and welcome to ${EMAIL_CONFIG.COMPANY_NAME}! Following the execution of your Freelancer Service Agreement, we are delighted to officially onboard you as a ${role}.
 
@@ -200,10 +216,14 @@ ${EMAIL_CONFIG.COMPANY_NAME}
       };
     }
 
-    case 'Rejected':
+    case 'Rejected': {
+      const emailSubject = `Application Update: ${role} — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`;
       return {
-        subject: `Application Update: ${role} — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`,
-        body: `Dear ${name},
+        subject: emailSubject,
+        body: `FUSION ENGINE TECHNOLOGY
+SUBJECT: ${emailSubject}
+
+Dear ${name},
 
 Thank you for your interest in joining ${EMAIL_CONFIG.COMPANY_NAME} and for taking the time to share your background for the ${role} opening (Application Ref: ${ref}).
 
@@ -219,11 +239,16 @@ ${EMAIL_CONFIG.COMPANY_NAME}
 🌐 https://www.fusionengine.in
 ✉️ ${EMAIL_CONFIG.COMPANY_EMAIL}`.trim(),
       };
+    }
 
-    default:
+    default: {
+      const emailSubject = `Update on your application for ${role} — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`;
       return {
-        subject: `Update on your application for ${role} — ${EMAIL_CONFIG.COMPANY_NAME} [${ref}]`,
-        body: `Dear ${name},
+        subject: emailSubject,
+        body: `FUSION ENGINE TECHNOLOGY
+SUBJECT: ${emailSubject}
+
+Dear ${name},
 
 We are writing to update you on your application for the ${role} opening at ${EMAIL_CONFIG.COMPANY_NAME} (Ref: ${ref}).
 
@@ -235,6 +260,7 @@ ${EMAIL_CONFIG.COMPANY_NAME}
 🌐 https://www.fusionengine.in
 ✉️ ${EMAIL_CONFIG.COMPANY_EMAIL}`.trim(),
       };
+    }
   }
 }
 
@@ -253,6 +279,13 @@ export async function sendCandidateEmail(payload: CandidateEmailPayload): Promis
       from_name: 'Fusion Engine Technology',
       subject: payload.subject,
       title: payload.subject,
+      email_subject: payload.subject,
+      Subject: payload.subject,
+      header: payload.subject,
+      email_header: payload.subject,
+      subject_line: payload.subject,
+      heading: payload.subject,
+      topic: payload.subject,
       message: payload.body,
       content: payload.body,
       from_email: EMAIL_CONFIG.COMPANY_EMAIL,
