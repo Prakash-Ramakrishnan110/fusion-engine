@@ -21,13 +21,11 @@ export function generateFreelancerAgreementText(details: FreelancerAgreementDeta
   const startDate = details.startDate || agreementDate;
 
   return `
-================================================================================
 FUSION ENGINE TECHNOLOGY
 FREELANCER ONBOARDING & SERVICE AGREEMENT
 Tagline: Innovate • Integrate • Accelerate
 Website: https://fusionengine.in
 Email: fusionenginetechnology@gmail.com
-================================================================================
 
 This Freelancer Onboarding & Service Agreement (“Agreement”) is entered into on ${agreementDate} between Fusion Engine Technology and the Freelancer identified below.
 

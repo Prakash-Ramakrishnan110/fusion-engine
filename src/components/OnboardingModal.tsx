@@ -59,6 +59,7 @@ const OnboardingModal = () => {
         from_name: formData.name,
         from_email: formData.contact,
         from_phone: formData.contact,
+        subject: `New Client Onboarding Inquiry: ${formData.service} — ${formData.name}`,
         service_requested: formData.service,
         project_scope: formData.projectScope,
         message: formData.message || `Onboarding inquiry for ${formData.service} (${formData.projectScope})`,

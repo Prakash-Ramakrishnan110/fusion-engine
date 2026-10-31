@@ -240,7 +240,8 @@ export const CandidateAgreementSignPage: React.FC = () => {
           from_name: `${signatureName.trim()} (Agreement Digitally Signed)`,
           from_email: candidateEmail || 'candidate@fusionengine.in',
           to_email: 'fusionenginetechnology@gmail.com',
-          message: `[FREELANCER AGREEMENT DIGITALLY SIGNED]\nCandidate Name: ${signatureName.trim()}\nReference Code: ${targetRef}\nRole: ${agreementRole}\nSigned Timestamp: ${new Date().toLocaleString()}\nAffirmation: ${affirmationText.trim().toUpperCase()}\nCompliance: Indian Information Technology Act, 2000 (Section 10A)`,
+          subject: `Agreement Digitally Signed: ${signatureName.trim()} — ${agreementRole} [${targetRef}]`,
+          message: `[FREELANCER AGREEMENT DIGITALLY SIGNED]\nCandidate Name: ${signatureName.trim()}\nReference Code: ${targetRef}\nRole: ${agreementRole}\nSigned Timestamp: ${new Date().toLocaleString()}\nAffirmation: ${affirmationText.trim().toUpperCase()}`,
           time: new Date().toLocaleString(),
         },
         PUBLIC_KEY
@@ -286,6 +287,7 @@ export const CandidateAgreementSignPage: React.FC = () => {
           from_name: `${signatureName.trim() || 'Candidate'} (Offer Declined)`,
           from_email: candidateEmail || 'candidate@fusionengine.in',
           to_email: 'fusionenginetechnology@gmail.com',
+          subject: `Candidate Offer Declined: ${signatureName.trim() || 'Candidate'} [${targetRef}]`,
           message: `[OFFER DECLINED BY CANDIDATE]\nCandidate: ${signatureName.trim() || 'Candidate'}\nReference Code: ${targetRef}\nReason: ${declineReason}\nAdditional Notes: ${declineNotes.trim() || 'None'}\nTimestamp: ${new Date().toLocaleString()}`,
           time: new Date().toLocaleString(),
         },
@@ -541,9 +543,6 @@ export const CandidateAgreementSignPage: React.FC = () => {
                 </p>
                 <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
                   Innovate • Integrate • Accelerate | https://fusionengine.in | fusionenginetechnology@gmail.com
-                </p>
-                <p className="text-[10px] sm:text-xs italic text-muted-foreground pt-1">
-                  Enforceable under Section 10A of the Indian Information Technology Act, 2000 & Indian Contract Act, 1872
                 </p>
               </div>
 

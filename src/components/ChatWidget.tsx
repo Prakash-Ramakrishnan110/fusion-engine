@@ -35,6 +35,7 @@ const ChatWidget = () => {
         {
           from_name: "Website Live Chat Visitor",
           from_email: "livechat@fusionengine.in",
+          subject: "New Live Chat Inquiry — Fusion Engine Website",
           message: `Live Chat Message: ${userMsg}`,
           to_email: 'fusionenginetechnology@gmail.com',
           time: new Date().toLocaleString()

@@ -212,6 +212,7 @@ Submission Timestamp: ${new Date().toLocaleString()}
         from_email: formData.email,
         from_phone: formData.phone,
         phone: formData.phone,
+        subject: `New Job Application: ${formData.role} — ${formData.fullName} [${refCode}]`,
         message: detailedMessage,
         reply_to: formData.email,
         name: formData.fullName,

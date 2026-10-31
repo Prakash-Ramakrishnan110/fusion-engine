@@ -342,7 +342,6 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
       text-transform: uppercase;
       letter-spacing: 0.75px;
       color: #0f172a;
-      border-bottom: 2px solid #0f172a;
       padding-bottom: 3px;
       margin-top: 18px;
       margin-bottom: 8px;
@@ -540,7 +539,6 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
         <h1>FUSION ENGINE TECHNOLOGY</h1>
         <div class="subtitle">Freelancer Onboarding &amp; Service Agreement</div>
         <div class="meta">Innovate • Integrate • Accelerate &nbsp;|&nbsp; https://fusionengine.in &nbsp;|&nbsp; fusionenginetechnology@gmail.com</div>
-        <div class="statute">Statutory Electronic Execution under Section 10A of the Indian Information Technology Act, 2000 &amp; Indian Contract Act, 1872</div>
       </div>
 
       <div class="stamp-box">
@@ -637,7 +635,7 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
                   </Badge>
                 </DialogTitle>
                 <DialogDescription className="text-xs text-muted-foreground mt-0.5">
-                  Statutory electronic contract record pursuant to Section 10A of the Indian Information Technology Act, 2000
+                  Certified electronic contract record and deliverable specification
                 </DialogDescription>
               </div>
             </div>
@@ -722,7 +720,6 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
               color: #0f172a;
               margin-top: 18px;
               margin-bottom: 8px;
-              border-bottom: 2px solid #0f172a;
               padding-bottom: 3px;
             }
             .agreement-preview-scroll .sub-clause-header {
@@ -796,9 +793,6 @@ export const SignedAgreementModal: React.FC<SignedAgreementModalProps> = ({
             </p>
             <p className="text-xs text-slate-600 mt-1 font-sans">
               Innovate • Integrate • Accelerate &nbsp;|&nbsp; https://fusionengine.in &nbsp;|&nbsp; fusionenginetechnology@gmail.com
-            </p>
-            <p className="text-xs italic text-slate-500 pt-1">
-              Statutory Electronic Execution under Section 10A Indian Information Technology Act, 2000 &amp; Indian Contract Act, 1872
             </p>
           </div>
 

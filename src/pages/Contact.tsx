@@ -36,6 +36,7 @@ const Contact = () => {
         from_email: formData.email,
         from_phone: formData.phone,
         phone: formData.phone,
+        subject: `New Contact Form Inquiry from ${formData.name}`,
         message: formData.message,
         reply_to: formData.email,
         name: formData.name,

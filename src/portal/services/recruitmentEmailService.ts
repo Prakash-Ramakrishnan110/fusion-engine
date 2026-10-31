@@ -52,25 +52,20 @@ export function getCandidateEmailTemplate(
 Thank you for applying for the ${role} position at ${EMAIL_CONFIG.COMPANY_NAME}!
 
 We have successfully received your candidate application and portfolio.
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 📌 YOUR APPLICATION DETAILS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 • Candidate Name:    ${name}
 • Position Applied:  ${role}
 • Application Ref:   ${ref}
 • Submission Date:   ${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
 • Status:            Under Technical & Leadership Review
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📋 WHAT HAPPENS NEXT?
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 1. Technical Screening: Our engineering & recruitment review team is evaluating your qualifications.
 2. Shortlisting & Agreement: If your profile matches our active project deliverables, you will receive an invitation to review and digitally sign your Freelancer Service Agreement.
 3. Review Timeline: We aim to update applicants within 24 to 48 business hours.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ⚠️ IMPORTANT: CHECK YOUR INBOX & SPAM FOLDER
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Please check your primary Inbox and Spam / Junk / Promotions folders for future communications from ${EMAIL_CONFIG.COMPANY_EMAIL}.
 Please click "Report as Not Spam" or add our email to your contacts so you do not miss your shortlisting and agreement signing link!
 
@@ -90,17 +85,13 @@ ${EMAIL_CONFIG.COMPANY_NAME}
 
 We are pleased to inform you that your application (Ref: ${ref}) for ${role} has been SHORTLISTED by our technical review team at ${EMAIL_CONFIG.COMPANY_NAME}!
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📄 FREELANCER ONBOARDING & SERVICE AGREEMENT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-As part of our standard professional onboarding process pursuant to Section 10A of the Indian Information Technology Act, 2000, please review and digitally sign your Freelancer Service Agreement using your personalized secure link:
+Please review and digitally sign your Freelancer Service Agreement using your personalized secure link below:
 
 🔗 REVIEW & SIGN YOUR AGREEMENT:
 ${agreementLink}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📌 SUMMARY OF AGREED ENGAGEMENT TERMS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 • Position:          ${role}
 • Engagement Model:  Independent Freelancer / Deliverable-Based
 • Developer Pay:     Sprint & milestone compensation upon deliverable verification
@@ -108,9 +99,7 @@ ${agreementLink}
 • IP Protection:     Perpetual assignment of deliverables to Fusion Engine Technology
 • Notice Period:     7 days written notice by either party
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📋 NEXT STEPS TO ACTIVATE YOUR WORKSPACE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 1. Click the agreement link above on your phone or computer.
 2. Carefully review the terms and type your legal full name to sign.
 3. Once signed, our administration team will review your countersignature and generate your Workforce Portal login credentials.
@@ -132,14 +121,11 @@ ${EMAIL_CONFIG.COMPANY_NAME}
 
 This email certifies that your Freelancer Onboarding & Service Agreement has been DIGITALLY SIGNED AND RECORDED under Application Reference ${ref}.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📜 ELECTRONIC EXECUTION CERTIFICATE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 • Candidate Signature: ${candidate.agreementSignature || name}
 • Application Ref:     ${ref}
 • Role:                ${role}
 • Signed Timestamp:    ${candidate.agreementSignedAt ? new Date(candidate.agreementSignedAt).toLocaleString('en-IN') : new Date().toLocaleString('en-IN')}
-• Statutory Standard:  Section 10A, Indian Information Technology Act, 2000
 
 A permanent statutory record has been archived in our Document Vault. Our leadership team is now preparing your Workforce Portal workspace and login credentials.
 
@@ -179,18 +165,14 @@ ${EMAIL_CONFIG.COMPANY_NAME}
 
 Congratulations and welcome to ${EMAIL_CONFIG.COMPANY_NAME}! Following the execution of your Freelancer Service Agreement, we are delighted to officially onboard you as a ${role}.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🔑 YOUR WORKSPACE LOGIN CREDENTIALS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 • Portal URL:         ${loginUrl}
 • User ID:            ${userId}
 • Registered Email:   ${candidate.email || 'Your registered email'}
 • Temporary Password: ${tempPass}
 • Assigned Workspace: ${deptName}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📋 STEP-BY-STEP FIRST LOGIN GUIDE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Step 1: Open the Portal
 Open: ${loginUrl}
 
