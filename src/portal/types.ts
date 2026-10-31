@@ -44,6 +44,8 @@ export interface Client {
   email: string;
   gstNo?: string;
   address?: string;
+  city?: string;
+  industry?: string;
   projectCode?: string;
   projectName?: string;
   contractValueINR?: number;

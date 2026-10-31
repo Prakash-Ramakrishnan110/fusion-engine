@@ -185,6 +185,8 @@ interface PortalContextType {
   // Notifications
   notifications: NotificationItem[];
   markNotificationRead: (id: string) => Promise<void>;
+  markAllNotificationsRead: () => Promise<void>;
+  clearNotifications: () => Promise<void>;
 
   // Search
   searchQuery: string;
@@ -251,6 +253,7 @@ const STORAGE_KEYS = {
   TASKS: 'fet_portal_tasks_v1',
   VOUCHERS: 'fet_portal_vouchers_v1',
   DOCUMENTS: 'fet_portal_documents_v1',
+  NOTIFICATIONS: 'fet_portal_notifications_v1',
 };
 
 
@@ -672,7 +675,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           clientName: p.clients?.name || 'Internal',
           type: p.type as any,
           description: p.description || '',
-          status: p.status as any,
+          status: p.status === 'active' ? 'Active' : p.status === 'completed' ? 'Completed' : p.status === 'draft' ? 'Planning' : (p.status as any),
           contractValueINR: Number(p.contract_value) || 0,
           totalBudgetINR: Number(p.contract_value) || 0,
           startDate: p.start_date,
@@ -805,6 +808,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             source: l.source || 'Direct Outreach',
             assignedToId: l.assigned_to || undefined,
             assignedToName: l.assigned_profile?.full_name || undefined,
+            ownerId: l.assigned_to || undefined,
+            ownerName: l.assigned_profile?.full_name || undefined,
             status: l.stage === 'new' ? 'New'
                   : l.stage === 'contacted' ? 'Contacted'
                   : l.stage === 'interested' ? 'Qualified'
@@ -949,6 +954,101 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         }
       } catch (err) {
         console.warn('Supabase notifications fetch note:', err);
+      }
+
+      // 6.9 Fetch Daily Standups from Supabase
+      try {
+        const { data: standupData, error: standupErr } = await supabase
+          .from('daily_standups')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(100);
+
+        if (!standupErr && standupData && standupData.length > 0) {
+          const mappedStandups: DailyStandupUpdate[] = standupData.map((s: any) => ({
+            id: s.id,
+            projectId: s.project_id || 'all',
+            projectName: s.project_name || 'Project Deliverable',
+            developerId: s.developer_id || 'developer',
+            developerName: s.developer_name || 'Team Member',
+            completedToday: s.completed_today,
+            plannedTomorrow: s.planned_tomorrow,
+            blockers: s.blockers || undefined,
+            hasBlocker: Boolean(s.has_blocker),
+            createdAt: s.created_at,
+          }));
+          setDailyStandups((prev) => {
+            const dbIds = new Set(mappedStandups.map((m) => m.id));
+            const localOnly = prev.filter((item) => !dbIds.has(item.id));
+            return [...mappedStandups, ...localOnly];
+          });
+        }
+      } catch (err) {
+        console.warn('Supabase daily_standups fetch note:', err);
+      }
+
+      // 6.10 Fetch Clients from Supabase
+      try {
+        const { data: clientsData, error: clientsErr } = await supabase
+          .from('clients')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (!clientsErr && clientsData && clientsData.length > 0) {
+          const mappedClients: Client[] = clientsData.map((c: any) => ({
+            id: c.id,
+            name: c.name,
+            contactPerson: c.contact_person,
+            phone: c.phone,
+            email: c.email || '',
+            gstNo: c.gst_no || undefined,
+            address: c.address || undefined,
+            city: c.city || undefined,
+            industry: c.industry || undefined,
+            status: c.status || 'Active',
+            sourceLeadId: c.source_lead_id || undefined,
+            createdAt: c.created_at ? c.created_at.split('T')[0] : new Date().toISOString().split('T')[0],
+          }));
+          setClients((prev) => {
+            const dbIds = new Set(mappedClients.map((m) => m.id));
+            const localOnly = prev.filter((item) => !dbIds.has(item.id));
+            return [...mappedClients, ...localOnly];
+          });
+        }
+      } catch (err) {
+        console.warn('Supabase clients fetch note:', err);
+      }
+
+      // 6.11 Fetch Documents from Supabase
+      try {
+        const { data: docsData, error: docsErr } = await supabase
+          .from('documents')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (!docsErr && docsData && docsData.length > 0) {
+          const mappedDocs: DocumentItem[] = docsData.map((d: any) => ({
+            id: d.id,
+            projectId: d.project_id || undefined,
+            title: d.title,
+            category: d.category === 'other' && d.title?.includes('Agreement') ? 'Recruitment' : (d.category as any) || 'Company',
+            referenceCode: d.reference_code || d.id,
+            complianceStandard: d.compliance_standard || undefined,
+            fileFormat: d.file_format || 'PDF',
+            filePath: d.file_path || undefined,
+            uploadedBy: d.uploaded_by || 'System',
+            uploadedAt: d.created_at,
+            description: d.description || '',
+            version: d.version || 1,
+          }));
+          setDocuments((prev) => {
+            const dbIds = new Set(mappedDocs.map((m) => m.id));
+            const localOnly = prev.filter((item) => !dbIds.has(item.id));
+            return [...mappedDocs, ...localOnly];
+          });
+        }
+      } catch (err) {
+        console.warn('Supabase documents fetch note:', err);
       }
 
       // 7. Fetch Audit Log
@@ -1553,7 +1653,9 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     milestones: Array<{ name: string; percentage: number; dueDate: string }>;
     members: Array<{ profileId: string; projectRole: 'tech_lead' | 'developer' | 'qa'; payModel: 'per_task' | 'per_module' | 'milestone_share' | 'hourly'; rate: number; allocationPct: number }>;
   }) => {
-    const newProjId = `proj_${Date.now()}`;
+    const newProjId = crypto.randomUUID();
+    const moduleIds = payload.modules.map(() => crypto.randomUUID());
+    const milestoneIds = payload.milestones.map(() => crypto.randomUUID());
     const newProject: Project = {
       id: newProjId,
       code: `PRJ-2026-${String(projects.length + 1).padStart(3, '0')}`,
@@ -1568,7 +1670,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       targetEndDate: payload.endDate,
       modules: payload.modules.map((m) => m.name),
       milestones: payload.milestones.map((ms, idx) => ({
-        id: `ms_${newProjId}_${idx + 1}`,
+        id: milestoneIds[idx],
         projectId: newProjId,
         name: ms.name,
         percentageAllocation: ms.percentage,
@@ -1635,12 +1737,29 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setTasks((prev) => [...generatedTasks, ...prev]);
     setSelectedProjectId(newProjId);
 
-    // Sync project to Supabase via direct table insert (non-blocking, local-first)
+    // Sync project, modules, milestones, members, and tasks to Supabase via direct table inserts
     if (isSupabaseLive) {
       try {
+        let resolvedClientId: string | null = payload.clientId && isUuid(payload.clientId) ? payload.clientId : null;
+        if (!resolvedClientId && payload.clientData?.name) {
+          const newCliUuid = crypto.randomUUID();
+          const { error: cliErr } = await supabase.from('clients').insert({
+            id: newCliUuid,
+            name: payload.clientData.name,
+            contact_person: payload.clientData.contactPerson || 'Owner',
+            phone: payload.clientData.phone || '+91 9000000000',
+            email: payload.clientData.email || null,
+            gst_no: payload.clientData.gstNo || null,
+            status: 'Active',
+          });
+          if (!cliErr) resolvedClientId = newCliUuid;
+        }
+
         const { error: projErr } = await supabase.from('projects').insert({
+          id: newProjId,
           code: newProject.code,
           name: newProject.name,
+          client_id: resolvedClientId,
           type: payload.type,
           description: payload.description || null,
           contract_value: payload.contractValue,
@@ -1648,7 +1767,72 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           end_date: payload.endDate,
           status: 'active',
         });
-        if (projErr) {
+
+        if (!projErr) {
+          if (payload.modules.length > 0) {
+            await supabase.from('project_modules').insert(
+              payload.modules.map((m, idx) => ({
+                id: moduleIds[idx],
+                project_id: newProjId,
+                name: m.name,
+                description: m.description || null,
+                budget_weight_pct: m.budgetWeightPct || 0,
+                sort_order: m.sortOrder ?? idx,
+                status: 'in_progress',
+              }))
+            );
+          }
+
+          if (newProject.milestones.length > 0) {
+            await supabase.from('milestones').insert(
+              newProject.milestones.map((ms) => ({
+                id: ms.id,
+                project_id: newProjId,
+                name: ms.name,
+                percentage: ms.percentageAllocation,
+                amount: ms.agreedAmountINR,
+                due_date: ms.dueDate,
+                status: 'pending',
+              }))
+            );
+          }
+
+          const validMembers = (newProject.members || []).filter((m) => isUuid(m.profileId));
+          if (validMembers.length > 0) {
+            await supabase.from('project_members').insert(
+              validMembers.map((m) => ({
+                id: m.id,
+                project_id: newProjId,
+                profile_id: m.profileId,
+                project_role: m.projectRole === 'tech_lead' ? 'tech_lead' : m.projectRole === 'qa' ? 'qa' : 'developer',
+                pay_model: m.payModel,
+                rate: m.rate,
+                allocation_pct: m.allocationPct,
+              }))
+            );
+          }
+
+          if (generatedTasks.length > 0) {
+            await supabase.from('tasks').insert(
+              generatedTasks.map((t) => ({
+                id: t.id,
+                project_id: newProjId,
+                module_id: t.moduleId && isUuid(t.moduleId) ? t.moduleId : null,
+                milestone_id: t.milestoneId && isUuid(t.milestoneId) ? t.milestoneId : null,
+                title: t.title,
+                description: t.description,
+                acceptance_criteria: t.acceptanceCriteria || null,
+                assignee_id: isUuid(t.assignedToId) ? t.assignedToId : null,
+                reviewer_id: isUuid(t.reviewerId || '') ? t.reviewerId : null,
+                priority: t.priority.toLowerCase() as any,
+                status: 'in_progress',
+                estimated_hours: t.estimatedHours || 24,
+                payout_amount: t.payoutAmountINR || 0,
+                deadline: t.deadline,
+              }))
+            );
+          }
+        } else {
           console.warn('Supabase create project notice (local copy preserved):', projErr.message);
         }
       } catch (err: any) {
@@ -1855,6 +2039,11 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       localStorage.setItem(STORAGE_KEYS.DAILY_STANDUPS, JSON.stringify(updated));
       return updated;
     });
+    if (isSupabaseLive) {
+      supabase.from('daily_standups').delete().eq('id', standupId).then(({ error }) => {
+        if (error) console.warn('Supabase deleteDailyStandup notice:', error.message);
+      });
+    }
     toast.success('Standup report removed.');
     return { success: true };
   };
@@ -2303,6 +2492,14 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         return l;
       })
     );
+    if (isSupabaseLive && isUuid(leadId)) {
+      supabase.from('leads').update({
+        next_callback_at: new Date(nextCallbackAt).toISOString(),
+        assigned_to: isUuid(userId) ? userId : undefined,
+      }).eq('id', leadId).then(({ error }) => {
+        if (error) console.warn('Supabase updateLeadFollowUp notice:', error.message);
+      });
+    }
     toast.success('Follow-up scheduled in your personal outreach queue!');
     return true;
   };
@@ -2628,6 +2825,74 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
+  const createNotification = useCallback(
+    async (
+      title: string,
+      body: string,
+      link?: string,
+      category: NotificationItem['category'] = 'system',
+      targetUserId?: string | null
+    ) => {
+      const notifId = crypto.randomUUID();
+      const createdAt = new Date().toISOString();
+      const newNotif: NotificationItem = {
+        id: notifId,
+        userId: targetUserId || null,
+        title,
+        body,
+        link,
+        category,
+        readAt: null,
+        createdAt,
+      };
+
+      setNotifications((prev) => [newNotif, ...prev.slice(0, 49)]);
+
+      if (isSupabaseLive) {
+        try {
+          await supabase.from('notifications').insert({
+            id: notifId,
+            user_id: targetUserId && isUuid(targetUserId) ? targetUserId : null,
+            title,
+            body,
+            link: link || null,
+            category: category || 'system',
+            created_at: createdAt,
+          });
+        } catch (err) {
+          console.warn('Supabase createNotification notice:', err);
+        }
+      }
+    },
+    [isSupabaseLive]
+  );
+
+  const markAllNotificationsRead = async () => {
+    const nowIso = new Date().toISOString();
+    setNotifications((prev) => prev.map((n) => (n.readAt ? n : { ...n, readAt: nowIso })));
+
+    if (isSupabaseLive) {
+      try {
+        await supabase.from('notifications').update({ read_at: nowIso }).is('read_at', null);
+      } catch (err) {
+        console.warn('Supabase markAllNotificationsRead notice:', err);
+      }
+    }
+  };
+
+  const clearNotifications = async () => {
+    setNotifications([]);
+    localStorage.removeItem(STORAGE_KEYS.NOTIFICATIONS);
+
+    if (isSupabaseLive) {
+      try {
+        await supabase.from('notifications').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+      } catch (err) {
+        console.warn('Supabase clearNotifications notice:', err);
+      }
+    }
+  };
+
   const markNotificationRead = async (id: string) => {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, readAt: new Date().toISOString() } : n))
@@ -2723,6 +2988,14 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         return updated;
       });
 
+      saveApplicationToSupabase(newApp).catch((err) => console.warn('Supabase application insert note:', err));
+      createNotification(
+        '🎉 New Candidate Application',
+        `${newApp.fullName} applied for ${newApp.roleTitle} (${referenceCode})`,
+        '/portal/team?tab=hiring',
+        'recruitment'
+      );
+
       await addAuditLog(
         'RECRUITMENT_APPLICATION_SUBMITTED',
         'JobApplication',
@@ -2764,6 +3037,14 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated));
         return updated;
       });
+
+      updateApplicationInSupabase(applicationId, {
+        status,
+        adminNotes: notes,
+        reviewedAt: new Date().toISOString(),
+        reviewedBy: currentUser?.name || 'Super Admin',
+        ...(emailMeta ? { lastEmailSentAt: emailMeta.sentAt, lastEmailType: emailMeta.emailType } : {}),
+      }).catch((err) => console.warn('Supabase status update note:', err));
 
       await addAuditLog(
         'RECRUITMENT_APPLICATION_STATUS_UPDATED',
@@ -2820,6 +3101,9 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             department: 'engineering',
             fullName: signatureName,
             email: '',
+            phone: '',
+            city: '',
+            experienceSummary: 'Digitally executed onboarding agreement.',
             status: 'Shortlisted',
             submittedAt: signedTimestamp,
             agreementSignedAt: signedTimestamp,
@@ -2937,6 +3221,20 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated));
         return updated;
       });
+
+      updateApplicationInSupabase(applicationId, {
+        status: 'Rejected',
+        agreementStatus: 'rejected',
+        agreementRejectedAt: new Date().toISOString(),
+        agreementRejectionReason: reason + (notes ? ' - ' + notes : ''),
+      }).catch((err) => console.warn('Supabase reject agreement note:', err));
+
+      createNotification(
+        '⚠️ Offer Declined by Candidate',
+        'Application ' + applicationId + ' declined onboarding agreement (' + reason + ')',
+        '/portal/team?tab=hiring',
+        'recruitment'
+      );
 
       await addAuditLog(
         'CANDIDATE_AGREEMENT_REJECTED',
@@ -3071,6 +3369,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(updated));
         return updated;
       });
+      deleteApplicationFromSupabase(applicationId).catch((err) => console.warn('Supabase delete application note:', err));
       await addAuditLog('JOB_APPLICATION_DELETED', 'JobApplication', `Deleted application ${applicationId}`);
       toast.success('Candidate application removed.');
       return { success: true };
@@ -3109,6 +3408,11 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         localStorage.setItem(STORAGE_KEYS.TASKS, JSON.stringify(updated));
         return updated;
       });
+      if (isSupabaseLive && isUuid(taskId)) {
+        supabase.from('tasks').delete().eq('id', taskId).then(({ error }) => {
+          if (error) console.warn('Supabase deleteTask notice:', error.message);
+        });
+      }
       await addAuditLog('TASK_DELETED', 'Tasks', `Deleted task ${taskId}`);
       toast.success('Task removed from board.');
       return { success: true };
@@ -3132,6 +3436,11 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       if (selectedProjectId === projectId) {
         setSelectedProjectId('all');
       }
+      if (isSupabaseLive && isUuid(projectId)) {
+        supabase.from('projects').delete().eq('id', projectId).then(({ error }) => {
+          if (error) console.warn('Supabase deleteProject notice:', error.message);
+        });
+      }
       await addAuditLog('PROJECT_DELETED', 'Projects', `Deleted project ${projectId} and associated tasks.`);
       toast.success('Project and associated tasks removed.');
       return { success: true };
@@ -3147,6 +3456,11 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         localStorage.setItem(STORAGE_KEYS.LEADS, JSON.stringify(updated));
         return updated;
       });
+      if (isSupabaseLive && isUuid(leadId)) {
+        supabase.from('leads').delete().eq('id', leadId).then(({ error }) => {
+          if (error) console.warn('Supabase deleteLead notice:', error.message);
+        });
+      }
       await addAuditLog('LEAD_DELETED', 'Leads', `Deleted lead ${leadId}`);
       toast.success('Lead removed from CRM.');
       return { success: true };
@@ -3162,6 +3476,11 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         localStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify(updated));
         return updated;
       });
+      if (isSupabaseLive) {
+        supabase.from('documents').delete().eq('id', documentId).then(({ error }) => {
+          if (error) console.warn('Supabase deleteDocument notice:', error.message);
+        });
+      }
       await addAuditLog('DOCUMENT_DELETED', 'Documents', `Deleted document ${documentId}`);
       toast.success('Document removed from vault.');
       return { success: true };
@@ -3234,6 +3553,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         addAuditLog,
         notifications,
         markNotificationRead,
+        markAllNotificationsRead,
+        clearNotifications,
         searchQuery,
         setSearchQuery,
         clients,
@@ -3326,6 +3647,9 @@ export const usePortal = (): PortalContextType => {
             department: 'engineering',
             fullName: signatureName,
             email: '',
+            phone: '',
+            city: '',
+            experienceSummary: 'Digitally executed onboarding agreement.',
             status: 'Shortlisted',
             submittedAt: signedTimestamp,
             agreementSignedAt: signedTimestamp,
@@ -3515,6 +3839,8 @@ export const usePortal = (): PortalContextType => {
       addAuditLog: async () => {},
       notifications: [],
       markNotificationRead: async () => {},
+      markAllNotificationsRead: async () => {},
+      clearNotifications: async () => {},
       searchQuery: '',
       setSearchQuery: () => {},
       clients: [],

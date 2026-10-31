@@ -190,12 +190,15 @@ export const TeamStandupFeed: React.FC<TeamStandupFeedProps> = ({
         ) : (
           displayList.map((standup) => {
             const devUser = users.find((u) => u.id === standup.developerId);
-            const timeAgo = new Date(standup.createdAt).toLocaleDateString(undefined, {
-              month: 'short',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-            });
+            const parsedDate = standup.createdAt ? new Date(standup.createdAt) : new Date();
+            const timeAgo = !isNaN(parsedDate.getTime())
+              ? parsedDate.toLocaleDateString('en-IN', {
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })
+              : 'Today';
 
             return (
               <div

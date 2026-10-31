@@ -47,53 +47,127 @@ export const DashboardPage: React.FC = () => {
   const isAdmin = user.role === 'admin' || user.role === 'super_admin';
 
   // Admin metrics
-  const activeProjectsCount = projects.filter((p) => p.status === 'Active').length;
+  const activeProjectsCount = projects.filter(
+    (p) => p.status === 'Active' || p.status === 'active'
+  ).length;
   const totalTasks = tasks.length;
-  const completedTasks = tasks.filter((t) => t.status === 'Approved' || t.status === 'Completed').length;
-  const pendingReviewTasks = tasks.filter((t) => t.status === 'Submitted for Review').length;
-  const changesRequestedTasks = tasks.filter((t) => t.status === 'Changes Requested').length;
+  const completedTasks = tasks.filter(
+    (t) => t.status === 'Approved' || t.status === 'Completed' || t.status === 'approved'
+  ).length;
+  const pendingReviewTasks = tasks.filter(
+    (t) => t.status === 'Submitted for Review' || t.status === 'submitted'
+  ).length;
+  const changesRequestedTasks = tasks.filter(
+    (t) => t.status === 'Changes Requested' || t.status === 'changes_requested'
+  ).length;
 
-  const qualifiedLeads = leads.filter((l) => l.status === 'Qualified').length;
-  const convertedLeads = leads.filter((l) => l.status === 'Converted').length;
-  const demosScheduled = leads.filter((l) => l.status === 'Demo Scheduled').length;
+  const qualifiedLeads = leads.filter(
+    (l) => l.status === 'Qualified' || l.status === 'interested'
+  ).length;
+  const convertedLeads = leads.filter(
+    (l) => l.status === 'Converted' || l.status === 'won'
+  ).length;
+  const demosScheduled = leads.filter(
+    (l) => l.status === 'Demo Scheduled' || l.status === 'demo'
+  ).length;
   const lockedContacts = leads.filter((l) => l.isLocked).length;
 
   const totalPaidINR = vouchers
     .filter((v) => v.status === 'Released / Paid')
-    .reduce((sum, v) => sum + v.netPayableINR, 0);
+    .reduce((sum, v) => sum + (Number(v.netPayableINR) || 0), 0);
 
   const pendingDisbursementINR = vouchers
     .filter((v) => v.status === 'Approved')
-    .reduce((sum, v) => sum + v.netPayableINR, 0);
+    .reduce((sum, v) => sum + (Number(v.netPayableINR) || 0), 0);
 
   const overallProgress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   // Developer metrics
-  const myProjects = projects.filter(
-    (p) => p.members?.some((m) => m.profileId === user.id || m.userId === user.id)
+  const myProjects = projects.filter((p) =>
+    p.members?.some(
+      (m) =>
+        m.profileId === user.id ||
+        m.userId === user.id ||
+        m.profileName?.toLowerCase() === user.name.toLowerCase()
+    )
   );
-  const myTasks = tasks.filter((t) => t.assignedToId === user.id);
-  const myCompletedTasks = myTasks.filter((t) => t.status === 'Approved').length;
-  const myPendingReview = myTasks.filter((t) => t.status === 'Submitted for Review').length;
-  const myActiveTasks = myTasks.filter((t) => t.status !== 'Approved');
-  const myVouchers = vouchers.filter((v) => v.recipientId === user.id);
+  const myTasks = tasks.filter(
+    (t) =>
+      t.assignedToId === user.id ||
+      t.assignedToId === user.userId ||
+      t.assignedToName?.toLowerCase() === user.name.toLowerCase()
+  );
+  const myCompletedTasks = myTasks.filter(
+    (t) => t.status === 'Approved' || t.status === 'approved'
+  ).length;
+  const myPendingReview = myTasks.filter(
+    (t) => t.status === 'Submitted for Review' || t.status === 'submitted'
+  ).length;
+  const myActiveTasks = myTasks.filter(
+    (t) => t.status !== 'Approved' && t.status !== 'approved'
+  );
+  const myVouchers = vouchers.filter(
+    (v) =>
+      v.recipientId === user.id ||
+      v.recipientId === user.userId ||
+      v.recipientName?.toLowerCase() === user.name.toLowerCase()
+  );
   const myTotalEarnedINR = myVouchers
     .filter((v) => v.status === 'Released / Paid')
-    .reduce((sum, v) => sum + v.netPayableINR, 0);
+    .reduce((sum, v) => sum + (Number(v.netPayableINR) || 0), 0);
   const myPendingPayoutINR = myVouchers
     .filter((v) => v.status === 'Approved')
-    .reduce((sum, v) => sum + v.netPayableINR, 0);
+    .reduce((sum, v) => sum + (Number(v.netPayableINR) || 0), 0);
 
   // Telecaller metrics
-  const myLeads = leads.filter((l) => l.ownerId === user.id || l.assignedToId === user.id);
-  const myLockedLeads = leads.filter((l) => l.isLocked && l.lockedById === user.id).length;
+  const myLeads = leads.filter(
+    (l) =>
+      l.ownerId === user.id ||
+      l.assignedToId === user.id ||
+      l.ownerId === user.userId ||
+      l.assignedToId === user.userId ||
+      l.ownerName?.toLowerCase() === user.name.toLowerCase() ||
+      l.assignedToName?.toLowerCase() === user.name.toLowerCase()
+  );
+  const myLockedLeads = leads.filter(
+    (l) =>
+      l.isLocked &&
+      (l.lockedById === user.id ||
+        l.lockedById === user.userId ||
+        l.lockedByName?.toLowerCase() === user.name.toLowerCase())
+  ).length;
   const myCallbacksDue = myLeads.filter(
     (l) => l.nextCallbackAt && l.status !== 'Converted' && l.status !== 'Rejected'
   );
-  const myConvertedLeads = myLeads.filter((l) => l.status === 'Converted').length;
-  const myQualifiedLeads = myLeads.filter(
-    (l) => l.status === 'Qualified' || l.status === 'Demo Scheduled'
+  const myConvertedLeads = myLeads.filter(
+    (l) => l.status === 'Converted' || l.status === 'won'
   ).length;
+  const myQualifiedLeads = myLeads.filter(
+    (l) =>
+      l.status === 'Qualified' ||
+      l.status === 'Demo Scheduled' ||
+      l.status === 'interested' ||
+      l.status === 'demo'
+  ).length;
+
+  const formatSafeDateTime = (dateStr?: string) => {
+    if (!dateStr) return 'Scheduled';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return 'Scheduled';
+    return d.toLocaleString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const formatSafeTime = (dateStr?: string) => {
+    if (!dateStr) return 'Just now';
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return 'Just now';
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -283,7 +357,7 @@ export const DashboardPage: React.FC = () => {
                             {lead.nextCallbackAt && (
                               <div className="text-[10px] text-amber-500 flex items-center gap-1 font-medium">
                                 <Clock className="w-3 h-3" />
-                                <span>Callback: {new Date(lead.nextCallbackAt).toLocaleString()} ({lead.followUpStage || 'Follow-Up'})</span>
+                                <span>Callback: {formatSafeDateTime(lead.nextCallbackAt)} ({lead.followUpStage || 'Follow-Up'})</span>
                               </div>
                             )}
                           </div>
@@ -780,7 +854,9 @@ export const DashboardPage: React.FC = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {projects.map((proj) => {
                         const pTasks = tasks.filter((t) => t.projectId === proj.id);
-                        const pApproved = pTasks.filter((t) => t.status === 'Approved').length;
+                        const pApproved = pTasks.filter(
+                          (t) => t.status === 'Approved' || t.status === 'Completed' || t.status === 'approved'
+                        ).length;
                         const pPct = pTasks.length > 0 ? Math.round((pApproved / pTasks.length) * 100) : 0;
 
                         return (
@@ -797,9 +873,15 @@ export const DashboardPage: React.FC = () => {
                             <div>
                               <div className="font-bold text-xs text-foreground truncate">{proj.name}</div>
                               <div className="text-[11px] text-muted-foreground truncate">
-                                Client: {proj.clientName || 'General Client'} • ₹{(proj.contractValueINR / 1000).toFixed(0)}k Budget
+                                Client: {proj.clientName || 'General Client'} • ₹{((Number(proj.contractValueINR) || 0) / 1000).toFixed(0)}k Budget
                               </div>
                             </div>
+                            {(proj.startDate || proj.targetEndDate) && (
+                              <div className="flex items-center justify-between text-[10px] text-muted-foreground font-mono bg-muted/30 px-2 py-1 rounded">
+                                <span>Start: {proj.startDate || 'TBD'}</span>
+                                <span>Due: {proj.targetEndDate || 'TBD'}</span>
+                              </div>
+                            )}
 
                             <div className="space-y-1 pt-1">
                               <div className="flex justify-between text-[10px] text-muted-foreground">
@@ -899,7 +981,7 @@ export const DashboardPage: React.FC = () => {
                         <div className="flex items-center justify-between text-[11px]">
                           <span className="font-semibold text-primary">{log.actorName}</span>
                           <span className="text-muted-foreground font-mono text-[10px]">
-                            {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            {formatSafeTime(log.timestamp)}
                           </span>
                         </div>
                         <div className="font-mono text-[10px] text-muted-foreground font-semibold">
