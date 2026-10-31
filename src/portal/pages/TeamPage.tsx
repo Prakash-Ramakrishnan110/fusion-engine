@@ -123,7 +123,8 @@ export const TeamPage: React.FC = () => {
   };
 
   // Hiring & Candidate Applications Tab States
-  const [hiringFilter, setHiringFilter] = useState<'All' | 'New' | 'Shortlisted' | 'Hired' | 'Rejected'>('All');
+  const [hiringFilter, setHiringFilter] = useState<'All' | 'New' | 'Shortlisted' | 'Agreement Signed' | 'Hired' | 'Rejected'>('All');
+  const [departmentFilter, setDepartmentFilter] = useState<'All' | 'engineering' | 'sales'>('All');
   const [hiringSearch, setHiringSearch] = useState('');
 
   // Modal 3: Candidate Email Notification Dialog
@@ -133,11 +134,12 @@ export const TeamPage: React.FC = () => {
   const [signedAppForView, setSignedAppForView] = useState<JobApplication | null>(null);
   const [isSignedModalOpen, setIsSignedModalOpen] = useState(false);
 
-  const handleTriggerCandidateAction = (
+  const handleTriggerCandidateAction = async (
     app: JobApplication,
     status: 'Shortlisted' | 'Hired' | 'Rejected' | string
   ) => {
-    setSelectedAppForEmail(app);
+    await updateApplicationStatus(app.id, status as JobApplication['status']);
+    setSelectedAppForEmail({ ...app, status: status as JobApplication['status'] });
     setTargetStatusForEmail(status);
     setIsEmailModalOpen(true);
   };
@@ -715,41 +717,72 @@ export const TeamPage: React.FC = () => {
             {/* Candidate Applications Section */}
             <div className="space-y-4">
               {/* Filter Bar */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-card/60 border border-border/60 rounded-2xl p-4">
-                <div className="flex items-center gap-2">
-                  <Input
-                    placeholder="Search candidate name, email, phone, role..."
-                    value={hiringSearch}
-                    onChange={(e) => hiringSearch !== e.target.value && setHiringSearch(e.target.value)}
-                    className="h-8 text-xs w-full sm:w-64"
-                  />
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleCreateSampleCandidate}
-                    className="h-8 text-xs gap-1.5 shrink-0 hidden sm:flex text-primary hover:text-primary"
-                  >
-                    <Plus className="w-3.5 h-3.5" /> Add Test Candidate
-                  </Button>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-1.5">
-                  {(['All', 'New', 'Shortlisted', 'Hired', 'Rejected'] as const).map((status) => (
-                    <Button
-                      key={status}
-                      size="sm"
-                      variant={hiringFilter === status ? 'default' : 'ghost'}
-                      onClick={() => setHiringFilter(status)}
-                      className={`text-xs h-7 px-2.5 rounded-lg cursor-pointer ${
-                        hiringFilter === status ? 'shadow-xs' : 'text-muted-foreground'
-                      }`}
+              <div className="flex flex-col gap-3 bg-card/60 border border-border/60 rounded-2xl p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Input
+                      placeholder="Search candidate name, email, phone, role, city..."
+                      value={hiringSearch}
+                      onChange={(e) => setHiringSearch(e.target.value)}
+                      className="h-8 text-xs w-full sm:w-64"
+                    />
+                    <Select
+                      value={departmentFilter}
+                      onValueChange={(val: 'All' | 'engineering' | 'sales') => setDepartmentFilter(val)}
                     >
-                      {status}
-                      {status === 'All'
-                        ? ` (${applications.length})`
-                        : ` (${applications.filter((a) => a.status === status).length})`}
+                      <SelectTrigger className="h-8 w-40 text-xs cursor-pointer">
+                        <SelectValue placeholder="All Roles" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="All" className="text-xs">All Departments ({applications.length})</SelectItem>
+                        <SelectItem value="engineering" className="text-xs">
+                          Engineering ({applications.filter((a) => a.department === 'engineering').length})
+                        </SelectItem>
+                        <SelectItem value="sales" className="text-xs">
+                          Sales / Telecaller ({applications.filter((a) => a.department === 'sales').length})
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleCreateSampleCandidate}
+                      className="h-8 text-xs gap-1.5 shrink-0 hidden sm:flex text-primary hover:text-primary cursor-pointer"
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Add Test Candidate
                     </Button>
-                  ))}
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {(['All', 'New', 'Shortlisted', 'Agreement Signed', 'Hired', 'Rejected'] as const).map((status) => {
+                      const count =
+                        status === 'All'
+                          ? applications.length
+                          : status === 'New'
+                          ? applications.filter((a) => a.status === 'New' || a.status === 'Under Review').length
+                          : status === 'Shortlisted'
+                          ? applications.filter((a) => a.status === 'Shortlisted' || a.status === 'Interview Scheduled').length
+                          : status === 'Agreement Signed'
+                          ? applications.filter((a) => a.agreementStatus === 'signed' || Boolean(a.agreementTermsAccepted)).length
+                          : status === 'Rejected'
+                          ? applications.filter((a) => a.status === 'Rejected' || a.agreementStatus === 'rejected').length
+                          : applications.filter((a) => a.status === status).length;
+
+                      return (
+                        <Button
+                          key={status}
+                          size="sm"
+                          variant={hiringFilter === status ? 'default' : 'ghost'}
+                          onClick={() => setHiringFilter(status)}
+                          className={`text-xs h-7 px-2.5 rounded-lg cursor-pointer ${
+                            hiringFilter === status ? 'shadow-xs' : 'text-muted-foreground'
+                          }`}
+                        >
+                          {status} ({count})
+                        </Button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 
@@ -760,15 +793,31 @@ export const TeamPage: React.FC = () => {
 
                 const filtered = appList.filter((app) => {
                   if (!app) return false;
-                  const matchStatus = hiringFilter === 'All' || app.status === hiringFilter;
+                  const matchDept =
+                    departmentFilter === 'All' || app.department === departmentFilter;
+                  const matchStatus =
+                    hiringFilter === 'All'
+                      ? true
+                      : hiringFilter === 'New'
+                      ? app.status === 'New' || app.status === 'Under Review'
+                      : hiringFilter === 'Shortlisted'
+                      ? app.status === 'Shortlisted' || app.status === 'Interview Scheduled'
+                      : hiringFilter === 'Agreement Signed'
+                      ? app.agreementStatus === 'signed' || Boolean(app.agreementTermsAccepted)
+                      : hiringFilter === 'Rejected'
+                      ? app.status === 'Rejected' || app.agreementStatus === 'rejected'
+                      : app.status === hiringFilter;
                   const matchSearch =
                     !q ||
                     (app.fullName || '').toLowerCase().includes(q) ||
                     (app.email || '').toLowerCase().includes(q) ||
-                    (app.phone || '').includes(q) ||
+                    (app.phone || '').toLowerCase().includes(q) ||
                     (app.roleTitle || '').toLowerCase().includes(q) ||
-                    (app.referenceCode || '').toLowerCase().includes(q);
-                  return matchStatus && matchSearch;
+                    (app.referenceCode || '').toLowerCase().includes(q) ||
+                    (app.city || '').toLowerCase().includes(q) ||
+                    (app.department || '').toLowerCase().includes(q) ||
+                    (app.status || '').toLowerCase().includes(q);
+                  return matchDept && matchStatus && matchSearch;
                 });
 
 
@@ -865,55 +914,76 @@ export const TeamPage: React.FC = () => {
 
                             {/* Candidate Actions & Status Controls */}
                             <div className="shrink-0 flex flex-col sm:items-end gap-2">
-                              {/* Quick Action Buttons: Shortlist, Hire, Reject */}
+                              {/* Dynamic Action Controls: Buttons removed once decision is made */}
                               <div className="flex items-center gap-1.5 flex-wrap">
-                                <Button
-                                  type="button"
-                                  size="sm"
-                                  variant="outline"
-                                  className={`h-7 px-2.5 text-xs gap-1 font-semibold transition-all cursor-pointer ${
-                                    app.status === 'Shortlisted'
-                                      ? 'bg-blue-500/20 text-blue-600 border-blue-500/40 shadow-xs'
-                                      : 'hover:bg-blue-500/10 hover:text-blue-600 hover:border-blue-500/30 text-muted-foreground'
-                                  }`}
-                                  onClick={() => handleTriggerCandidateAction(app, 'Shortlisted')}
-                                  title="Shortlist candidate and send invitation email"
-                                >
-                                  <Star className={`w-3.5 h-3.5 ${app.status === 'Shortlisted' ? 'fill-blue-500 text-blue-500' : ''}`} />
-                                  <span>Shortlist</span>
-                                </Button>
+                                {(app.status === 'New' || app.status === 'Under Review') ? (
+                                  <>
+                                    <Button
+                                      type="button"
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-7 px-2.5 text-xs gap-1 font-semibold transition-all cursor-pointer hover:bg-blue-500/10 hover:text-blue-600 hover:border-blue-500/30 text-foreground"
+                                      onClick={() => handleTriggerCandidateAction(app, 'Shortlisted')}
+                                      title="Shortlist candidate and send invitation email"
+                                    >
+                                      <Star className="w-3.5 h-3.5 text-blue-500" />
+                                      <span>Shortlist</span>
+                                    </Button>
 
-                                <Button
-                                  type="button"
-                                  size="sm"
-                                  variant="outline"
-                                  className={`h-7 px-2.5 text-xs gap-1 font-semibold transition-all cursor-pointer ${
-                                    app.status === 'Hired'
-                                      ? 'bg-emerald-500/20 text-emerald-600 border-emerald-500/40 shadow-xs'
-                                      : 'hover:bg-emerald-500/10 hover:text-emerald-600 hover:border-emerald-500/30 text-muted-foreground'
-                                  }`}
-                                  onClick={() => handleTriggerCandidateAction(app, 'Hired')}
-                                  title="Hire candidate and send offer email"
-                                >
-                                  <UserCheck className="w-3.5 h-3.5" />
-                                  <span>Hire</span>
-                                </Button>
+                                    <Button
+                                      type="button"
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-7 px-2.5 text-xs gap-1 font-semibold transition-all cursor-pointer hover:bg-emerald-500/10 hover:text-emerald-600 hover:border-emerald-500/30 text-foreground"
+                                      onClick={() => handleTriggerCandidateAction(app, 'Hired')}
+                                      title="Hire candidate and send offer email"
+                                    >
+                                      <UserCheck className="w-3.5 h-3.5 text-emerald-500" />
+                                      <span>Hire</span>
+                                    </Button>
 
-                                <Button
-                                  type="button"
-                                  size="sm"
-                                  variant="outline"
-                                  className={`h-7 px-2.5 text-xs gap-1 font-semibold transition-all cursor-pointer ${
-                                    app.status === 'Rejected'
-                                      ? 'bg-rose-500/20 text-rose-600 border-rose-500/40 shadow-xs'
-                                      : 'hover:bg-rose-500/10 hover:text-rose-600 hover:border-rose-500/30 text-muted-foreground'
-                                  }`}
-                                  onClick={() => handleTriggerCandidateAction(app, 'Rejected')}
-                                  title="Reject candidate and send acknowledgement email"
-                                >
-                                  <UserX className="w-3.5 h-3.5" />
-                                  <span>Reject</span>
-                                </Button>
+                                    <Button
+                                      type="button"
+                                      size="sm"
+                                      variant="outline"
+                                      className="h-7 px-2.5 text-xs gap-1 font-semibold transition-all cursor-pointer hover:bg-rose-500/10 hover:text-rose-600 hover:border-rose-500/30 text-foreground"
+                                      onClick={() => handleTriggerCandidateAction(app, 'Rejected')}
+                                      title="Reject candidate and send acknowledgement email"
+                                    >
+                                      <UserX className="w-3.5 h-3.5 text-rose-500" />
+                                      <span>Reject</span>
+                                    </Button>
+                                  </>
+                                ) : app.status === 'Shortlisted' || app.status === 'Interview Scheduled' ? (
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <Badge className="bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30 text-xs py-1 px-2.5 gap-1 font-semibold">
+                                      <Star className="w-3.5 h-3.5 fill-blue-500 text-blue-500" />
+                                      <span>{app.status}</span>
+                                    </Badge>
+                                    {(app.agreementTermsAccepted || app.agreementStatus === 'signed') && (
+                                      <Button
+                                        type="button"
+                                        size="sm"
+                                        onClick={() => handleTriggerCandidateAction(app, 'Hired')}
+                                        className="h-7 px-2.5 text-xs gap-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold cursor-pointer shadow-xs"
+                                        title="Confirm Hire and send login credentials"
+                                      >
+                                        <UserCheck className="w-3.5 h-3.5" />
+                                        <span>Approve & Hire</span>
+                                      </Button>
+                                    )}
+                                  </div>
+                                ) : app.status === 'Hired' ? (
+                                  <Badge className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-xs py-1 px-2.5 gap-1 font-semibold">
+                                    <UserCheck className="w-3.5 h-3.5 text-emerald-500" />
+                                    <span>Hired & Verified</span>
+                                  </Badge>
+                                ) : (
+                                  <Badge className="bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 text-xs py-1 px-2.5 gap-1 font-semibold">
+                                    <UserX className="w-3.5 h-3.5 text-rose-500" />
+                                    <span>Rejected</span>
+                                  </Badge>
+                                )}
 
                                 <Select
                                   value={app.status}

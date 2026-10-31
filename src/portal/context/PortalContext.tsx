@@ -49,6 +49,23 @@ import defaultAvatar from '../../assets/default-avatar.svg';
 const isUuid = (str: string) =>
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
 
+const dedupeDocumentsList = (list: DocumentItem[]): DocumentItem[] => {
+  const seenRefs = new Set<string>();
+  const seenTitles = new Set<string>();
+  const result: DocumentItem[] = [];
+  for (const doc of list) {
+    if (!doc) continue;
+    const refKey = (doc.referenceCode || '').trim().toLowerCase();
+    const titleKey = (doc.title || '').trim().toLowerCase();
+    if (refKey && seenRefs.has(refKey)) continue;
+    if (titleKey && seenTitles.has(titleKey)) continue;
+    if (refKey) seenRefs.add(refKey);
+    if (titleKey) seenTitles.add(titleKey);
+    result.push(doc);
+  }
+  return result;
+};
+
 const INITIAL_DAILY_STANDUPS: DailyStandupUpdate[] = [];
 
 // Demo seed data removed — production uses real applications only.
@@ -230,6 +247,7 @@ interface PortalContextType {
   deleteProject: (projectId: string) => Promise<{ success: boolean; error?: string }>;
   deleteLead: (leadId: string) => Promise<{ success: boolean; error?: string }>;
   deleteDocument: (documentId: string) => Promise<{ success: boolean; error?: string }>;
+  deduplicateDocuments: () => Promise<{ removedCount: number }>;
 
   // Utility
   cleanDuplicateData: () => Promise<number>;
@@ -406,10 +424,12 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) return parsed;
+        if (Array.isArray(parsed)) {
+          return dedupeDocumentsList([...parsed, ...INITIAL_DOCUMENTS]);
+        }
       } catch {}
     }
-    return INITIAL_DOCUMENTS;
+    return dedupeDocumentsList(INITIAL_DOCUMENTS);
   });
 
   useEffect(() => {
@@ -916,16 +936,39 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         })));
       }
 
-      // 7.5 Fetch Applications from Supabase
+      // 7.5 Fetch Applications from Supabase & synthesize Signed Agreement docs
+      let signedCandidateDocs: DocumentItem[] = [];
       try {
         const remoteApps = await fetchApplicationsFromSupabase();
         if (remoteApps && remoteApps.length > 0) {
-          setApplications(remoteApps);
+          const normalizedApps = remoteApps.map((app) => {
+            if ((app.agreementStatus === 'signed' || app.agreementTermsAccepted) && app.status === 'New') {
+              updateApplicationInSupabase(app.id, { status: 'Shortlisted' }).catch(() => {});
+              return { ...app, status: 'Shortlisted' as const };
+            }
+            return app;
+          });
+          setApplications(normalizedApps);
           try {
-            localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(remoteApps));
+            localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify(normalizedApps));
           } catch (e) {
             console.warn('Applications storage write note:', e);
           }
+
+          signedCandidateDocs = normalizedApps
+            .filter((a) => a.agreementStatus === 'signed' || a.agreementTermsAccepted || a.status === 'Hired')
+            .map((a) => ({
+              id: isUuid(a.id) ? a.id : crypto.randomUUID(),
+              title: `Freelancer Service Agreement — ${a.agreementSignature || a.fullName} (${a.referenceCode})`,
+              category: 'Recruitment' as const,
+              referenceCode: a.referenceCode,
+              complianceStandard: 'Section 10A Indian Information Technology Act, 2000',
+              fileFormat: 'PDF/Contract',
+              uploadedBy: a.agreementSignature || a.fullName,
+              uploadedAt: a.agreementSignedAt ? a.agreementSignedAt.split('T')[0] : (a.submittedAt ? a.submittedAt.split('T')[0] : new Date().toISOString().split('T')[0]),
+              description: `Digitally certified freelancer onboarding contract executed by ${a.agreementSignature || a.fullName} for ${a.roleTitle}. Enforceable under Section 10A IT Act 2000.`,
+              version: 1,
+            }));
         }
       } catch (appErr) {
         console.warn('Supabase application sync note:', appErr);
@@ -1026,27 +1069,46 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           .select('*')
           .order('created_at', { ascending: false });
 
-        if (!docsErr && docsData && docsData.length > 0) {
-          const mappedDocs: DocumentItem[] = docsData.map((d: any) => ({
-            id: d.id,
-            projectId: d.project_id || undefined,
-            title: d.title,
-            category: d.category === 'other' && d.title?.includes('Agreement') ? 'Recruitment' : (d.category as any) || 'Company',
-            referenceCode: d.reference_code || d.id,
-            complianceStandard: d.compliance_standard || undefined,
-            fileFormat: d.file_format || 'PDF',
-            filePath: d.file_path || undefined,
-            uploadedBy: d.uploaded_by || 'System',
-            uploadedAt: d.created_at,
-            description: d.description || '',
-            version: d.version || 1,
-          }));
-          setDocuments((prev) => {
-            const dbIds = new Set(mappedDocs.map((m) => m.id));
-            const localOnly = prev.filter((item) => !dbIds.has(item.id));
-            return [...mappedDocs, ...localOnly];
-          });
+        const mappedDocs: DocumentItem[] = (!docsErr && docsData)
+          ? docsData.map((d: any) => ({
+              id: d.id,
+              projectId: d.project_id || undefined,
+              title: d.title,
+              category:
+                d.category === 'other' || d.title?.toLowerCase().includes('agreement') || d.title?.toLowerCase().includes('contractor')
+                  ? 'Recruitment'
+                  : (d.category as any) || 'Company',
+              referenceCode: d.reference_code || d.id,
+              complianceStandard: d.compliance_standard || 'Statutory Compliance Record',
+              fileFormat: d.file_format || 'PDF',
+              filePath: d.file_path || undefined,
+              uploadedBy: d.uploaded_by || 'System',
+              uploadedAt: d.created_at ? d.created_at.split('T')[0] : new Date().toISOString().split('T')[0],
+              description: d.description || '',
+              version: d.version || 1,
+            }))
+          : [];
+
+        const existingDbRefs = new Set(mappedDocs.map((d) => (d.referenceCode || '').toLowerCase()));
+        for (const sDoc of signedCandidateDocs) {
+          if (sDoc.referenceCode && !existingDbRefs.has(sDoc.referenceCode.toLowerCase())) {
+            supabase.from('documents').insert({
+              id: isUuid(sDoc.id) ? sDoc.id : crypto.randomUUID(),
+              title: sDoc.title,
+              category: 'other',
+              reference_code: sDoc.referenceCode,
+              compliance_standard: sDoc.complianceStandard || null,
+              file_format: sDoc.fileFormat || 'PDF/Contract',
+              description: sDoc.description || null,
+              uploaded_by: null,
+              file_path: null,
+            }).then(() => {});
+          }
         }
+
+        setDocuments((prev) =>
+          dedupeDocumentsList([...signedCandidateDocs, ...mappedDocs, ...prev, ...INITIAL_DOCUMENTS])
+        );
       } catch (err) {
         console.warn('Supabase documents fetch note:', err);
       }
@@ -3038,13 +3100,55 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         return updated;
       });
 
-      updateApplicationInSupabase(applicationId, {
+      await updateApplicationInSupabase(applicationId, {
         status,
         adminNotes: notes,
         reviewedAt: new Date().toISOString(),
         reviewedBy: currentUser?.name || 'Super Admin',
         ...(emailMeta ? { lastEmailSentAt: emailMeta.sentAt, lastEmailType: emailMeta.emailType } : {}),
       }).catch((err) => console.warn('Supabase status update note:', err));
+
+      const matchedApp = applications.find(
+        (a) => a.id === applicationId || a.referenceCode === applicationId
+      );
+      if (status === 'Hired' && matchedApp) {
+        const docUuid = isUuid(matchedApp.id) ? matchedApp.id : crypto.randomUUID();
+        const refCode = matchedApp.referenceCode || matchedApp.id;
+        const signerName = matchedApp.agreementSignature || matchedApp.fullName;
+        const hiredAgreementDoc: DocumentItem = {
+          id: docUuid,
+          title: `Freelancer Service Agreement — ${signerName} (${refCode})`,
+          category: 'Recruitment',
+          referenceCode: refCode,
+          complianceStandard: 'Section 10A Indian Information Technology Act, 2000',
+          fileFormat: 'PDF/Contract',
+          uploadedBy: signerName,
+          uploadedAt: (matchedApp.agreementSignedAt || new Date().toISOString()).split('T')[0],
+          description: `Digitally certified freelancer onboarding contract executed by ${signerName} for ${matchedApp.roleTitle}. Enforceable under Section 10A IT Act 2000.`,
+          version: 1,
+        };
+        setDocuments((prevDocs) => {
+          const updatedDocs = dedupeDocumentsList([hiredAgreementDoc, ...prevDocs]);
+          try {
+            localStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify(updatedDocs));
+          } catch {}
+          return updatedDocs;
+        });
+        if (isSupabaseLive) {
+          await supabase.from('documents').delete().eq('reference_code', refCode);
+          await supabase.from('documents').insert({
+            id: docUuid,
+            title: hiredAgreementDoc.title,
+            category: 'other',
+            reference_code: refCode,
+            compliance_standard: hiredAgreementDoc.complianceStandard || null,
+            file_format: hiredAgreementDoc.fileFormat || 'PDF/Contract',
+            description: hiredAgreementDoc.description || null,
+            uploaded_by: null,
+            file_path: null,
+          });
+        }
+      }
 
       await addAuditLog(
         'RECRUITMENT_APPLICATION_STATUS_UPDATED',
@@ -3082,6 +3186,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             app.referenceCode.toLowerCase() === applicationId.toLowerCase()
               ? {
                   ...app,
+                  status: app.status === 'New' || app.status === 'Under Review' ? ('Shortlisted' as const) : app.status,
                   agreementSignedAt: signedTimestamp,
                   agreementSignature: signatureName,
                   agreementSignerIp: signerIp || 'Verified Web Session',
@@ -3125,7 +3230,19 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         return updated;
       });
 
+      const matchedCandidate = applications.find(
+        (a) =>
+          a.id.toLowerCase() === applicationId.toLowerCase() ||
+          a.referenceCode.toLowerCase() === applicationId.toLowerCase()
+      );
+      const resolvedRefCode = matchedCandidate?.referenceCode || applicationId;
+      const nextStatus =
+        !matchedCandidate || matchedCandidate.status === 'New' || matchedCandidate.status === 'Under Review'
+          ? 'Shortlisted'
+          : matchedCandidate.status;
+
       updateApplicationInSupabase(applicationId, {
+        status: nextStatus,
         agreementSignedAt: signedTimestamp,
         agreementSignature: signatureName,
         agreementSignerIp: signerIp || 'Verified Web Session',
@@ -3137,29 +3254,33 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
       createNotification(
         '✍️ Agreement Digitally Signed',
-        `${signatureName} signed Freelancer Service Agreement for ${applicationId}`,
+        `${signatureName} signed Freelancer Service Agreement for ${resolvedRefCode}`,
         '/portal/team?tab=hiring',
         'recruitment'
       );
 
-      // Automatically archive executed agreement in Document Vault (/portal/documents)
-      const agreementDocId = `doc_agreement_${applicationId.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+      // Automatically archive executed agreement in Document Vault (/portal/documents) with valid UUID
+      const agreementDocId = crypto.randomUUID();
       const newAgreementDoc: DocumentItem = {
         id: agreementDocId,
-        title: `Freelancer Service Agreement — ${signatureName} (${applicationId})`,
+        title: `Freelancer Service Agreement — ${signatureName} (${resolvedRefCode})`,
         category: 'Recruitment',
-        referenceCode: applicationId,
+        referenceCode: resolvedRefCode,
         complianceStandard: 'Section 10A Indian Information Technology Act, 2000',
         fileFormat: 'PDF/Contract',
         uploadedBy: signatureName,
-        uploadedAt: signedTimestamp,
+        uploadedAt: signedTimestamp.split('T')[0],
         description: `Digitally certified freelancer onboarding contract executed by ${signatureName}. Enforceable under Section 10A IT Act 2000.`,
         version: 1,
       };
 
       setDocuments((prevDocs) => {
-        const filtered = prevDocs.filter((d) => d.id !== agreementDocId && d.referenceCode !== applicationId);
-        const updatedDocs = [newAgreementDoc, ...filtered];
+        const filtered = prevDocs.filter(
+          (d) =>
+            d.referenceCode?.toLowerCase() !== resolvedRefCode.toLowerCase() &&
+            d.referenceCode?.toLowerCase() !== applicationId.toLowerCase()
+        );
+        const updatedDocs = dedupeDocumentsList([newAgreementDoc, ...filtered]);
         try {
           localStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify(updatedDocs));
         } catch (e) {
@@ -3168,22 +3289,29 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         return updatedDocs;
       });
 
-      // Sync signed agreement document to Supabase vault (non-blocking)
+      // Sync signed agreement document to Supabase vault (replacing any duplicate reference_code)
       if (isSupabaseLive) {
-        supabase.from('documents').insert({
-          id: agreementDocId,
-          title: newAgreementDoc.title,
-          category: 'other',
-          reference_code: newAgreementDoc.referenceCode || applicationId,
-          compliance_standard: newAgreementDoc.complianceStandard || null,
-          file_format: newAgreementDoc.fileFormat || 'PDF/Contract',
-          description: newAgreementDoc.description || null,
-          uploaded_by: null,
-          file_path: null,
-          created_at: newAgreementDoc.uploadedAt,
-        }).then(({ error }) => {
-          if (error) console.warn('Supabase document vault sync notice:', error.message);
-        });
+        supabase
+          .from('documents')
+          .delete()
+          .eq('reference_code', resolvedRefCode)
+          .then(() =>
+            supabase.from('documents').insert({
+              id: agreementDocId,
+              title: newAgreementDoc.title,
+              category: 'other',
+              reference_code: resolvedRefCode,
+              compliance_standard: newAgreementDoc.complianceStandard || null,
+              file_format: newAgreementDoc.fileFormat || 'PDF/Contract',
+              description: newAgreementDoc.description || null,
+              uploaded_by: null,
+              file_path: null,
+              created_at: signedTimestamp,
+            })
+          )
+          .then(({ error }) => {
+            if (error) console.warn('Supabase document vault sync notice:', error.message);
+          });
       }
 
       await addAuditLog(
@@ -3471,15 +3599,21 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const deleteDocument = async (documentId: string): Promise<{ success: boolean; error?: string }> => {
     try {
+      const targetDoc = documents.find((d) => d.id === documentId);
       setDocuments((prev) => {
         const updated = prev.filter((d) => d.id !== documentId);
         localStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify(updated));
         return updated;
       });
       if (isSupabaseLive) {
-        supabase.from('documents').delete().eq('id', documentId).then(({ error }) => {
-          if (error) console.warn('Supabase deleteDocument notice:', error.message);
-        });
+        if (isUuid(documentId)) {
+          supabase.from('documents').delete().eq('id', documentId).then(({ error }) => {
+            if (error) console.warn('Supabase deleteDocument notice:', error.message);
+          });
+        }
+        if (targetDoc?.referenceCode) {
+          supabase.from('documents').delete().eq('reference_code', targetDoc.referenceCode).then(() => {});
+        }
       }
       await addAuditLog('DOCUMENT_DELETED', 'Documents', `Deleted document ${documentId}`);
       toast.success('Document removed from vault.');
@@ -3487,6 +3621,52 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     } catch (err: any) {
       return { success: false, error: err?.message || 'Failed to delete document.' };
     }
+  };
+
+  const deduplicateDocuments = async (): Promise<{ removedCount: number }> => {
+    const initialCount = documents.length;
+    const cleaned = dedupeDocumentsList(documents);
+    setDocuments(cleaned);
+    localStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify(cleaned));
+
+    let dbRemoved = 0;
+    if (isSupabaseLive) {
+      try {
+        const { data: dbDocs } = await supabase
+          .from('documents')
+          .select('id, reference_code, title, created_at')
+          .order('created_at', { ascending: false });
+        if (dbDocs && dbDocs.length > 0) {
+          const seenRefs = new Set<string>();
+          const seenTitles = new Set<string>();
+          const duplicateIds: string[] = [];
+          for (const row of dbDocs) {
+            const rKey = (row.reference_code || '').trim().toLowerCase();
+            const tKey = (row.title || '').trim().toLowerCase();
+            if ((rKey && seenRefs.has(rKey)) || (tKey && seenTitles.has(tKey))) {
+              duplicateIds.push(row.id);
+            } else {
+              if (rKey) seenRefs.add(rKey);
+              if (tKey) seenTitles.add(tKey);
+            }
+          }
+          if (duplicateIds.length > 0) {
+            await supabase.from('documents').delete().in('id', duplicateIds);
+            dbRemoved = duplicateIds.length;
+          }
+        }
+      } catch (err) {
+        console.warn('Supabase deduplicateDocuments notice:', err);
+      }
+    }
+
+    const removedCount = Math.max(initialCount - cleaned.length, dbRemoved);
+    if (removedCount > 0) {
+      toast.success(`Removed ${removedCount} duplicate document(s) from the vault.`);
+    } else {
+      toast.success('Document vault is already 100% deduplicated.');
+    }
+    return { removedCount };
   };
 
   const commissionRules: CommissionRule[] = [
@@ -3575,6 +3755,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         deleteProject,
         deleteLead,
         deleteDocument,
+        deduplicateDocuments,
         cleanDuplicateData,
         resetToDefaultData,
         refreshData,
@@ -3668,12 +3849,14 @@ export const usePortal = (): PortalContextType => {
           console.warn('Public sign applications storage write note:', e);
         }
 
-        // Also archive signed contract in Document Vault
+        // Also archive signed contract in Document Vault & Supabase
         try {
-          const agreementDocId = `doc_agreement_${applicationId.toLowerCase().replace(/[^a-z0-9]/g, '_')}`;
+          const agreementDocId = crypto.randomUUID();
           const savedDocs = localStorage.getItem(STORAGE_KEYS.DOCUMENTS);
           const docs: DocumentItem[] = savedDocs ? JSON.parse(savedDocs) : [];
-          const filteredDocs = docs.filter((d) => d.id !== agreementDocId && d.referenceCode !== applicationId);
+          const filteredDocs = docs.filter(
+            (d) => d.referenceCode?.toLowerCase() !== applicationId.toLowerCase()
+          );
           const newDoc: DocumentItem = {
             id: agreementDocId,
             title: `Freelancer Service Agreement — ${signatureName} (${applicationId})`,
@@ -3682,17 +3865,38 @@ export const usePortal = (): PortalContextType => {
             complianceStandard: 'Section 10A Indian Information Technology Act, 2000',
             fileFormat: 'PDF/Contract',
             uploadedBy: signatureName,
-            uploadedAt: signedTimestamp,
+            uploadedAt: signedTimestamp.split('T')[0],
             description: `Digitally certified freelancer onboarding contract executed by ${signatureName}. Enforceable under Section 10A IT Act 2000.`,
             version: 1,
           };
-          localStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify([newDoc, ...filteredDocs]));
+          localStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify(dedupeDocumentsList([newDoc, ...filteredDocs])));
+          if (isSupabaseConfigured()) {
+            supabase
+              .from('documents')
+              .delete()
+              .eq('reference_code', applicationId)
+              .then(() =>
+                supabase.from('documents').insert({
+                  id: agreementDocId,
+                  title: newDoc.title,
+                  category: 'other',
+                  reference_code: applicationId,
+                  compliance_standard: newDoc.complianceStandard || null,
+                  file_format: newDoc.fileFormat || 'PDF/Contract',
+                  description: newDoc.description || null,
+                  uploaded_by: null,
+                  file_path: null,
+                  created_at: signedTimestamp,
+                })
+              );
+          }
         } catch (docErr) {
           console.warn('Public doc archive note:', docErr);
         }
 
         window.dispatchEvent(new CustomEvent('fet_applications_updated'));
         updateApplicationInSupabase(applicationId, {
+          status: 'Shortlisted',
           agreementSignedAt: signedTimestamp,
           agreementSignature: signatureName,
           agreementSignerIp: '(Verified Web)',
@@ -3876,6 +4080,7 @@ export const usePortal = (): PortalContextType => {
       deleteProject: async () => ({ success: false }),
       deleteLead: async () => ({ success: false }),
       deleteDocument: async () => ({ success: false }),
+      deduplicateDocuments: async () => ({ removedCount: 0 }),
       cleanDuplicateData: async () => 0,
       resetToDefaultData: () => {},
       refreshData: async () => {},
