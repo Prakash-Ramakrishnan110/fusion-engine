@@ -93,58 +93,7 @@ export const INITIAL_LEADS: TelecallerLead[] = [];
 // Production Initial State - Clean baseline for milestone payment vouchers
 export const INITIAL_VOUCHERS: PaymentVoucher[] = [];
 
-// Clean, deduplicated statutory and compliance documents
-export const INITIAL_DOCUMENTS: DocumentItem[] = [
-  {
-    id: 'doc_001',
-    category: 'Company',
-    title: 'Udyam MSME Registration Certificate',
-    referenceCode: 'UDYAM-TN-02-0089124',
-    complianceStandard: 'Ministry of MSME, Govt. of India',
-    fileFormat: 'PDF Signed',
-    uploadedAt: '2026-01-10',
-    description: 'Statutory registration establishing Fusion Engine Technology as an eligible Micro Enterprise under Startup India guidelines.',
-  },
-  {
-    id: 'doc_002',
-    category: 'Recruitment',
-    title: 'Developer Independent Contractor & IP Assignment Agreement',
-    referenceCode: 'FET-LEG-AGR-004',
-    complianceStandard: 'Indian Contract Act 1872 & Copyright Act 1957',
-    fileFormat: 'PDF Template',
-    uploadedAt: '2026-01-15',
-    description: 'Standard deliverable-based contract with complete Intellectual Property assignment and non-disclosure terms.',
-  },
-  {
-    id: 'doc_003',
-    category: 'Sales',
-    title: 'Telecaller Merchant Pitch Deck & Objection Guide',
-    referenceCode: 'FET-SLS-SCR-01',
-    complianceStandard: 'Internal Sales Operations Standard',
-    fileFormat: 'DOCX / PDF',
-    uploadedAt: '2026-02-01',
-    description: 'Standard 3-minute pitch targeting restaurant owners with pain points, competitor comparison, and closing rebuttals.',
-  },
-  {
-    id: 'doc_004',
-    category: 'Financial',
-    title: 'Milestone Payment Voucher Standard Specification',
-    referenceCode: 'FET-FIN-VOUCH-V1',
-    complianceStandard: 'Income Tax Act Sec 194J / TDS Reconciliation',
-    fileFormat: 'Standardized Template',
-    uploadedAt: '2026-02-05',
-    description: 'Dual-signoff voucher capturing developer PAN, UTR reference, gross milestone sum, and net disbursed payout.',
-  },
-  {
-    id: 'doc_005',
-    category: 'Project',
-    title: 'Restaurant SaaS Software Architecture & SRS Document',
-    referenceCode: 'FET-PRJ-SRS-2026-01',
-    complianceStandard: 'ISO/IEC/IEEE 29148 Standard',
-    fileFormat: 'PDF Technical Spec',
-    uploadedAt: '2026-03-01',
-    description: 'Complete system requirements specification for multi-tenant KOT sync, split billing, and QR guest ordering.',
-  },
-];
+// Production Initial State - Clean baseline for statutory and compliance documents
+export const INITIAL_DOCUMENTS: DocumentItem[] = [];
 
 export const INITIAL_AUDIT_LOGS: AuditLogItem[] = [];

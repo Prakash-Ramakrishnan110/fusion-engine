@@ -49,12 +49,43 @@ import defaultAvatar from '../../assets/default-avatar.svg';
 const isUuid = (str: string) =>
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(str);
 
+const DEMO_DOC_REFS = new Set([
+  'udyam-tn-02-0089124',
+  'fet-leg-agr-004',
+  'fet-sls-scr-01',
+  'fet-fin-vouch-v1',
+  'fet-prj-srs-2026-01',
+  'doc_001',
+  'doc_002',
+  'doc_003',
+  'doc_004',
+  'doc_005',
+]);
+
+export const isNotDemoDoc = (doc: DocumentItem): boolean => {
+  if (!doc) return false;
+  const ref = (doc.referenceCode || '').trim().toLowerCase();
+  const id = (doc.id || '').trim().toLowerCase();
+  const title = (doc.title || '').trim().toLowerCase();
+  if (DEMO_DOC_REFS.has(ref) || DEMO_DOC_REFS.has(id)) return false;
+  if (
+    title.includes('udyam msme') ||
+    title.includes('developer independent contractor & ip') ||
+    title.includes('telecaller merchant pitch deck') ||
+    title.includes('milestone payment voucher standard') ||
+    title.includes('restaurant saas software architecture & srs')
+  ) {
+    return false;
+  }
+  return true;
+};
+
 const dedupeDocumentsList = (list: DocumentItem[]): DocumentItem[] => {
   const seenRefs = new Set<string>();
   const seenTitles = new Set<string>();
   const result: DocumentItem[] = [];
   for (const doc of list) {
-    if (!doc) continue;
+    if (!doc || !isNotDemoDoc(doc)) continue;
     const refKey = (doc.referenceCode || '').trim().toLowerCase();
     const titleKey = (doc.title || '').trim().toLowerCase();
     if (refKey && seenRefs.has(refKey)) continue;
@@ -425,11 +456,13 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
-          return dedupeDocumentsList([...parsed, ...INITIAL_DOCUMENTS]);
+          const cleaned = dedupeDocumentsList(parsed.filter(isNotDemoDoc));
+          localStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify(cleaned));
+          return cleaned;
         }
       } catch {}
     }
-    return dedupeDocumentsList(INITIAL_DOCUMENTS);
+    return [];
   });
 
   useEffect(() => {
@@ -1106,9 +1139,13 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           }
         }
 
-        setDocuments((prev) =>
-          dedupeDocumentsList([...signedCandidateDocs, ...mappedDocs, ...prev, ...INITIAL_DOCUMENTS])
-        );
+        setDocuments((prev) => {
+          const cleaned = dedupeDocumentsList([...signedCandidateDocs, ...mappedDocs, ...prev]);
+          try {
+            localStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify(cleaned));
+          } catch {}
+          return cleaned;
+        });
       } catch (err) {
         console.warn('Supabase documents fetch note:', err);
       }

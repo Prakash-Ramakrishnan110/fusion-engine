@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { usePortal } from '../context/PortalContext';
+import { usePortal, isNotDemoDoc } from '../context/PortalContext';
 import { DocumentItem, JobApplication } from '../types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -95,7 +95,7 @@ export const DocumentsPage: React.FC = () => {
     const result: DocumentItem[] = [];
 
     for (const doc of combined) {
-      if (!doc) continue;
+      if (!doc || !isNotDemoDoc(doc)) continue;
       const refKey = (doc.referenceCode || '').trim().toLowerCase();
       const titleKey = (doc.title || '').trim().toLowerCase();
       if (refKey && seenRefs.has(refKey)) continue;
