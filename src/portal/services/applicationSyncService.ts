@@ -15,6 +15,7 @@ export const mapRowToApplication = (row: any): JobApplication => ({
   expectedCompensation: row.expected_compensation || undefined,
   experienceSummary: row.experience_summary || '',
   resumeFileName: row.resume_file_name || undefined,
+  resumeFileData: row.resume_file_data || undefined,
   status: row.status,
   adminNotes: row.admin_notes || undefined,
   submittedAt: row.submitted_at,
@@ -47,6 +48,7 @@ export const mapApplicationToRow = (app: JobApplication): any => ({
   expected_compensation: app.expectedCompensation || null,
   experience_summary: app.experienceSummary || null,
   resume_file_name: app.resumeFileName || null,
+  resume_file_data: app.resumeFileData || null,
   status: app.status || 'New',
   admin_notes: app.adminNotes || null,
   submitted_at: app.submittedAt || new Date().toISOString(),
@@ -91,7 +93,7 @@ export async function fetchApplicationsFromSupabase(): Promise<JobApplication[] 
 }
 
 /**
- * Save new candidate application to Supabase
+ * Save new candidate application to Supabase with resume data support
  */
 export async function saveApplicationToSupabase(app: JobApplication): Promise<boolean> {
   if (!isSupabaseConfigured()) return false;
@@ -102,6 +104,16 @@ export async function saveApplicationToSupabase(app: JobApplication): Promise<bo
       .upsert(row, { onConflict: 'reference_code' });
 
     if (error) {
+      // If column resume_file_data does not exist yet in Supabase SQL, retry without it so applicant record is preserved
+      if ((error.code === '42703' || error.message.includes('resume_file_data')) && row.resume_file_data) {
+        console.warn('Notice: resume_file_data column pending in Supabase table; saving record without binary payload...');
+        const fallbackRow = { ...row };
+        delete fallbackRow.resume_file_data;
+        const { error: retryErr } = await supabase
+          .from('job_applications' as any)
+          .upsert(fallbackRow, { onConflict: 'reference_code' });
+        if (!retryErr) return true;
+      }
       console.warn('Supabase save application error:', error.message);
       return false;
     }
@@ -113,7 +125,7 @@ export async function saveApplicationToSupabase(app: JobApplication): Promise<bo
 }
 
 /**
- * Update candidate application in Supabase (e.g. status, signed agreement)
+ * Update candidate application in Supabase (e.g. status, signed agreement, resume data)
  */
 export async function updateApplicationInSupabase(
   refOrId: string,
@@ -137,6 +149,8 @@ export async function updateApplicationInSupabase(
     if (updates.agreementRejectedAt !== undefined) partialRow.agreement_rejected_at = updates.agreementRejectedAt;
     if (updates.agreementRejectionReason !== undefined) partialRow.agreement_rejection_reason = updates.agreementRejectionReason;
     if (updates.agreementDocumentText !== undefined) partialRow.agreement_document_text = updates.agreementDocumentText;
+    if (updates.resumeFileName !== undefined) partialRow.resume_file_name = updates.resumeFileName;
+    if (updates.resumeFileData !== undefined) partialRow.resume_file_data = updates.resumeFileData;
 
     const { error } = await supabase
       .from('job_applications' as any)
@@ -144,6 +158,14 @@ export async function updateApplicationInSupabase(
       .or(`id.eq.${refOrId},reference_code.eq.${refOrId}`);
 
     if (error) {
+      if ((error.code === '42703' || error.message.includes('resume_file_data')) && partialRow.resume_file_data) {
+        delete partialRow.resume_file_data;
+        const { error: retryErr } = await supabase
+          .from('job_applications' as any)
+          .update(partialRow)
+          .or(`id.eq.${refOrId},reference_code.eq.${refOrId}`);
+        if (!retryErr) return true;
+      }
       console.warn('Supabase update application error:', error.message);
       return false;
     }

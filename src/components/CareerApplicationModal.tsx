@@ -145,7 +145,7 @@ export const CareerApplicationModal: React.FC<CareerApplicationModalProps> = ({
         expectedCompensation: formData.expectedCompensation || undefined,
         experienceSummary: formData.experience,
         resumeFileName: `${resumeFile.name} (${resumeFile.size})`,
-        resumeFileData: safeResumeData,
+        resumeFileData: resumeFile.dataUrl,
       });
 
       const refCode = appRes.referenceCode || `FET-APP-${Math.floor(100000 + Math.random() * 900000)}`;

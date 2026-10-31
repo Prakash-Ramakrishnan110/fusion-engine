@@ -40,6 +40,7 @@ import {
   FolderKanban,
   AlertTriangle,
   Download,
+  Eye,
   FileText,
   Lock,
   Unlock,
@@ -133,6 +134,7 @@ export const TeamPage: React.FC = () => {
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const [signedAppForView, setSignedAppForView] = useState<JobApplication | null>(null);
   const [isSignedModalOpen, setIsSignedModalOpen] = useState(false);
+  const [resumeForPreview, setResumeForPreview] = useState<{ name: string; dataUrl: string; candidateName: string } | null>(null);
 
   const handleTriggerCandidateAction = async (
     app: JobApplication,
@@ -1097,23 +1099,45 @@ export const TeamPage: React.FC = () => {
 
                           {/* Row 3: Resume Document & Links */}
                           <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border/40">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-wrap">
                               {app.resumeFileData ? (
-                                <a
-                                  href={app.resumeFileData}
-                                  download={app.resumeFileName || `${app.fullName}-Resume.pdf`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
+                                <div className="flex items-center gap-1.5">
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    className="gap-1.5 text-xs text-primary font-bold border-primary/30 hover:bg-primary/10 cursor-pointer shadow-xs"
+                                    onClick={() =>
+                                      setResumeForPreview({
+                                        name: app.resumeFileName || 'Resume.pdf',
+                                        dataUrl: app.resumeFileData!,
+                                        candidateName: app.fullName,
+                                      })
+                                    }
+                                    className="gap-1.5 text-xs text-primary font-bold border-primary/30 hover:bg-primary/10 cursor-pointer shadow-xs h-7 px-2.5"
                                   >
-                                    <Download className="w-3.5 h-3.5" />
-                                    Download Resume ({app.resumeFileName || 'Resume.pdf'})
+                                    <Eye className="w-3.5 h-3.5" />
+                                    Preview Resume
                                   </Button>
-                                </a>
+                                  <a
+                                    href={app.resumeFileData}
+                                    download={app.resumeFileName || `${app.fullName}-Resume.pdf`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                  >
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="gap-1 text-xs text-muted-foreground hover:text-foreground cursor-pointer h-7 px-2"
+                                    >
+                                      <Download className="w-3.5 h-3.5" />
+                                      Download
+                                    </Button>
+                                  </a>
+                                </div>
+                              ) : app.resumeFileName ? (
+                                <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+                                  <FileText className="w-3.5 h-3.5 text-primary" />
+                                  <span>Attached: <strong className="text-foreground">{app.resumeFileName}</strong></span>
+                                </span>
                               ) : (
                                 <span className="text-xs text-muted-foreground italic flex items-center gap-1">
                                   <FileText className="w-3.5 h-3.5" /> No resume file attached
@@ -1411,6 +1435,53 @@ export const TeamPage: React.FC = () => {
         onOpenChange={setIsSignedModalOpen}
         application={signedAppForView}
       />
+
+      {/* MODAL 7: In-Portal Candidate Resume Previewer */}
+      <Dialog open={Boolean(resumeForPreview)} onOpenChange={(open) => !open && setResumeForPreview(null)}>
+        <DialogContent className="max-w-4xl w-[95vw] max-h-[92vh] flex flex-col p-4 sm:p-6 bg-background border-border shadow-2xl rounded-2xl">
+          <DialogHeader className="border-b border-border/40 pb-3 flex flex-row items-center justify-between gap-3">
+            <div>
+              <DialogTitle className="text-base sm:text-lg font-bold flex items-center gap-2">
+                <FileText className="w-5 h-5 text-primary" />
+                <span>Candidate Resume: {resumeForPreview?.candidateName}</span>
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground mt-0.5 font-mono">
+                {resumeForPreview?.name}
+              </DialogDescription>
+            </div>
+            {resumeForPreview && (
+              <a
+                href={resumeForPreview.dataUrl}
+                download={resumeForPreview.name}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button size="sm" className="gap-1.5 text-xs mr-6">
+                  <Download className="w-3.5 h-3.5" /> Download File
+                </Button>
+              </a>
+            )}
+          </DialogHeader>
+
+          <div className="flex-1 min-h-[500px] max-h-[70vh] w-full rounded-xl border border-border/60 bg-muted/20 overflow-hidden mt-3">
+            {resumeForPreview?.dataUrl.startsWith('data:image/') ? (
+              <div className="w-full h-full flex items-center justify-center p-4 overflow-auto">
+                <img
+                  src={resumeForPreview.dataUrl}
+                  alt={resumeForPreview.name}
+                  className="max-w-full max-h-[65vh] object-contain rounded-lg shadow-md"
+                />
+              </div>
+            ) : (
+              <iframe
+                src={resumeForPreview?.dataUrl}
+                title={resumeForPreview?.name || 'Candidate Resume Document'}
+                className="w-full h-full min-h-[500px] border-0 rounded-xl bg-white"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
 
   );
