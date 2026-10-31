@@ -43,14 +43,19 @@ export const LoginPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userIdOrEmail.trim() || !password.trim()) {
+    const form = e.currentTarget as HTMLFormElement;
+    const inputs = form.querySelectorAll('input');
+    const enteredUser = (userIdOrEmail || inputs[0]?.value || '').trim();
+    const enteredPass = (password || inputs[1]?.value || '').trim();
+
+    if (!enteredUser || !enteredPass) {
       toast.error('Please enter both User ID and Password.');
       return;
     }
 
     setIsLoading(true);
     try {
-      const res = await login(userIdOrEmail, password);
+      const res = await login(enteredUser, enteredPass);
       setIsLoading(false);
       if (res.success) {
         toast.success(`Authenticated successfully!`);
@@ -65,6 +70,11 @@ export const LoginPage: React.FC = () => {
       setIsLoading(false);
       toast.error(err.message || 'Authentication error.');
     }
+  };
+
+  const handleQuickFill = (user: string, pass: string) => {
+    setUserIdOrEmail(user);
+    setPassword(pass);
   };
 
   return (
@@ -149,6 +159,38 @@ export const LoginPage: React.FC = () => {
                   </span>
                 )}
               </Button>
+
+              {/* Quick Fill Preset Credentials */}
+              <div className="pt-2 border-t border-border/40">
+                <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1.5">
+                  <span className="flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-primary" /> Quick Demo Fill:
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleQuickFill('admin.prakash@fusionengine.in', 'Prakash@2004')}
+                    className="text-left p-2 rounded-lg border border-border/60 bg-muted/30 hover:bg-muted/80 transition-colors text-[10px] space-y-0.5 cursor-pointer"
+                  >
+                    <div className="font-bold text-foreground flex items-center gap-1">
+                      <ShieldAlert className="w-3 h-3 text-primary" /> Super Admin
+                    </div>
+                    <div className="text-muted-foreground font-mono truncate">admin.prakash@fusion...</div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleQuickFill('prakash.r', 'Welcome@2026!')}
+                    className="text-left p-2 rounded-lg border border-border/60 bg-muted/30 hover:bg-muted/80 transition-colors text-[10px] space-y-0.5 cursor-pointer"
+                  >
+                    <div className="font-bold text-foreground flex items-center gap-1">
+                      <Code2 className="w-3 h-3 text-emerald-600" /> Developer
+                    </div>
+                    <div className="text-muted-foreground font-mono truncate">prakash.r</div>
+                  </button>
+                </div>
+              </div>
             </form>
           </CardContent>
 

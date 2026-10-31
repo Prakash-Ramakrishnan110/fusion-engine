@@ -356,14 +356,15 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
               u.email !== 'priya.nair@fusionengine.in'
           );
 
-          // Update Super Admin account to prakash.r (Prakash Ramakrishnan)
-          const result = filtered.map((u) => {
-            if (u.role === 'super_admin' || u.userId === 'admin' || u.userId === 'prakash.r') {
+          // Normalize Super Admin account to admin.prakash (Founder & Super Admin)
+          const result: UserPersona[] = filtered.map((u) => {
+            if (u.role === 'super_admin' || u.userId === 'admin' || u.userId === 'admin.prakash') {
               return {
                 ...u,
-                userId: 'prakash.r',
+                userId: 'admin.prakash',
                 name: 'Prakash Ramakrishnan',
-                email: 'prakash.ramakrishnan@fusionengine.in',
+                email: 'admin.prakash@fusionengine.in',
+                role: 'super_admin' as UserRole,
                 title: 'Founder & Super Admin',
                 avatar: u.avatar && u.avatar.trim() !== '' ? u.avatar : defaultAvatar,
               };
@@ -374,7 +375,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             };
           });
 
-          const hasAdmin = result.some((u) => u.userId === 'prakash.r' || u.role === 'super_admin');
+          const hasAdmin = result.some((u) => u.userId === 'admin.prakash' || u.role === 'super_admin');
           if (!hasAdmin) {
             result.unshift(INITIAL_PERSONAS[0]);
           }
@@ -711,11 +712,13 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           return [...mappedUsers, ...localOnly];
         });
 
-        // Update currentUser only if matched in mappedUsers (prevents clobbering developer session)
-        if (currentUser) {
-          const updated = mappedUsers.find((u) => u.id === currentUser.id);
-          if (updated) setCurrentUser(updated);
-        }
+        // Update currentUser using functional update to prevent clobbering developer session
+        setCurrentUser((prev) => {
+          if (!prev) return null;
+          if (prev.role === 'developer' || prev.userId === 'prakash.r') return prev;
+          const updated = mappedUsers.find((u) => u.id === prev.id);
+          return updated || prev;
+        });
       }
 
       // 2. Fetch Projects with Modules, Milestones, and Members
@@ -1196,7 +1199,18 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     if (isSupabaseLive) {
       // Supabase Auth listener
       const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-        if (session?.user) {
+        if (event === 'SIGNED_IN' && session?.user) {
+          // If already logged in as developer or candidate, do not clobber
+          const savedStr = localStorage.getItem(STORAGE_KEYS.AUTH_USER);
+          if (savedStr) {
+            try {
+              const savedUser = JSON.parse(savedStr);
+              if (savedUser && savedUser.role === 'developer') {
+                return;
+              }
+            } catch (_) {}
+          }
+
           const { data: profile } = await supabase
             .from('profiles')
             .select('*, developer_details(*)')
@@ -1292,31 +1306,42 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   // AUTHENTICATION METHODS
   // ==========================================
 
-  const login = async (userIdOrEmail: string, password: string): Promise<{
+  const login = async (userIdOrEmail: string, rawPassword: string): Promise<{
     success: boolean;
     error?: string;
     mustChangePassword?: boolean;
     redirectPath?: string;
   }> => {
-    const rawInput = userIdOrEmail.trim();
+    const rawInput = (userIdOrEmail || '').trim();
+    const cleanPassword = (rawPassword || '').trim();
     const cleanId = extractUserIdFromEmail(rawInput).toLowerCase();
+    const baseUsername = cleanId.includes('@') ? cleanId.split('@')[0] : cleanId;
     const email = formatPortalEmail(rawInput);
 
-    // 1. Super Admin Authentication (admin.prakash@fusionengine.in / Prakash@2004)
+    // 1. Super Admin Authentication (admin / admin.prakash@fusionengine.in / Prakash@2004)
     const isAdminIdentifier =
       cleanId === 'admin.prakash' ||
       cleanId === 'admin' ||
       cleanId === 'fusion.admin' ||
       cleanId === 'superadmin' ||
+      baseUsername === 'admin' ||
+      baseUsername === 'admin.prakash' ||
+      baseUsername === 'fusion.admin' ||
+      baseUsername === 'superadmin' ||
       rawInput.toLowerCase() === 'admin.prakash@fusionengine.in' ||
       email.toLowerCase() === 'admin.prakash@fusionengine.in' ||
       rawInput.toLowerCase() === 'fusion.admin@fusionengine.in' ||
-      rawInput.toLowerCase() === 'prakash.ramakrishnan@fusionengine.in';
+      rawInput.toLowerCase() === 'fusionenginetechnology@gmail.com' ||
+      rawInput.toLowerCase() === 'prakash7418132954@gmail.com' ||
+      rawInput.toLowerCase() === 'prakash.ramakrishnan@fusionengine.in' ||
+      (cleanId === 'prakash' && (cleanPassword === 'Prakash@2004' || cleanPassword === 'admin'));
 
     const isAdminPassword =
-      password === 'Prakash@2004' ||
-      password === 'admin' ||
-      password === 'admin123';
+      cleanPassword === 'Prakash@2004' ||
+      cleanPassword === 'admin' ||
+      cleanPassword === 'admin123' ||
+      cleanPassword === 'Fusion@2026' ||
+      ((cleanId === 'admin' || baseUsername === 'admin') && cleanPassword === 'Welcome@2026!');
 
     if (isAdminIdentifier && isAdminPassword) {
       const adminUser: UserPersona = {
@@ -1340,12 +1365,16 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const isDevPrakash =
       (cleanId === 'prakash.r' ||
         cleanId === 'prakash' ||
+        baseUsername === 'prakash.r' ||
         rawInput.toLowerCase() === 'prakash2954r@gmail.com' ||
         rawInput.toLowerCase() === 'prakash2004r@gmail.com' ||
         cleanId === 'fet-app-898381') &&
-      password === 'Welcome@2026!';
+      cleanPassword === 'Welcome@2026!';
 
     if (isDevPrakash) {
+      if (isSupabaseLive) {
+        await supabase.auth.signOut().catch(() => {});
+      }
       const devUser: UserPersona = {
         id: '793508c1-954b-40ab-8b45-0cee5da44530',
         userId: 'prakash.r',
@@ -1377,7 +1406,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         )
     );
 
-    if (matchedCandidate && (password === 'Welcome@2026!' || password.startsWith('TempPass') || password === 'admin123')) {
+    if (matchedCandidate && (cleanPassword === 'Welcome@2026!' || cleanPassword.startsWith('TempPass') || cleanPassword === 'admin123')) {
       const isSales = matchedCandidate.department === 'sales' || matchedCandidate.roleTitle.toLowerCase().includes('telecaller');
       const candidateUser: UserPersona = {
         id: matchedCandidate.id,
@@ -1409,7 +1438,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         u.name.toLowerCase() === rawInput.toLowerCase()
     );
 
-    if (matchedDirectoryUser && (password === 'Welcome@2026!' || password === 'Prakash@2004' || password.length >= 4)) {
+    if (matchedDirectoryUser && (cleanPassword === 'Welcome@2026!' || cleanPassword === 'Prakash@2004' || cleanPassword.length >= 4)) {
       if (matchedDirectoryUser.isActive === false) {
         return { success: false, error: 'This account has been deactivated by Super Admin.' };
       }
@@ -1432,7 +1461,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       try {
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
-          password,
+          password: cleanPassword,
         });
 
         if (!error && data?.user) {
