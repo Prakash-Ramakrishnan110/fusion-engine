@@ -30,6 +30,8 @@ const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
 const ServerError = lazy(() => import("./pages/ServerError"));
 const Maintenance = lazy(() => import("./pages/Maintenance"));
 import CookieBanner from "./components/CookieBanner";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 // Internal Workforce & Lead Management Portal (Phases 1-6)
 const PortalLayout = lazy(() => import("./portal/PortalLayout"));
@@ -122,6 +124,8 @@ const App = () => (
         <ChatWidget />
         <OnboardingModal />
         <CookieBanner />
+        <Analytics />
+        <SpeedInsights />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
