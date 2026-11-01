@@ -54,6 +54,119 @@ export const ORG_SCHEMA = {
   "priceRange": "$$$"
 };
 
+export const FAQ_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How fast can you build my MVP?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Our 'Launch in 14 Days' program is designed for speed. For most startups, we deliver a fully functional, high-quality MVP in just 10-14 days. More complex enterprise platforms typically take 4-8 weeks."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I own the source code and IP?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Absolutely. Once the project is completed and handed over, you own 100% of the intellectual property, source code, and digital assets with full legal transfer."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What technology stack do you use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "We specialize in modern, scalable stacks like React, Next.js, TypeScript, Tailwind CSS, and Node.js. For AI capabilities, we integrate leading models from OpenAI, Anthropic, and Google Gemini."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do you handle post-launch support?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "We offer comprehensive support packages including ongoing maintenance, cloud scaling assistance, 99.9% uptime monitoring, and continuous feature iterations as your dedicated technical partner."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can you help with fundraising and pitch decks?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes! Beyond code, we help with technical architecture diagrams, product roadmaps, and feature prioritization that angel investors and VCs love to see in pitch decks."
+      }
+    }
+  ]
+};
+
+export const DEVELOPER_JOB_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "JobPosting",
+  "title": "Full-Stack Developer Contractor",
+  "description": "<p>Build high-impact web and mobile applications, MVPs, and AI-driven platforms at Fusion Engine Technology. Work with modern technologies including React, TypeScript, Node.js, and cloud backends.</p>",
+  "datePosted": "2026-10-01",
+  "validThrough": "2027-12-31",
+  "employmentType": "CONTRACTOR",
+  "hiringOrganization": {
+    "@type": "Organization",
+    "name": "Fusion Engine Technology",
+    "sameAs": "https://www.fusionengine.in",
+    "logo": "https://www.fusionengine.in/header-logo.png"
+  },
+  "jobLocation": {
+    "@type": "Place",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Palacode",
+      "addressLocality": "Dharmapuri",
+      "addressRegion": "Tamil Nadu",
+      "postalCode": "636808",
+      "addressCountry": "IN"
+    }
+  },
+  "jobLocationType": "TELECOMMUTE",
+  "applicantLocationRequirements": {
+    "@type": "Country",
+    "name": "India"
+  },
+  "directApply": true
+};
+
+export const SALES_JOB_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "JobPosting",
+  "title": "Telecaller & Inside Sales Executive",
+  "description": "<p>Engage prospective startups and enterprise clients, qualify incoming inquiries, explain technical development offerings, and schedule discovery consultations for lead engineering teams.</p>",
+  "datePosted": "2026-10-01",
+  "validThrough": "2027-12-31",
+  "employmentType": "CONTRACTOR",
+  "hiringOrganization": {
+    "@type": "Organization",
+    "name": "Fusion Engine Technology",
+    "sameAs": "https://www.fusionengine.in",
+    "logo": "https://www.fusionengine.in/header-logo.png"
+  },
+  "jobLocation": {
+    "@type": "Place",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Palacode",
+      "addressLocality": "Dharmapuri",
+      "addressRegion": "Tamil Nadu",
+      "postalCode": "636808",
+      "addressCountry": "IN"
+    }
+  },
+  "jobLocationType": "TELECOMMUTE",
+  "applicantLocationRequirements": {
+    "@type": "Country",
+    "name": "India"
+  },
+  "directApply": true
+};
+
 export const seoData: Record<string, PageSEO> = {
   "/": {
     title: "Fusion Engine Technology | Build, Launch & Scale Modern Digital Solutions",
@@ -64,6 +177,7 @@ export const seoData: Record<string, PageSEO> = {
     ogType: "website",
     schemaJsonLd: [
       ORG_SCHEMA,
+      FAQ_SCHEMA,
       {
         "@context": "https://schema.org",
         "@type": "WebSite",
@@ -227,6 +341,27 @@ export const seoData: Record<string, PageSEO> = {
         "name": "Contact Fusion Engine Technology",
         "url": `${SITE_URL}/contact`
       }
+    ]
+  },
+  "/careers": {
+    title: "Careers & Opportunities | Join Fusion Engine Technology",
+    description: "Explore open developer, engineering, and sales opportunities at Fusion Engine Technology. Fast-track application process, competitive compensation, and remote flexibility.",
+    keywords: "developer jobs, software engineer contractor, telecaller sales jobs, remote developer opportunities, Fusion Engine careers, tech jobs India, hiring developers",
+    canonical: `${SITE_URL}/careers`,
+    ogImage: DEFAULT_OG_IMAGE,
+    ogType: "website",
+    schemaJsonLd: [
+      ORG_SCHEMA,
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL },
+          { "@type": "ListItem", "position": 2, "name": "Careers", "item": `${SITE_URL}/careers` }
+        ]
+      },
+      DEVELOPER_JOB_SCHEMA,
+      SALES_JOB_SCHEMA
     ]
   },
   "/privacy": {

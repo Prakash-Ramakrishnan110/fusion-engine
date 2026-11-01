@@ -36,6 +36,10 @@ Allow: /
 Disallow: /500
 Disallow: /maintenance
 Disallow: /admin
+Disallow: /portal
+Disallow: /portal/*
+Disallow: /agreement
+Disallow: /agreement/*
 Disallow: /*?*query=
 
 # Crawl Delay
