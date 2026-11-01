@@ -25,7 +25,7 @@ const Founder = () => {
               <img 
                 src={ceoImage} 
                 alt="Prakash Ramakrishnan" 
-                className="w-full h-full object-cover"
+                loading="lazy" decoding="async" width={256} height={256} className="w-full h-full object-cover"
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = 'none';
                 }}

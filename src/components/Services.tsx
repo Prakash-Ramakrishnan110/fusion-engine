@@ -19,7 +19,7 @@ const services = [
     features: ["Multi-tenant Architecture", "Subscription Billing", "Usage-Based Pricing", "Analytics Dashboards"],
     stat: "10x",
     statLabel: "Faster Launch",
-    image: "/services/saas.png",
+    image: "/services/saas.webp",
   },
   {
     icon: Brain,
@@ -28,7 +28,7 @@ const services = [
     features: ["AI Chatbots", "Predictive Analytics", "Smart Monitoring", "Computer Vision"],
     stat: "40%",
     statLabel: "Cost Reduction",
-    image: "/services/ai.png",
+    image: "/services/ai.webp",
   },
   {
     icon: Globe,
@@ -37,7 +37,7 @@ const services = [
     features: ["Admin Dashboards", "ERP & CRM Platforms", "Multi-Vendor Marketplaces", "API-Driven Architecture"],
     stat: "99.9%",
     statLabel: "Uptime SLA",
-    image: "/services/web.png",
+    image: "/services/web.webp",
   },
   {
     icon: Smartphone,
@@ -46,7 +46,7 @@ const services = [
     features: ["Native iOS/Android", "Flutter Cross-Platform", "GPS & IoT Integration", "Offline-first Architecture"],
     stat: "50+",
     statLabel: "Apps Delivered",
-    image: "/services/mobile.png",
+    image: "/services/mobile.webp",
   },
   {
     icon: Cpu,
@@ -55,7 +55,7 @@ const services = [
     features: ["IoT Architecture", "Embedded Systems", "Hardware Integration", "Real-time Processing"],
     stat: "Zero",
     statLabel: "Latency Focus",
-    image: "/services/firmware.png",
+    image: "/services/firmware.webp",
   },
   {
     icon: Server,
@@ -64,7 +64,7 @@ const services = [
     features: ["AWS / GCP / Azure", "Serverless Architecture", "Secure Auth", "Performance Optimization"],
     stat: "256-bit",
     statLabel: "Encryption",
-    image: "/services/cloud.png",
+    image: "/services/cloud.webp",
   },
 ];
 
@@ -121,7 +121,11 @@ const Services = () => {
                 <img 
                   src={service.image} 
                   alt={service.title} 
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  loading="lazy"
+decoding="async"
+width={600}
+height={192}
+className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent"></div>
                 <div className="absolute bottom-4 right-4 text-right">

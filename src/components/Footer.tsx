@@ -52,7 +52,7 @@ const Footer = () => {
                   className="h-12 w-auto object-contain bg-white rounded-md p-1.5 border border-border shadow-sm transition-transform hover:scale-105"
                 />
                 <div className="h-12 flex items-center gap-2 bg-white rounded-md px-3 border border-border shadow-sm transition-transform hover:scale-105">
-                  <img src="/assets/google-business.png" alt="Google Business" className="h-6 w-6 object-contain shrink-0" />
+                  <img loading="lazy" decoding="async" width={24} height={24} src="/assets/google-business.png" alt="Google Business" className="h-6 w-6 object-contain shrink-0" />
                   <div className="flex flex-col justify-center">
                     <span className="text-[9px] font-bold text-gray-500 uppercase leading-none mb-0.5 tracking-wider">Verified on</span>
                     <span className="text-[11px] font-bold text-gray-900 leading-none">Google Business</span>
